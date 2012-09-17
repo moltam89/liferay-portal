@@ -30,12 +30,12 @@ CKEDITOR.dialog.add(
 				if (CKEDITOR.env.ie) {
 					selection.unlock(true);
 
-					data.address = selection.getNative().createRange().text;
+					data.address = "http://" + selection.getNative().createRange().text;
 
 					selection.lock();
 				}
 				else {
-					data.address = selection.getNative().toString();
+					data.address = "http://" + selection.getNative().toString();
 				}
 			}
 
