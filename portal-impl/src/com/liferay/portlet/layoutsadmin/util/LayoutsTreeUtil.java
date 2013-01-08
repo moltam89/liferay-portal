@@ -15,6 +15,8 @@
 package com.liferay.portlet.layoutsadmin.util;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -31,9 +33,12 @@ import com.liferay.portal.model.LayoutRevision;
 import com.liferay.portal.model.LayoutSetBranch;
 import com.liferay.portal.model.User;
 import com.liferay.portal.model.impl.VirtualLayout;
+import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.LayoutServiceUtil;
 import com.liferay.portal.service.LayoutSetBranchLocalServiceUtil;
+import com.liferay.portal.service.permission.LayoutPermissionUtil;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.SessionClicks;
@@ -155,7 +160,11 @@ public class LayoutsTreeUtil {
 			jsonObject.put("priority", layout.getPriority());
 			jsonObject.put("privateLayout", layout.isPrivateLayout());
 			jsonObject.put("type", layout.getType());
-			jsonObject.put("updateable", SitesUtil.isLayoutUpdateable(layout));
+			jsonObject.put(
+				"updateable",
+				SitesUtil.isLayoutUpdateable(layout) &&
+					checkPermission(themeDisplay, layout));
+
 			jsonObject.put("uuid", layout.getUuid());
 
 			LayoutRevision layoutRevision = LayoutStagingUtil.getLayoutRevision(
@@ -231,6 +240,17 @@ public class LayoutsTreeUtil {
 			paginationJSON);
 
 		return paginationJSONObject.getInt(String.valueOf(layoutId), 0);
+	}
+
+	private static boolean checkPermission(
+			ThemeDisplay themeDisplay, Layout layout)
+		throws PortalException, SystemException {
+	
+		PermissionChecker permissionChecker =
+			themeDisplay.getPermissionChecker();
+	
+		return LayoutPermissionUtil.contains(
+			permissionChecker, layout, ActionKeys.UPDATE);
 	}
 
 }
