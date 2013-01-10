@@ -384,13 +384,6 @@ public class AnnouncementsEntryLocalServiceImpl
 					"usersOrgsTree",
 					ListUtil.fromArray(new Organization[] {organization}));
 			}
-			else if (className.equals(Role.class.getName())) {
-				Role role = rolePersistence.findByPrimaryKey(classPK);
-
-				toName = role.getName();
-
-				params.put("usersRoles", classPK);
-			}
 			else if (className.equals(UserGroup.class.getName())) {
 				UserGroup userGroup = userGroupPersistence.findByPrimaryKey(
 					classPK);
@@ -414,6 +407,13 @@ public class AnnouncementsEntryLocalServiceImpl
 			if (Validator.isNotNull(toAddress)) {
 				users.add(user);
 			}
+		}
+		else if (className.equals(Role.class.getName())) {
+			Role role = rolePersistence.findByPrimaryKey(classPK);
+
+			toName = role.getName();
+
+			users = userLocalService.getUsersByRole(classPK);
 		}
 		else {
 			users = userLocalService.search(
