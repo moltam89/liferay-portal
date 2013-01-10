@@ -1364,6 +1364,88 @@
 				) AND (User_.status = ?)
 		]]>
 	</sql>
+	<sql id="com.liferay.portal.service.persistence.UserFinder.findByRoles">
+		<![CDATA[
+			SELECT
+				{User_.*}
+			FROM
+				User_
+			WHERE
+				(userId IN (
+					SELECT 
+						userId
+					FROM
+						(
+							(
+								SELECT
+									userId, roleId
+								FROM
+									alnatest.Users_Roles
+							)
+							UNION
+							(
+								SELECT
+									userId, roleId
+								FROM
+									alnatest.UserGroupRole
+							)
+							UNION
+							(
+								SELECT
+									userId, roleId
+								FROM
+									Users_UserGroups
+								INNER JOIN
+									UserGroupGroupRole ON
+										(UserGroupGroupRole.userGroupId = Users_UserGroups.userGroupId)
+							)
+							UNION
+							(
+								SELECT
+									userId, roleId
+								FROM
+									Users_UserGroups
+								INNER JOIN
+									Group_ ON
+										(Group_.classPK = Users_UserGroups.userGroupId)
+								INNER JOIN
+									Groups_Roles ON
+										(Groups_Roles.groupId = Group_.groupId)
+							)
+							UNION
+							(
+								SELECT
+									userId, roleId
+								FROM
+									Users_Orgs
+								INNER JOIN
+									Group_ ON
+										(Group_.classPK = Users_Orgs.organizationId)
+								INNER JOIN
+									Groups_Roles ON
+										(Groups_Roles.groupId = Group_.groupId)
+							)
+							UNION
+							(
+								SELECT
+									userId, roleId
+								FROM
+									Users_Groups
+								INNER JOIN
+									Group_ ON
+										(Group_.classPK = Users_Groups.groupId)
+								INNER JOIN
+									Groups_Roles ON
+										(Groups_Roles.groupId = Group_.groupId)
+							)
+						)
+							AllUsersRoles
+					WHERE
+						(AllUsersRoles.roleId = ?)
+					)
+				)
+		]]>
+	</sql>
 	<sql id="com.liferay.portal.service.persistence.UserFinder.joinByContactTwitterSN">
 		<![CDATA[
 			INNER JOIN

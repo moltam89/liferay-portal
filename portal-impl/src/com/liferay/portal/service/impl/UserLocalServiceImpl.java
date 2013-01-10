@@ -2812,6 +2812,18 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	}
 
 	/**
+	 * Returns all the users who have the specified role directly or indirectly
+	 * through membership in sites, organizations or user groups.
+	 *
+	 * @param  roleId the primary key of the role
+	 * @return the users have the role
+	 * @throws SystemException if a system exception occurred
+	 */
+	public List<User> getUsersByRole(long roleId) throws SystemException {
+		return userFinder.findByRoles(roleId);
+	}
+
+	/**
 	 * Returns <code>true</code> if the user is a member of the group.
 	 *
 	 * @param  groupId the primary key of the group
