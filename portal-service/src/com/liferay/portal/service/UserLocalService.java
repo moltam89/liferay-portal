@@ -1564,6 +1564,18 @@ public interface UserLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
+	* Returns all the users who have the specified role directly or indirectly
+	* through membership in sites, organizations or user groups.
+	*
+	* @param roleId the primary key of the role
+	* @return the users have the role
+	* @throws SystemException if a system exception occurred
+	*/
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public java.util.List<com.liferay.portal.model.User> getUsersByRole(
+		long roleId) throws com.liferay.portal.kernel.exception.SystemException;
+
+	/**
 	* Returns <code>true</code> if the user is a member of the group.
 	*
 	* @param groupId the primary key of the group
