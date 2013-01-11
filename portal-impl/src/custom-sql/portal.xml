@@ -1380,16 +1380,16 @@
 								SELECT
 									userId, roleId
 								FROM
-									alnatest.Users_Roles
+									Users_Roles
 							)
-							UNION
+							UNION ALL
 							(
 								SELECT
 									userId, roleId
 								FROM
-									alnatest.UserGroupRole
+									UserGroupRole
 							)
-							UNION
+							UNION ALL
 							(
 								SELECT
 									userId, roleId
@@ -1399,7 +1399,7 @@
 									UserGroupGroupRole ON
 										(UserGroupGroupRole.userGroupId = Users_UserGroups.userGroupId)
 							)
-							UNION
+							UNION ALL
 							(
 								SELECT
 									userId, roleId
@@ -1412,7 +1412,7 @@
 									Groups_Roles ON
 										(Groups_Roles.groupId = Group_.groupId)
 							)
-							UNION
+							UNION ALL
 							(
 								SELECT
 									userId, roleId
@@ -1425,7 +1425,7 @@
 									Groups_Roles ON
 										(Groups_Roles.groupId = Group_.groupId)
 							)
-							UNION
+							UNION ALL
 							(
 								SELECT
 									userId, roleId
