@@ -341,11 +341,12 @@ public class DDMImpl implements DDM {
 			try {
 				String fileName = uploadRequest.getFileName(fieldNameValue);
 
-				inputStream = uploadRequest.getFileAsStream(fieldName, true);
+				inputStream = uploadRequest.getFileAsStream(
+					fieldNameValue, true);
 
 				if (inputStream != null) {
 					String filePath = storeFieldFile(
-						baseModel, fieldName, inputStream, serviceContext);
+						baseModel, fieldNameValue, inputStream, serviceContext);
 
 					JSONObject recordFileJSONObject =
 						JSONFactoryUtil.createJSONObject();
