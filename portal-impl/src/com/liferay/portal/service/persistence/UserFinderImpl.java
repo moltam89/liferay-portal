@@ -68,6 +68,9 @@ public class UserFinderImpl
 
 	public static final String FIND_BY_NO_GROUPS =
 		UserFinder.class.getName() + ".findByNoGroups";
+	
+	public static final String FIND_BY_ROLES =
+		UserFinder.class.getName() + ".findByRoles";
 
 	public static final String FIND_BY_C_FN_MN_LN_SN_EA_S =
 		UserFinder.class.getName() + ".findByC_FN_MN_LN_SN_EA_S";
@@ -397,6 +400,32 @@ public class UserFinderImpl
 			SQLQuery q = session.createSQLQuery(sql);
 
 			q.addEntity("User_", UserImpl.class);
+
+			return q.list(true);
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	public List<User> findByRoles(long roleId) throws SystemException {
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			String sql = CustomSQLUtil.get(FIND_BY_ROLES);
+
+			SQLQuery q = session.createSQLQuery(sql);
+
+			q.addEntity("User_", UserImpl.class);
+
+			QueryPos qPos = QueryPos.getInstance(q);
+
+			qPos.add(roleId);
 
 			return q.list(true);
 		}
