@@ -17,6 +17,7 @@ package com.liferay.portlet.assetpublisher.action;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Http;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -146,8 +147,21 @@ public class RSSAction extends com.liferay.portal.struts.RSSAction {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		AssetEntryQuery assetEntryQuery = AssetPublisherUtil.getAssetEntryQuery(
-			preferences, new long[] {themeDisplay.getScopeGroupId()});
+		long scopeGroupId = themeDisplay.getScopeGroupId();
+
+		long[] groupIds = AssetPublisherUtil.getGroupIds(
+			preferences, scopeGroupId, themeDisplay.getLayout());
+
+		AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
+
+		if (!ArrayUtil.contains(groupIds, scopeGroupId)) {
+			assetEntryQuery = AssetPublisherUtil.getAssetEntryQuery(
+				preferences, ArrayUtil.append(groupIds, scopeGroupId));
+		}
+		else {
+			assetEntryQuery = AssetPublisherUtil.getAssetEntryQuery(
+				preferences, groupIds);
+		}
 
 		boolean anyAssetType = GetterUtil.getBoolean(
 			preferences.getValue("anyAssetType", null), true);
@@ -181,10 +195,6 @@ public class RSSAction extends com.liferay.portal.struts.RSSAction {
 			preferences.getValue("excludeZeroViewCount", null));
 
 		assetEntryQuery.setExcludeZeroViewCount(excludeZeroViewCount);
-
-		long[] groupIds = AssetPublisherUtil.getGroupIds(
-			preferences, themeDisplay.getScopeGroupId(),
-			themeDisplay.getLayout());
 
 		assetEntryQuery.setGroupIds(groupIds);
 
