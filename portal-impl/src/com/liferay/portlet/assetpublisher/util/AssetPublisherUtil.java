@@ -15,6 +15,8 @@
 package com.liferay.portlet.assetpublisher.util;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -208,15 +210,10 @@ public class AssetPublisherUtil {
 
 		AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
 
-		long[] allAssetCategoryIds = new long[0];
-		long[] anyAssetCategoryIds = new long[0];
-		long[] notAllAssetCategoryIds = new long[0];
-		long[] notAnyAssetCategoryIds = new long[0];
-
 		String[] allAssetTagNames = new String[0];
-		String[] anyAssetTagNames = new String[0];
+		String[][] anyAssetTagNames = new String[0][];
 		String[] notAllAssetTagNames = new String[0];
-		String[] notAnyAssetTagNames = new String[0];
+		String[][] notAnyAssetTagNames = new String[0][];
 
 		for (int i = 0; true; i++) {
 			String[] queryValues = portletPreferences.getValues(
@@ -241,35 +238,37 @@ public class AssetPublisherUtil {
 				if (queryContains &&
 					(queryAndOperator || (assetCategoryIds.length == 1))) {
 
-					allAssetCategoryIds = assetCategoryIds;
+					assetEntryQuery.addAllCategoryIds(assetCategoryIds);
 				}
 				else if (queryContains && !queryAndOperator) {
-					anyAssetCategoryIds = assetCategoryIds;
+					assetEntryQuery.addAnyCategoryIdsArray(assetCategoryIds);
 				}
 				else if (!queryContains && queryAndOperator) {
-					notAllAssetCategoryIds = assetCategoryIds;
+					assetEntryQuery.addNotAllCategoryIds(assetCategoryIds);
 				}
 				else {
-					notAnyAssetCategoryIds = assetCategoryIds;
+					assetEntryQuery.addNotAnyCategoryIdsArray(assetCategoryIds);
 				}
 			}
 			else {
 				if (queryContains && queryAndOperator) {
-					allAssetTagNames = queryValues;
+					allAssetTagNames = ArrayUtil.append(
+						allAssetTagNames, queryValues);
 				}
 				else if (queryContains && !queryAndOperator) {
-					anyAssetTagNames = queryValues;
+					anyAssetTagNames = ArrayUtil.append(
+						anyAssetTagNames, queryValues);
 				}
 				else if (!queryContains && queryAndOperator) {
-					notAllAssetTagNames = queryValues;
+					notAllAssetTagNames = ArrayUtil.append(
+						notAllAssetTagNames, queryValues);
 				}
 				else {
-					notAnyAssetTagNames = queryValues;
+					notAnyAssetTagNames = ArrayUtil.append(
+						notAnyAssetTagNames, queryValues);
 				}
 			}
 		}
-
-		assetEntryQuery.setAllCategoryIds(allAssetCategoryIds);
 
 		for (String assetTagName : allAssetTagNames) {
 			long[] allAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
@@ -278,14 +277,12 @@ public class AssetPublisherUtil {
 			assetEntryQuery.addAllTagIdsArray(allAssetTagIds);
 		}
 
-		assetEntryQuery.setAnyCategoryIds(anyAssetCategoryIds);
+		for (String[] it : anyAssetTagNames) {
+			long[] anyAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
+				scopeGroupIds, it);
 
-		long[] anyAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
-			scopeGroupIds, anyAssetTagNames);
-
-		assetEntryQuery.setAnyTagIds(anyAssetTagIds);
-
-		assetEntryQuery.setNotAllCategoryIds(notAllAssetCategoryIds);
+			assetEntryQuery.addAnyTagIdsArray(anyAssetTagIds);
+		}
 
 		for (String assetTagName : notAllAssetTagNames) {
 			long[] notAllAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
@@ -294,12 +291,10 @@ public class AssetPublisherUtil {
 			assetEntryQuery.addNotAllTagIdsArray(notAllAssetTagIds);
 		}
 
-		assetEntryQuery.setNotAnyCategoryIds(notAnyAssetCategoryIds);
-
-		long[] notAnyAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
-			scopeGroupIds, notAnyAssetTagNames);
-
-		assetEntryQuery.setNotAnyTagIds(notAnyAssetTagIds);
+		for (String[] it : notAnyAssetTagNames) {
+			assetEntryQuery.addNotAnyTagIdsArray(
+				_getAssetTagIds(scopeGroupIds, it));
+		}
 
 		return assetEntryQuery;
 	}
@@ -568,6 +563,21 @@ public class AssetPublisherUtil {
 		}
 
 		return xml;
+	}
+
+	private static long[][] _getAssetTagIds(
+			long[] scopeGroupIds, String[] assetTagNames)
+		throws PortalException, SystemException {
+
+		long[][] result = new long[assetTagNames.length][];
+
+		for (int i = 0; i < assetTagNames.length; i++) {
+			result[i] =
+				AssetTagLocalServiceUtil.getTagIds(
+					scopeGroupIds, assetTagNames[i]);
+		}
+
+		return result;
 	}
 
 	private static long _getGroupId(
