@@ -390,6 +390,18 @@ public class AnnouncementsEntryLocalServiceImpl
 				toName = role.getName();
 
 				params.put("usersRoles", classPK);
+
+				List<Group> groups = rolePersistence.getGroups(classPK);
+
+				for (Group group : groups) {
+					AnnouncementsEntry tempEntry =
+						(AnnouncementsEntry)entry.clone();
+
+					tempEntry.setClassPK(group.getClassPK());
+					tempEntry.setClassNameId(group.getClassNameId());
+
+					notifyUsers(tempEntry);
+				}
 			}
 			else if (className.equals(UserGroup.class.getName())) {
 				UserGroup userGroup = userGroupPersistence.findByPrimaryKey(
