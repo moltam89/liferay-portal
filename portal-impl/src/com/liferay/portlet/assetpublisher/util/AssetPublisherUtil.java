@@ -15,6 +15,8 @@
 package com.liferay.portlet.assetpublisher.util;
 
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -208,14 +210,9 @@ public class AssetPublisherUtil {
 
 		AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
 
-		long[] allAssetCategoryIds = new long[0];
-		long[] anyAssetCategoryIds = new long[0];
-		long[] notAllAssetCategoryIds = new long[0];
-		long[] notAnyAssetCategoryIds = new long[0];
-
 		String[] allAssetTagNames = new String[0];
-		String[] anyAssetTagNames = new String[0];
-		String[] notAllAssetTagNames = new String[0];
+		String[][] anyAssetTagNames = new String[0][];
+		String[][] notAllAssetTagNames = new String[0][];
 		String[] notAnyAssetTagNames = new String[0];
 
 		for (int i = 0; true; i++) {
@@ -241,35 +238,37 @@ public class AssetPublisherUtil {
 				if (queryContains &&
 					(queryAndOperator || (assetCategoryIds.length == 1))) {
 
-					allAssetCategoryIds = assetCategoryIds;
+					assetEntryQuery.addAllCategoryIds(assetCategoryIds);
 				}
 				else if (queryContains && !queryAndOperator) {
-					anyAssetCategoryIds = assetCategoryIds;
+					assetEntryQuery.addAnyCategoryIdsArray(assetCategoryIds);
 				}
 				else if (!queryContains && queryAndOperator) {
-					notAllAssetCategoryIds = assetCategoryIds;
+					assetEntryQuery.addNotAllCategoryIdsArray(assetCategoryIds);
 				}
 				else {
-					notAnyAssetCategoryIds = assetCategoryIds;
+					assetEntryQuery.addNotAnyCategoryIds(assetCategoryIds);
 				}
 			}
 			else {
 				if (queryContains && queryAndOperator) {
-					allAssetTagNames = queryValues;
+					allAssetTagNames = ArrayUtil.append(
+						allAssetTagNames, queryValues);
 				}
 				else if (queryContains && !queryAndOperator) {
-					anyAssetTagNames = queryValues;
+					anyAssetTagNames = ArrayUtil.append(
+						anyAssetTagNames, queryValues);
 				}
 				else if (!queryContains && queryAndOperator) {
-					notAllAssetTagNames = queryValues;
+					notAllAssetTagNames = ArrayUtil.append(
+						notAllAssetTagNames, queryValues);
 				}
 				else {
-					notAnyAssetTagNames = queryValues;
+					notAnyAssetTagNames = ArrayUtil.append(
+						notAnyAssetTagNames, queryValues);
 				}
 			}
 		}
-
-		assetEntryQuery.setAllCategoryIds(allAssetCategoryIds);
 
 		for (String assetTagName : allAssetTagNames) {
 			long[] allAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
@@ -278,28 +277,24 @@ public class AssetPublisherUtil {
 			assetEntryQuery.addAllTagIdsArray(allAssetTagIds);
 		}
 
-		assetEntryQuery.setAnyCategoryIds(anyAssetCategoryIds);
+		for (String[] it : anyAssetTagNames) {
+			long[] anyAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
+				scopeGroupIds, it);
 
-		long[] anyAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
-			scopeGroupIds, anyAssetTagNames);
-
-		assetEntryQuery.setAnyTagIds(anyAssetTagIds);
-
-		assetEntryQuery.setNotAllCategoryIds(notAllAssetCategoryIds);
-
-		for (String assetTagName : notAllAssetTagNames) {
-			long[] notAllAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
-				scopeGroupIds, assetTagName);
-
-			assetEntryQuery.addNotAllTagIdsArray(notAllAssetTagIds);
+			assetEntryQuery.addAnyTagIdsArray(anyAssetTagIds);
 		}
 
-		assetEntryQuery.setNotAnyCategoryIds(notAnyAssetCategoryIds);
+		for (String assetTagName : notAnyAssetTagNames) {
+			long[] notAnyAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
+				scopeGroupIds, assetTagName);
 
-		long[] notAnyAssetTagIds = AssetTagLocalServiceUtil.getTagIds(
-			scopeGroupIds, notAnyAssetTagNames);
+			assetEntryQuery.addNotAnyTagIds(notAnyAssetTagIds);
+		}
 
-		assetEntryQuery.setNotAnyTagIds(notAnyAssetTagIds);
+		for (String[] it : notAllAssetTagNames) {
+			assetEntryQuery.addNotAllTagIdsArray(
+				_getAssetTagIds(scopeGroupIds, it));
+		}
 
 		return assetEntryQuery;
 	}
@@ -570,6 +565,21 @@ public class AssetPublisherUtil {
 		return xml;
 	}
 
+	private static long[][] _getAssetTagIds(
+			long[] scopeGroupIds, String[] assetTagNames)
+		throws PortalException, SystemException {
+
+		long[][] result = new long[assetTagNames.length][];
+
+		for (int i = 0; i < assetTagNames.length; i++) {
+			result[i] =
+				AssetTagLocalServiceUtil.getTagIds(
+					scopeGroupIds, assetTagNames[i]);
+		}
+
+		return result;
+	}
+
 	private static long _getGroupId(
 			String scopeId, long scopeGroupId, boolean privateLayout)
 		throws Exception {
@@ -629,5 +639,7 @@ public class AssetPublisherUtil {
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(AssetPublisherUtil.class);
+
+	private String[] notAllAssetTagNames;
 
 }
