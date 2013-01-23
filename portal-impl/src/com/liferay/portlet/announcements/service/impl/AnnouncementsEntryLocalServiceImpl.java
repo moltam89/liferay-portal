@@ -397,8 +397,8 @@ public class AnnouncementsEntryLocalServiceImpl
 					AnnouncementsEntry tempEntry =
 						(AnnouncementsEntry)entry.clone();
 
-					tempEntry.setClassPK(group.getClassPK());
 					tempEntry.setClassNameId(group.getClassNameId());
+					tempEntry.setClassPK(group.getClassPK());
 
 					notifyUsers(tempEntry);
 				}
