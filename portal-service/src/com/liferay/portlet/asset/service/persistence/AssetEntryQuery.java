@@ -23,6 +23,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -33,8 +34,8 @@ import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetTagLocalServiceUtil;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.portlet.PortletRequest;
@@ -77,9 +78,12 @@ public class AssetEntryQuery {
 
 	public AssetEntryQuery(AssetEntryQuery assetEntryQuery) {
 		setAllCategoryIds(assetEntryQuery.getAllCategoryIds());
+		setAllTagIds(assetEntryQuery.getAllTagIds());
 		setAllTagIdsArray(assetEntryQuery.getAllTagIdsArray());
 		setAnyCategoryIds(assetEntryQuery.getAnyCategoryIds());
+		setAnyCategoryIdsArray(assetEntryQuery.getAnyCategoryIdsArray());
 		setAnyTagIds(assetEntryQuery.getAnyTagIds());
+		setAnyTagIdsArray(assetEntryQuery.getAnyTagIdsArray());
 		setClassNameIds(assetEntryQuery.getClassNameIds());
 		setClassTypeIds(assetEntryQuery.getClassTypeIds());
 		setEnablePermissions(assetEntryQuery.isEnablePermissions());
@@ -90,9 +94,12 @@ public class AssetEntryQuery {
 		setLayout(assetEntryQuery.getLayout());
 		setLinkedAssetEntryId(assetEntryQuery.getLinkedAssetEntryId());
 		setNotAllCategoryIds(assetEntryQuery.getNotAllCategoryIds());
+		setNotAnyTagIds(assetEntryQuery.getNotAnyTagIds());
 		setNotAllTagIdsArray(assetEntryQuery.getNotAllTagIdsArray());
 		setNotAnyCategoryIds(assetEntryQuery.getNotAnyCategoryIds());
+		setNotAllCategoryIdsArray(assetEntryQuery.getNotAllCategoryIdsArray());
 		setNotAnyTagIds(assetEntryQuery.getNotAnyTagIds());
+		setNotAllTagIdsList(assetEntryQuery.getNotAllTagIdsList());
 		setOrderByCol1(assetEntryQuery.getOrderByCol1());
 		setOrderByCol2(assetEntryQuery.getOrderByCol2());
 		setOrderByType1(assetEntryQuery.getOrderByType1());
@@ -147,25 +154,73 @@ public class AssetEntryQuery {
 			new long[] {PortalUtil.getClassNameId(className)}, searchContainer);
 	}
 
+	public void addAllCategoryIds(long[] allCategoryIds) {
+		if (allCategoryIds.length == 0) {
+			return;
+		}
+
+		setAllCategoryIds(ArrayUtil.append(_allCategoryIds, allCategoryIds));
+	}
+
 	public void addAllTagIdsArray(long[] allTagsIds) {
 		if (allTagsIds.length == 0) {
 			return;
 		}
 
-		_allTagIdsArray = ArrayUtil.append(_allTagIdsArray, allTagsIds);
-
-		_allTagIds = _flattenTagIds(_allTagIdsArray);
+		setAllTagIdsArray(ArrayUtil.append(_allTagIdsArray, allTagsIds));
 	}
 
-	public void addNotAllTagIdsArray(long[] notAllTagsIds) {
-		if (notAllTagsIds.length == 0) {
+	public void addAnyCategoryIdsArray(long[] anyCategoryIds) {
+		if (anyCategoryIds.length == 0) {
 			return;
 		}
 
-		_notAllTagIdsArray = ArrayUtil.append(
-			_notAllTagIdsArray, notAllTagsIds);
+		setAnyCategoryIdsArray(
+			ArrayUtil.append(_anyCategoryIdsArray, anyCategoryIds));
+	}
 
-		_notAllTagIds = _flattenTagIds(_notAllTagIdsArray);
+	public void addAnyTagIdsArray(long[] anyTagIds) {
+		if (anyTagIds.length == 0) {
+			return;
+		}
+
+		setAnyTagIdsArray(ArrayUtil.append(_anyTagIdsArray, anyTagIds));
+	}
+
+	public void addNotAllCategoryIdsArray(long[] notAllCategoryIds) {
+		if (notAllCategoryIds.length == 0) {
+			return;
+		}
+
+		setNotAllCategoryIdsArray(
+			ArrayUtil.append(_notAllCategoryIdsArray, notAllCategoryIds));
+	}
+
+	public void addNotAllTagIdsArray(long[][] notAllTagIds) {
+		if (notAllTagIds.length == 0) {
+			return;
+		}
+
+		_notAllTagIdsList.add(notAllTagIds);
+
+		_toString = null;
+	}
+
+	public void addNotAnyCategoryIds(long[] notAnyCategoryIds) {
+		if (notAnyCategoryIds.length == 0) {
+			return;
+		}
+
+		setNotAnyCategoryIds(
+			ArrayUtil.append(_notAnyCategoryIds, notAnyCategoryIds));
+	}
+
+	public void addNotAnyTagIds(long[] notAnyTagIds) {
+		if (notAnyTagIds.length == 0) {
+			return;
+		}
+
+		setNotAnyTagIds(ArrayUtil.append(_notAnyTagIds, notAnyTagIds));
 	}
 
 	public long[] getAllCategoryIds() {
@@ -176,6 +231,7 @@ public class AssetEntryQuery {
 		return _getLeftAndRightCategoryIds(_allCategoryIds);
 	}
 
+	@Deprecated
 	public long[] getAllTagIds() {
 		return _allTagIds;
 	}
@@ -184,16 +240,26 @@ public class AssetEntryQuery {
 		return _allTagIdsArray;
 	}
 
+	@Deprecated
 	public long[] getAnyCategoryIds() {
 		return _anyCategoryIds;
+	}
+
+	public long[][] getAnyCategoryIdsArray() {
+		return _anyCategoryIdsArray;
 	}
 
 	public long[] getAnyLeftAndRightCategoryIds() {
 		return _getLeftAndRightCategoryIds(_anyCategoryIds);
 	}
 
+	@Deprecated
 	public long[] getAnyTagIds() {
 		return _anyTagIds;
+	}
+
+	public long[][] getAnyTagIdsArray() {
+		return _anyTagIdsArray;
 	}
 
 	public long[] getClassNameIds() {
@@ -224,20 +290,32 @@ public class AssetEntryQuery {
 		return _linkedAssetEntryId;
 	}
 
+	@Deprecated
 	public long[] getNotAllCategoryIds() {
 		return _notAllCategoryIds;
 	}
 
+	public long[][] getNotAllCategoryIdsArray() {
+		return _notAllCategoryIdsArray;
+	}
+
+	@Deprecated
 	public long[] getNotAllLeftAndRightCategoryIds() {
 		return _getLeftAndRightCategoryIds(_notAllCategoryIds);
 	}
 
+	@Deprecated
 	public long[] getNotAllTagIds() {
 		return _notAllTagIds;
 	}
 
+	@Deprecated
 	public long[][] getNotAllTagIdsArray() {
 		return _notAllTagIdsArray;
+	}
+
+	public List<long[][]> getNotAllTagIdsList() {
+		return _notAllTagIdsList;
 	}
 
 	public long[] getNotAnyCategoryIds() {
@@ -294,6 +372,7 @@ public class AssetEntryQuery {
 		_toString = null;
 	}
 
+	@Deprecated
 	public void setAllTagIds(long[] allTagIds) {
 		_allTagIds = allTagIds;
 
@@ -310,14 +389,28 @@ public class AssetEntryQuery {
 		_toString = null;
 	}
 
+	@Deprecated
 	public void setAnyCategoryIds(long[] anyCategoryIds) {
 		_anyCategoryIds = anyCategoryIds;
 
 		_toString = null;
 	}
 
+	public void setAnyCategoryIdsArray(long[][] anyCategoryIdsArray) {
+		_anyCategoryIdsArray = anyCategoryIdsArray;
+
+		_toString = null;
+	}
+
+	@Deprecated
 	public void setAnyTagIds(long[] anyTagIds) {
 		_anyTagIds = anyTagIds;
+
+		_toString = null;
+	}
+
+	public void setAnyTagIdsArray(long[][] anyTagIdsArray) {
+		_anyTagIdsArray = anyTagIdsArray;
 
 		_toString = null;
 	}
@@ -388,6 +481,13 @@ public class AssetEntryQuery {
 		_toString = null;
 	}
 
+	public void setNotAllCategoryIdsArray(long[][] notAllCategoryIdsArray) {
+		_notAllCategoryIdsArray = notAllCategoryIdsArray;
+
+		_toString = null;
+	}
+
+	@Deprecated
 	public void setNotAllTagIds(long[] notAllTagIds) {
 		_notAllTagIds = notAllTagIds;
 
@@ -396,10 +496,17 @@ public class AssetEntryQuery {
 		_toString = null;
 	}
 
+	@Deprecated
 	public void setNotAllTagIdsArray(long[][] notAllTagIdsArray) {
 		_notAllTagIdsArray = notAllTagIdsArray;
 
 		_notAllTagIds = _flattenTagIds(notAllTagIdsArray);
+
+		_toString = null;
+	}
+
+	public void setNotAllTagIdsList(List<long[][]> notAllTagIdsList) {
+		_notAllTagIdsList = notAllTagIdsList;
 
 		_toString = null;
 	}
@@ -464,7 +571,7 @@ public class AssetEntryQuery {
 			return _toString;
 		}
 
-		StringBundler sb = new StringBundler(47);
+		StringBundler sb = new StringBundler(55);
 
 		sb.append("{allCategoryIds=");
 		sb.append(StringUtil.merge(_allCategoryIds));
@@ -472,8 +579,12 @@ public class AssetEntryQuery {
 		sb.append(StringUtil.merge(_allTagIds));
 		sb.append(", anyCategoryIds=");
 		sb.append(StringUtil.merge(_anyCategoryIds));
+		sb.append(", anyCategoryIdsArray=");
+		sb.append(_2DArrayToString(_anyCategoryIdsArray));
 		sb.append(", anyTagIds=");
 		sb.append(StringUtil.merge(_anyTagIds));
+		sb.append(", anyTagIdsArray=");
+		sb.append(_2DArrayToString(_anyTagIdsArray));
 		sb.append(", classNameIds=");
 		sb.append(StringUtil.merge(_classNameIds));
 		sb.append(", classTypeIds=");
@@ -496,12 +607,17 @@ public class AssetEntryQuery {
 		sb.append(_linkedAssetEntryId);
 		sb.append(", notAllCategoryIds=");
 		sb.append(StringUtil.merge(_notAllCategoryIds));
+		sb.append(", notAllCategoryIdsArray=");
+		sb.append(_2DArrayToString(_notAllCategoryIdsArray));
 		sb.append(", notAllTagIds=");
 		sb.append(StringUtil.merge(_notAllTagIds));
+		sb.append(", notAllTagIdsList=");
+		sb.append(_tagIdsListToString(_notAllTagIdsList));
 		sb.append(", notAnyCategoryIds=");
 		sb.append(StringUtil.merge(_notAnyCategoryIds));
 		sb.append(", notAnyTagIds=");
 		sb.append(StringUtil.merge(_notAnyTagIds));
+
 		sb.append(", orderByCol1=");
 		sb.append(_orderByCol1);
 		sb.append(", orderByCol2=");
@@ -523,6 +639,17 @@ public class AssetEntryQuery {
 		return _toString;
 	}
 
+	private String _2DArrayToString(long[][] array) {
+		StringBundler sb = new StringBundler(array.length * 2);
+
+		for (long[] it : array) {
+			sb.append(StringUtil.merge(it));
+			sb.append(StringPool.SEMICOLON);
+		}
+
+		return sb.toString();
+	}
+
 	private long[][] _expandTagIds(long[] tagIds) {
 		long[][] tagIdsArray = new long[tagIds.length][1];
 
@@ -534,7 +661,7 @@ public class AssetEntryQuery {
 	}
 
 	private long[] _flattenTagIds(long[][] tagIdsArray) {
-		List<Long> tagIdsList = new ArrayList<Long>();
+		List<Long> tagIdsList = new LinkedList<Long>();
 
 		for (int i = 0; i < tagIdsArray.length; i++) {
 			long[] tagIds = tagIdsArray[i];
@@ -572,13 +699,26 @@ public class AssetEntryQuery {
 		return leftRightIds;
 	}
 
+	private String _tagIdsListToString(List<long[][]> tagIdsList) {
+		StringBundler sb = new StringBundler(tagIdsList.size() * 2);
+
+		for (long[][] it : tagIdsList) {
+			sb.append(_2DArrayToString(it));
+			sb.append(StringPool.NEW_LINE);
+		}
+
+		return sb.toString();
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(AssetEntryQuery.class);
 
 	private long[] _allCategoryIds = new long[0];
 	private long[] _allTagIds = new long[0];
 	private long[][] _allTagIdsArray = new long[0][];
 	private long[] _anyCategoryIds = new long[0];
+	private long[][] _anyCategoryIdsArray = new long[0][];
 	private long[] _anyTagIds = new long[0];
+	private long[][] _anyTagIdsArray = new long[0][];
 	private long[] _classNameIds = new long[0];
 	private long[] _classTypeIds = new long[0];
 	private boolean _enablePermissions;
@@ -589,8 +729,10 @@ public class AssetEntryQuery {
 	private Layout _layout;
 	private long _linkedAssetEntryId = 0;
 	private long[] _notAllCategoryIds = new long[0];
+	private long[][] _notAllCategoryIdsArray = new long[0][];
 	private long[] _notAllTagIds = new long[0];
 	private long[][] _notAllTagIdsArray = new long[0][];
+	private List<long[][]> _notAllTagIdsList = new LinkedList<long[][]>();
 	private long[] _notAnyCategoryIds = new long[0];
 	private long[] _notAnyTagIds = new long[0];
 	private String _orderByCol1;
