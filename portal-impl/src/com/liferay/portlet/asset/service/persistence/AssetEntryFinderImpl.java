@@ -54,7 +54,7 @@ public class AssetEntryFinderImpl
 		AssetEntryFinder.class.getName() + ".findByAndTagIds";
 
 	public static final String FIND_BY_ANY_TAG_IDS =
-			AssetEntryFinder.class.getName() + ".findByAnyTagIds";
+		AssetEntryFinder.class.getName() + ".findByAnyTagIds";
 
 	public int countEntries(AssetEntryQuery entryQuery) throws SystemException {
 		Session session = null;
@@ -168,7 +168,7 @@ public class AssetEntryFinderImpl
 	}
 
 	protected void buildAnyCategoriesSQL(long[][] categoryIds, StringBundler sb)
-					throws SystemException {
+		throws SystemException {
 
 		for (long[] it : categoryIds) {
 			buildAnyCategoriesSQLFragment(it, sb);
@@ -205,7 +205,7 @@ public class AssetEntryFinderImpl
 	}
 
 	protected void buildAnyTagsSQL(long[][] tagIds, StringBundler sb)
-					throws SystemException {
+		throws SystemException {
 
 		String sql = CustomSQLUtil.get(FIND_BY_ANY_TAG_IDS);
 

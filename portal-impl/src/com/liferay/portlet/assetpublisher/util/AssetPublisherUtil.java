@@ -721,6 +721,4 @@ public class AssetPublisherUtil {
 
 	private static Log _log = LogFactoryUtil.getLog(AssetPublisherUtil.class);
 
-	private String[] notAllAssetTagNames;
-
 }
