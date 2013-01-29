@@ -208,6 +208,17 @@ public class JournalPortletDataHandlerImpl extends BasePortletDataHandler {
 				dlRepositoryEntriesElement, ddmTemplatePath, ddmTemplate);
 		}
 
+		String smallImageURL = article.getSmallImageURL();
+
+		if (Validator.isNotNull(smallImageURL)) {
+			smallImageURL = DDMPortletDataHandlerImpl.exportReferencedContent(
+				portletDataContext, dlFileEntryTypesElement, dlFoldersElement,
+				dlFileEntriesElement, dlFileRanksElement, dlRepositoriesElement,
+				dlRepositoryEntriesElement, articleElement, smallImageURL);
+
+			article.setSmallImageURL(smallImageURL);
+		}
+
 		Image smallImage = ImageUtil.fetchByPrimaryKey(
 			article.getSmallImageId());
 
@@ -583,6 +594,15 @@ public class JournalPortletDataHandlerImpl extends BasePortletDataHandler {
 			}
 
 			parentDDMTemplateKey = existingDDMTemplate.getTemplateKey();
+		}
+
+		String smallImageURL = article.getSmallImageURL();
+
+		if (Validator.isNotNull(smallImageURL)) {
+			smallImageURL = importReferencedContent(
+				portletDataContext, articleElement, smallImageURL);
+
+			article.setSmallImageURL(smallImageURL);
 		}
 
 		File smallFile = null;
