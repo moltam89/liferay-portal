@@ -248,6 +248,8 @@ boolean advancedSearch = ParamUtil.getBoolean(liferayPortletRequest, ArticleDisp
 
 						emptySearchResults = searchResults.isEmpty();
 
+						int resultsSize = searchResults.size();
+
 						for (int i = 0; i < searchResults.size(); i++) {
 							SearchResult searchResult = searchResults.get(i);
 
@@ -263,6 +265,20 @@ boolean advancedSearch = ParamUtil.getBoolean(liferayPortletRequest, ArticleDisp
 							}
 							else if (className.equals(JournalFolder.class.getName())) {
 								curFolder = JournalFolderLocalServiceUtil.getFolder(searchResult.getClassPK());
+							}
+
+							if (Validator.isNotNull(searchTerms.getStatusCode()) && Validator.isNotNull(article)) {
+								double latestVersion = JournalArticleLocalServiceUtil.getLatestVersion(article.getGroupId(), article.getArticleId());
+
+								if (latestVersion > article.getVersion()) {
+									resultsSize--;
+
+									if (resultsSize == 0) {
+										emptySearchResults = true;
+									}
+
+									continue;
+								}
 							}
 						%>
 
@@ -359,11 +375,29 @@ boolean advancedSearch = ParamUtil.getBoolean(liferayPortletRequest, ArticleDisp
 
 						String[] queryTerms = StringUtil.split(keywords);
 
+						int resultsSize = results.size();
+
 						for (int i = 0; i < results.size(); i++) {
 							Object result = results.get(i);
 						%>
 
 							<%@ include file="/html/portlet/journal/cast_result.jspf" %>
+
+							<%
+							if (Validator.isNotNull(searchTerms.getStatusCode()) && Validator.isNotNull(curArticle)) {
+								double latestVersion = JournalArticleLocalServiceUtil.getLatestVersion(curArticle.getGroupId(), curArticle.getArticleId());
+
+								if (latestVersion > curArticle.getVersion()) {
+									resultsSize--;
+
+									if (resultsSize == 0) {
+										emptySearchResults = true;
+									}
+
+									continue;
+								}
+							}
+							%>
 
 							<c:choose>
 								<c:when test="<%= (curArticle != null) && JournalArticlePermission.contains(permissionChecker, curArticle, ActionKeys.VIEW) %>">
