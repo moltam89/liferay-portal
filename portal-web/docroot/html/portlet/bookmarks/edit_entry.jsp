@@ -148,6 +148,15 @@ long folderId = BeanParamUtil.getLong(entry, request, "folderId");
 </aui:form>
 
 <aui:script>
+	function <portlet:namespace />getSuggestionsContent() {
+		var content = '';
+
+		content += document.<portlet:namespace />fm.<portlet:namespace />name.value + ' ';
+		content += document.<portlet:namespace />fm.<portlet:namespace />description.value;
+
+		return content;
+	}
+
 	function <portlet:namespace />saveEntry() {
 		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= (entry == null) ? Constants.ADD : Constants.UPDATE %>";
 		submitForm(document.<portlet:namespace />fm);
