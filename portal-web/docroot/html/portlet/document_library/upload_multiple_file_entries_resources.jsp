@@ -252,3 +252,13 @@ long assetClassPK = 0;
 
 	<aui:button type="submit" />
 </aui:form>
+
+<aui:script>
+	function <portlet:namespace />getSuggestionsContent() {
+		var content = '';
+
+		content += document.<portlet:namespace />fm2.<portlet:namespace />description.value;
+
+		return content;
+	}
+</aui:script>

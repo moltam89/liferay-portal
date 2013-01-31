@@ -99,6 +99,15 @@ String[][] categorySections = {mainSections, identificationSections, miscellaneo
 		return '<a href="' + href + '"' + (onclick ? ' onclick="' + onclick + '" ' : '') + '>' + value + '</a>';
 	};
 
+	function <portlet:namespace />getSuggestionsContent() {
+		var content = '';
+
+		content += document.<portlet:namespace />fm.<portlet:namespace />name.value + ' ';
+		content += document.<portlet:namespace />fm.<portlet:namespace />comments.value;
+
+		return content;
+	}
+
 	function <portlet:namespace />saveOrganization() {
 		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= (organization == null) ? Constants.ADD : Constants.UPDATE %>";
 
