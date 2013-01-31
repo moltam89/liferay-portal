@@ -298,6 +298,15 @@ int secondReminder = BeanParamUtil.getInteger(event, request, "secondReminder", 
 		return window.<portlet:namespace />editor.getHTML();
 	}
 
+	function <portlet:namespace />getSuggestionsContent() {
+		var content = '';
+
+		content += document.<portlet:namespace />fm.<portlet:namespace />title.value + ' ';
+		content += window.<portlet:namespace />editor.getHTML();
+
+		return content;
+	}
+
 	function <portlet:namespace />initEditor() {
 		return "<%= UnicodeFormatter.toString(description) %>";
 	}
