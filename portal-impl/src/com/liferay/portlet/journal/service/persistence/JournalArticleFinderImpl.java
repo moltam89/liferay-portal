@@ -934,7 +934,6 @@ public class JournalArticleFinderImpl
 			}
 
 			qPos.add(classNameId);
-			qPos.add(queryDefinition.getStatus());
 			qPos.add(articleIds, 2);
 
 			if ((version != null) && (version > 0)) {
@@ -965,6 +964,8 @@ public class JournalArticleFinderImpl
 			}
 
 			qPos.add(companyId);
+
+			qPos.add(queryDefinition.getStatus());
 
 			Iterator<Long> itr = q.iterate();
 
@@ -1195,7 +1196,6 @@ public class JournalArticleFinderImpl
 			}
 
 			qPos.add(classNameId);
-			qPos.add(queryDefinition.getStatus());
 			qPos.add(articleIds, 2);
 
 			if ((version != null) && (version > 0)) {
@@ -1226,6 +1226,8 @@ public class JournalArticleFinderImpl
 			}
 
 			qPos.add(companyId);
+
+			qPos.add(queryDefinition.getStatus());
 
 			return (List<JournalArticle>)QueryUtil.list(
 				q, getDialect(), queryDefinition.getStart(),
