@@ -92,6 +92,9 @@ if ((folder == null) || folder.isSupportsMetadata()) {
 
 			<%
 			for (DLFileEntryType fileEntryType : fileEntryTypes) {
+				if ((fileEntryType.getFileEntryTypeId() > 0) && !DLFileEntryTypePermission.contains(permissionChecker, fileEntryType, ActionKeys.VIEW)) {
+					continue;
+				}
 			%>
 
 				<portlet:renderURL var="addFileEntryTypeURL">
