@@ -153,7 +153,18 @@ catch (Exception e) {
 					<div class="feed-entry">
 						<img alt="<%= (windowState.equals(WindowState.MAXIMIZED) || (j < expandedEntriesPerFeed)) ? LanguageUtil.get(pageContext, "collapse") : LanguageUtil.get(pageContext, "expande") %>" class="<portlet:namespace />entry-expander feed-entry-expander" src='<%= themeDisplay.getPathThemeImage() %>/arrows/01_<%= (windowState.equals(WindowState.MAXIMIZED) || (j < expandedEntriesPerFeed)) ? "minus" : "plus" %>.png' />
 
-						<span class="feed-entry-title"><aui:a href="<%= entryLink %>" target="_new"><%= HtmlUtil.escape(entry.getTitle()) %></aui:a></span>
+						<%
+						String sanitizedTitle = null;
+
+						try {
+							sanitizedTitle = SanitizerUtil.sanitize(company.getCompanyId(), scopeGroupId, user.getUserId(), null, 0, ContentTypes.TEXT_HTML, Sanitizer.MODE_XSS, entry.getTitle(), null);
+						}
+						catch (SanitizerException se) {
+							sanitizedTitle = StringPool.BLANK;
+						}
+						%>
+
+						<span class="feed-entry-title"><aui:a href="<%= entryLink %>" target="_new"><%= sanitizedTitle %></aui:a></span>
 
 						<div class="feed-entry-content <%= (windowState.equals(WindowState.MAXIMIZED) || (j < expandedEntriesPerFeed)) ? "" : "aui-helper-hidden" %>">
 							<c:if test="<%= entry.getPublishedDate() != null %>">
