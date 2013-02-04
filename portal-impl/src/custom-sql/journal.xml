@@ -54,7 +54,6 @@
 						(groupId = ?) AND
 						([$FOLDER_ID$]) AND
 						(classNameId = ?) AND
-						([$STATUS$]) AND
 						(
 							(articleId LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
 							(version = ?) [$AND_OR_CONNECTOR$]
@@ -77,7 +76,8 @@
 				(type_ = ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
 				(structureId LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
 				(templateId LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-				(companyId = ?)
+				(companyId = ?) AND
+				([$STATUS$])
 		]]>
 	</sql>
 	<sql id="com.liferay.portlet.journal.service.persistence.JournalArticleFinder.findByExpirationDate">
@@ -190,7 +190,6 @@
 						(groupId = ?) AND
 						([$FOLDER_ID$]) AND
 						(classNameId = ?) AND
-						([$STATUS$]) AND
 						(
 							(articleId LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
 							(version = ?) [$AND_OR_CONNECTOR$]
@@ -213,7 +212,8 @@
 				(type_ = ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
 				(structureId LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
 				(templateId LIKE ? [$AND_OR_NULL_CHECK$]) [$AND_OR_CONNECTOR$]
-				(companyId = ?)
+				(companyId = ?) AND
+				([$STATUS$])
 			ORDER BY
 				id_ ASC
 		]]>
