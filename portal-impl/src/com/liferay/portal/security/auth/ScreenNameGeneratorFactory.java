@@ -23,38 +23,11 @@ import com.liferay.portal.util.PropsValues;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Shuyang Zhou
  */
 public class ScreenNameGeneratorFactory {
 
 	public static ScreenNameGenerator getInstance() {
-		if (_originalScreenNameGenerator == null) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Instantiate " + PropsValues.USERS_SCREEN_NAME_GENERATOR);
-			}
-
-			ClassLoader classLoader =
-				PACLClassLoaderUtil.getPortalClassLoader();
-
-			try {
-				_originalScreenNameGenerator =
-					(ScreenNameGenerator)InstanceFactory.newInstance(
-						classLoader, PropsValues.USERS_SCREEN_NAME_GENERATOR);
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
-
-		if (_screenNameGenerator == null) {
-			_screenNameGenerator = _originalScreenNameGenerator;
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				"Return " + ClassUtil.getClassName(_screenNameGenerator));
-		}
-
 		return _screenNameGenerator;
 	}
 
@@ -71,10 +44,25 @@ public class ScreenNameGeneratorFactory {
 		}
 	}
 
+	public void afterPropertiesSet() throws Exception {
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Instantiate " + PropsValues.USERS_SCREEN_NAME_GENERATOR);
+		}
+
+		ClassLoader classLoader = PACLClassLoaderUtil.getPortalClassLoader();
+
+		_originalScreenNameGenerator =
+			(ScreenNameGenerator)InstanceFactory.newInstance(
+				classLoader, PropsValues.USERS_SCREEN_NAME_GENERATOR);
+
+		_screenNameGenerator = _originalScreenNameGenerator;
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(
 		ScreenNameGeneratorFactory.class);
 
 	private static ScreenNameGenerator _originalScreenNameGenerator;
-	private static ScreenNameGenerator _screenNameGenerator;
+	private static volatile ScreenNameGenerator _screenNameGenerator;
 
 }

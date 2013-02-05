@@ -23,35 +23,11 @@ import com.liferay.portal.util.PropsValues;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Shuyang Zhou
  */
 public class HookFactory {
 
 	public static Hook getInstance() {
-		if (_originalHook == null) {
-			if (_log.isDebugEnabled()) {
-				_log.debug("Instantiate " + PropsValues.MAIL_HOOK_IMPL);
-			}
-
-			ClassLoader classLoader =
-				PACLClassLoaderUtil.getPortalClassLoader();
-
-			try {
-				_originalHook = (Hook)InstanceFactory.newInstance(
-					classLoader, PropsValues.MAIL_HOOK_IMPL);
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
-
-		if (_hook == null) {
-			_hook = _originalHook;
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Return " + _hook.getClass().getName());
-		}
-
 		return _hook;
 	}
 
@@ -68,9 +44,22 @@ public class HookFactory {
 		}
 	}
 
+	public void afterPropertiesSet() throws Exception {
+		if (_log.isDebugEnabled()) {
+			_log.debug("Instantiate " + PropsValues.MAIL_HOOK_IMPL);
+		}
+
+		ClassLoader classLoader = PACLClassLoaderUtil.getPortalClassLoader();
+
+		_originalHook = (Hook)InstanceFactory.newInstance(
+			classLoader, PropsValues.MAIL_HOOK_IMPL);
+
+		_hook = _originalHook;
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(HookFactory.class);
 
-	private static Hook _hook;
+	private static volatile Hook _hook;
 	private static Hook _originalHook;
 
 }

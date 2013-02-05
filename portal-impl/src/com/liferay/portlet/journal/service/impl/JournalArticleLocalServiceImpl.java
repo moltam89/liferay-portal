@@ -1772,9 +1772,8 @@ public class JournalArticleLocalServiceImpl
 			long userId, long groupId, String articleId)
 		throws PortalException, SystemException {
 
-		List<JournalArticle> articles =
-			journalArticlePersistence.findByG_A(
-				groupId, articleId, 0, 1, new ArticleVersionComparator());
+		List<JournalArticle> articles = journalArticlePersistence.findByG_A(
+			groupId, articleId, 0, 1, new ArticleVersionComparator());
 
 		if (!articles.isEmpty()) {
 			return moveArticleToTrash(userId, articles.get(0));
@@ -1989,9 +1988,9 @@ public class JournalArticleLocalServiceImpl
 			attributes.put(Field.TITLE, title);
 			attributes.put(Field.TYPE, type);
 			attributes.put("articleId", articleId);
+			attributes.put("ddmStructureKey", structureId);
+			attributes.put("ddmTemplateKey", templateId);
 			attributes.put("params", params);
-			attributes.put("structureId", structureId);
-			attributes.put("templateId", templateId);
 
 			searchContext.setAttributes(attributes);
 

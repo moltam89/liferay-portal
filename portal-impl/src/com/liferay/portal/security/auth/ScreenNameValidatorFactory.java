@@ -23,38 +23,11 @@ import com.liferay.portal.util.PropsValues;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Shuyang Zhou
  */
 public class ScreenNameValidatorFactory {
 
 	public static ScreenNameValidator getInstance() {
-		if (_originalScreenNameValidator == null) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Instantiate " + PropsValues.USERS_SCREEN_NAME_VALIDATOR);
-			}
-
-			ClassLoader classLoader =
-				PACLClassLoaderUtil.getPortalClassLoader();
-
-			try {
-				_originalScreenNameValidator =
-					(ScreenNameValidator)InstanceFactory.newInstance(
-						classLoader, PropsValues.USERS_SCREEN_NAME_VALIDATOR);
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
-
-		if (_screenNameValidator == null) {
-			_screenNameValidator = _originalScreenNameValidator;
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				"Return " + ClassUtil.getClassName(_screenNameValidator));
-		}
-
 		return _screenNameValidator;
 	}
 
@@ -71,10 +44,25 @@ public class ScreenNameValidatorFactory {
 		}
 	}
 
+	public void afterPropertiesSet() throws Exception {
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Instantiate " + PropsValues.USERS_SCREEN_NAME_VALIDATOR);
+		}
+
+		ClassLoader classLoader = PACLClassLoaderUtil.getPortalClassLoader();
+
+		_originalScreenNameValidator =
+			(ScreenNameValidator)InstanceFactory.newInstance(
+				classLoader, PropsValues.USERS_SCREEN_NAME_VALIDATOR);
+
+		_screenNameValidator = _originalScreenNameValidator;
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(
 		ScreenNameValidatorFactory.class);
 
 	private static ScreenNameValidator _originalScreenNameValidator;
-	private static ScreenNameValidator _screenNameValidator;
+	private static volatile ScreenNameValidator _screenNameValidator;
 
 }

@@ -23,38 +23,11 @@ import com.liferay.portal.util.PropsValues;
 
 /**
  * @author Brian Wing Shun Chan
+ * @author Shuyang Zhou
  */
 public class EmailAddressValidatorFactory {
 
 	public static EmailAddressValidator getInstance() {
-		if (_originalEmailAddressValidator == null) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Instantiate " + PropsValues.USERS_EMAIL_ADDRESS_VALIDATOR);
-			}
-
-			ClassLoader classLoader =
-				PACLClassLoaderUtil.getPortalClassLoader();
-
-			try {
-				_originalEmailAddressValidator =
-					(EmailAddressValidator)InstanceFactory.newInstance(
-						classLoader, PropsValues.USERS_EMAIL_ADDRESS_VALIDATOR);
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
-
-		if (_emailAddressValidator == null) {
-			_emailAddressValidator = _originalEmailAddressValidator;
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug(
-				"Return " + ClassUtil.getClassName(_emailAddressValidator));
-		}
-
 		return _emailAddressValidator;
 	}
 
@@ -73,10 +46,25 @@ public class EmailAddressValidatorFactory {
 		}
 	}
 
+	public void afterPropertiesSet() throws Exception {
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Instantiate " + PropsValues.USERS_EMAIL_ADDRESS_VALIDATOR);
+		}
+
+		ClassLoader classLoader = PACLClassLoaderUtil.getPortalClassLoader();
+
+		_originalEmailAddressValidator =
+			(EmailAddressValidator)InstanceFactory.newInstance(
+				classLoader, PropsValues.USERS_EMAIL_ADDRESS_VALIDATOR);
+
+		_emailAddressValidator = _originalEmailAddressValidator;
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(
 		EmailAddressValidatorFactory.class);
 
-	private static EmailAddressValidator _emailAddressValidator;
+	private static volatile EmailAddressValidator _emailAddressValidator;
 	private static EmailAddressValidator _originalEmailAddressValidator;
 
 }

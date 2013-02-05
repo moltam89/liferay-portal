@@ -23,37 +23,11 @@ import com.liferay.portal.util.PropsValues;
 
 /**
  * @author Amos Fong
+ * @author Shuyang Zhou
  */
 public class FullNameValidatorFactory {
 
 	public static FullNameValidator getInstance() {
-		if (_originalFullNameValidator == null) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					"Instantiate " + PropsValues.USERS_FULL_NAME_VALIDATOR);
-			}
-
-			ClassLoader classLoader =
-				PACLClassLoaderUtil.getPortalClassLoader();
-
-			try {
-				_originalFullNameValidator =
-					(FullNameValidator)InstanceFactory.newInstance(
-						classLoader, PropsValues.USERS_FULL_NAME_VALIDATOR);
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
-		}
-
-		if (_fullNameValidator == null) {
-			_fullNameValidator = _originalFullNameValidator;
-		}
-
-		if (_log.isDebugEnabled()) {
-			_log.debug("Return " + ClassUtil.getClassName(_fullNameValidator));
-		}
-
 		return _fullNameValidator;
 	}
 
@@ -70,10 +44,24 @@ public class FullNameValidatorFactory {
 		}
 	}
 
+	public void afterPropertiesSet() throws Exception {
+		if (_log.isDebugEnabled()) {
+			_log.debug("Instantiate " + PropsValues.USERS_FULL_NAME_VALIDATOR);
+		}
+
+		ClassLoader classLoader = PACLClassLoaderUtil.getPortalClassLoader();
+
+		_originalFullNameValidator =
+			(FullNameValidator)InstanceFactory.newInstance(
+				classLoader, PropsValues.USERS_FULL_NAME_VALIDATOR);
+
+		_fullNameValidator = _originalFullNameValidator;
+	}
+
 	private static Log _log = LogFactoryUtil.getLog(
 		FullNameValidatorFactory.class);
 
-	private static FullNameValidator _fullNameValidator;
+	private static volatile FullNameValidator _fullNameValidator;
 	private static FullNameValidator _originalFullNameValidator;
 
 }

@@ -22,8 +22,6 @@ import com.liferay.portal.kernel.template.TemplateResource;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.template.TemplateContextHelper;
-import com.liferay.portlet.journal.util.URIResolver;
-import com.liferay.portlet.journal.util.XSLErrorListener;
 
 import java.io.Writer;
 
@@ -79,20 +77,25 @@ public class XSLTemplate implements Template {
 	}
 
 	public boolean processTemplate(Writer writer) throws TemplateException {
-		Locale locale = LocaleUtil.fromLanguageId(
-			_xslTemplateResource.getLanguageId());
-
-		XSLErrorListener xslErrorListener = new XSLErrorListener(locale);
-
-		URIResolver uriResolver = new URIResolver(
-			_xslTemplateResource.getTokens(),
-			_xslTemplateResource.getLanguageId());
-
 		TransformerFactory transformerFactory =
 			TransformerFactory.newInstance();
 
+		String languageId = null;
+
+		XSLURIResolver xslURIResolver =
+			_xslTemplateResource.getXSLURIResolver();
+
+		if (xslURIResolver != null) {
+			languageId = xslURIResolver.getLanguageId();
+		}
+
+		Locale locale = LocaleUtil.fromLanguageId(languageId);
+
+		XSLErrorListener xslErrorListener = new XSLErrorListener(locale);
+
 		transformerFactory.setErrorListener(xslErrorListener);
-		transformerFactory.setURIResolver(uriResolver);
+
+		transformerFactory.setURIResolver(xslURIResolver);
 
 		StreamSource xmlSource = new StreamSource(
 			_xslTemplateResource.getXMLReader());

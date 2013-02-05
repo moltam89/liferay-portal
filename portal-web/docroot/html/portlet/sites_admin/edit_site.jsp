@@ -167,6 +167,15 @@ else if (layoutSetPrototype != null) {
 </aui:form>
 
 <aui:script>
+	function <portlet:namespace />getSuggestionsContent() {
+		var content = '';
+
+		content += document.<portlet:namespace />fm.<portlet:namespace />name.value + ' ';
+		content += document.<portlet:namespace />fm.<portlet:namespace />description.value;
+
+		return content;
+	}
+
 	function <portlet:namespace />saveGroup() {
 		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= (group == null) ? Constants.ADD : Constants.UPDATE %>";
 

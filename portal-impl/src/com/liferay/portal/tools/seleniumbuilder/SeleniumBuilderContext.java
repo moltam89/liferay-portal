@@ -14,10 +14,11 @@
 
 package com.liferay.portal.tools.seleniumbuilder;
 
-import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.xml.Element;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.tools.ant.DirectoryScanner;
@@ -29,6 +30,8 @@ public class SeleniumBuilderContext {
 
 	public SeleniumBuilderContext(String baseDir) throws Exception {
 		_baseDir = baseDir;
+
+		_seleniumBuilderFileUtil = new SeleniumBuilderFileUtil(_baseDir);
 
 		DirectoryScanner directoryScanner = new DirectoryScanner();
 
@@ -48,21 +51,33 @@ public class SeleniumBuilderContext {
 
 			if (fileName.endsWith(".action")) {
 				_actionFileNames.add(fileName);
+
+				_actionRootElements.put(fileName, _getRootElement(fileName));
 			}
 			else if (fileName.endsWith(".function")) {
 				_functionFileNames.add(fileName);
+
+				_functionRootElements.put(fileName, _getRootElement(fileName));
 			}
 			else if (fileName.endsWith(".macro")) {
 				_macroFileNames.add(fileName);
+
+				_macroRootElements.put(fileName, _getRootElement(fileName));
 			}
 			else if (fileName.endsWith(".path")) {
 				_pathFileNames.add(fileName);
+
+				_pathRootElements.put(fileName, _getRootElement(fileName));
 			}
 			else if (fileName.endsWith(".testcase")) {
 				_testCaseFileNames.add(fileName);
+
+				_testCaseRootElements.put(fileName, _getRootElement(fileName));
 			}
 			else if (fileName.endsWith(".testsuite")) {
 				_testSuiteFileNames.add(fileName);
+
+				_testSuiteRootElements.put(fileName, _getRootElement(fileName));
 			}
 			else {
 				throw new IllegalArgumentException("Invalid file " + fileName);
@@ -74,6 +89,10 @@ public class SeleniumBuilderContext {
 		return _actionFileNames;
 	}
 
+	public Map<String, Element> getActionRootElements() {
+		return _actionRootElements;
+	}
+
 	public String getBaseDir() {
 		return _baseDir;
 	}
@@ -82,33 +101,69 @@ public class SeleniumBuilderContext {
 		return _functionFileNames;
 	}
 
+	public Map<String, Element> getFunctionRootElements() {
+		return _functionRootElements;
+	}
+
 	public Set<String> getMacroFileNames() {
 		return _macroFileNames;
+	}
+
+	public Map<String, Element> getMacroRootElements() {
+		return _macroRootElements;
 	}
 
 	public Set<String> getPathFileNames() {
 		return _pathFileNames;
 	}
 
+	public Map<String, Element> getPathRootElements() {
+		return _pathRootElements;
+	}
+
 	public Set<String> getTestCaseFileNames() {
 		return _testCaseFileNames;
+	}
+
+	public Map<String, Element> getTestCaseRootElements() {
+		return _testCaseRootElements;
 	}
 
 	public Set<String> getTestSuiteFileNames() {
 		return _testSuiteFileNames;
 	}
 
+	public Map<String, Element> getTestSuiteRootElements() {
+		return _testSuiteRootElements;
+	}
+
+	private Element _getRootElement(String fileName) throws Exception {
+		return _seleniumBuilderFileUtil.getRootElement(fileName);
+	}
+
 	private String _normalizeFileName(String fileName) {
-		return StringUtil.replace(
-			fileName, StringPool.BACK_SLASH, StringPool.SLASH);
+		return _seleniumBuilderFileUtil.normalizeFileName(fileName);
 	}
 
 	private Set<String> _actionFileNames = new HashSet<String>();
+	private Map<String, Element> _actionRootElements =
+		new HashMap<String, Element>();
 	private String _baseDir;
 	private Set<String> _functionFileNames = new HashSet<String>();
+	private Map<String, Element> _functionRootElements =
+		new HashMap<String, Element>();
 	private Set<String> _macroFileNames = new HashSet<String>();
+	private Map<String, Element> _macroRootElements =
+		new HashMap<String, Element>();
 	private Set<String> _pathFileNames = new HashSet<String>();
+	private Map<String, Element> _pathRootElements =
+		new HashMap<String, Element>();
+	private SeleniumBuilderFileUtil _seleniumBuilderFileUtil;
 	private Set<String> _testCaseFileNames = new HashSet<String>();
+	private Map<String, Element> _testCaseRootElements =
+		new HashMap<String, Element>();
 	private Set<String> _testSuiteFileNames = new HashSet<String>();
+	private Map<String, Element> _testSuiteRootElements =
+		new HashMap<String, Element>();
 
 }
