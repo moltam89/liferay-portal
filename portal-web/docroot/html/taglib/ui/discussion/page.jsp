@@ -482,15 +482,34 @@ Format dateFormatDateTime = FastDateFormatFactoryUtil.getDateTime(locale, timeZo
 										<%
 										MBMessage parentMessage = MBMessageLocalServiceUtil.getMessage(message.getParentMessageId());
 
-										StringBundler sb = new StringBundler(7);
+										StringBundler sb = new StringBundler();
 
-										sb.append("<a href=\"#");
-										sb.append(randomNamespace);
-										sb.append("message_");
-										sb.append(parentMessage.getMessageId());
-										sb.append("\">");
+										String parentMsgBody = BBCodeTranslatorUtil.getHTML(parentMessage.getBody());
+
+										parentMsgBody = StringUtil.replace(parentMsgBody, "@theme_images_path@/emoticons", themeDisplay.getPathThemeImages() + "/emoticons");
+										parentMsgBody = HtmlUtil.wordBreak(parentMsgBody, 80);
+
+										sb.append("<span aria-labelledby=\"");
+										sb.append(message.getMessageId());
+										sb.append("\" onBlur=\"Liferay.Portal.ToolTip.hide();\" ");
+										sb.append("onFocus=\"Liferay.Portal.ToolTip.show(this);\" ");
+										sb.append("onMouseOver=\"Liferay.Portal.ToolTip.show(this);\"><u>");
 										sb.append(HtmlUtil.escape(parentMessage.getUserName()));
-										sb.append("</a>");
+										sb.append("</u></span>");
+
+										sb.append("<span class=\"aui-tooltip-hidden tooltip-text\" id=\"");
+										sb.append(message.getMessageId());
+										sb.append("\"><b>");
+										sb.append(LanguageUtil.get(pageContext, "author"));
+										sb.append(":</b> ");
+										sb.append(HtmlUtil.escape(parentMessage.getUserName()));
+										sb.append("<br /><b>");
+										sb.append(LanguageUtil.get(pageContext, "date"));
+										sb.append(":</b> ");
+										sb.append(dateFormatDateTime.format(parentMessage.getModifiedDate()));
+										sb.append("<br /><br />");
+										sb.append(parentMsgBody);
+										sb.append("</span>");
 										%>
 
 										<%= LanguageUtil.format(pageContext, "posted-on-x-in-reply-to-x", new Object[] {dateFormatDateTime.format(message.getModifiedDate()), sb.toString()}) %>
