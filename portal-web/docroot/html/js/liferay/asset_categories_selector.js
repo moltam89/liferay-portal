@@ -374,7 +374,7 @@ AUI.add(
 						else {
 							assetId = instance._getTreeNodeAssetId(currentTarget);
 
-							entryMatchKey = currentTarget.get('label');
+							entryMatchKey = currentTarget.get('path');
 						}
 
 						var matchKey = instance.get('matchKey');
