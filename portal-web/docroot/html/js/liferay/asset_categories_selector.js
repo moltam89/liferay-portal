@@ -221,6 +221,7 @@ AUI.add(
 									id: treeId,
 									label: Liferay.Util.escapeHTML(item.titleCurrentValue),
 									leaf: !item.hasChildren,
+									path: item.path,
 									type: type
 								};
 
@@ -374,7 +375,7 @@ AUI.add(
 						else {
 							assetId = instance._getTreeNodeAssetId(currentTarget);
 
-							entryMatchKey = currentTarget.get('label');
+							entryMatchKey = currentTarget.get('path');
 						}
 
 						var matchKey = instance.get('matchKey');
