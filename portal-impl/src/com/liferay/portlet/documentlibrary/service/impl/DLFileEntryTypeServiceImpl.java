@@ -16,18 +16,25 @@ package com.liferay.portlet.documentlibrary.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.security.permission.ActionKeys;
+import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryTypeConstants;
+import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.base.DLFileEntryTypeServiceBaseImpl;
 import com.liferay.portlet.documentlibrary.service.permission.DLFileEntryTypePermission;
 import com.liferay.portlet.documentlibrary.service.permission.DLPermission;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * @author Alexander Chow
+ * @author Tibor Lipusz
  */
 public class DLFileEntryTypeServiceImpl extends DLFileEntryTypeServiceBaseImpl {
 
@@ -72,6 +79,39 @@ public class DLFileEntryTypeServiceImpl extends DLFileEntryTypeServiceBaseImpl {
 		return dlFileEntryTypePersistence.filterCountByGroupId(groupIds);
 	}
 
+	public List<DLFileEntryType> getFolderFileEntryTypes(
+			long[] groupIds, long folderId, boolean inherited)
+		throws PortalException, SystemException {
+
+		if (!inherited) {
+			return filterDLFileEntryTypes(
+				dlFolderPersistence.getDLFileEntryTypes(folderId));
+		}
+
+		List<DLFileEntryType> dlFileEntryTypes = null;
+
+		folderId = dlFileEntryTypeLocalService.getFileEntryTypesPrimaryFolderId(
+			folderId);
+
+		if (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			dlFileEntryTypes = filterDLFileEntryTypes(
+				dlFolderPersistence.getDLFileEntryTypes(folderId));
+		}
+
+		if ((dlFileEntryTypes == null) || dlFileEntryTypes.isEmpty()) {
+			dlFileEntryTypes = new ArrayList<DLFileEntryType>(
+				getFileEntryTypes(groupIds));
+
+			DLFileEntryType dlFileEntryType =
+				dlFileEntryTypePersistence.fetchByPrimaryKey(
+					DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT);
+
+			dlFileEntryTypes.add(0, dlFileEntryType);
+		}
+
+		return dlFileEntryTypes;
+	}
+
 	public List<DLFileEntryType> search(
 			long companyId, long[] groupIds, String keywords,
 			boolean includeBasicFileEntryType, int start, int end,
@@ -103,6 +143,30 @@ public class DLFileEntryTypeServiceImpl extends DLFileEntryTypeServiceBaseImpl {
 		dlFileEntryTypeLocalService.updateFileEntryType(
 			getUserId(), fileEntryTypeId, name, description, ddmStructureIds,
 			serviceContext);
+	}
+
+	protected List<DLFileEntryType> filterDLFileEntryTypes(
+			List<DLFileEntryType> dlFileEntryTypes)
+		throws PortalException {
+
+		PermissionChecker permissionChecker = getPermissionChecker();
+
+		dlFileEntryTypes = ListUtil.copy(dlFileEntryTypes);
+
+		Iterator<DLFileEntryType> iterator = dlFileEntryTypes.iterator();
+
+		while (iterator.hasNext()) {
+			DLFileEntryType fileEntryType = iterator.next();
+
+			if ((fileEntryType.getFileEntryTypeId() > 0) &&
+				!DLFileEntryTypePermission.contains(
+					permissionChecker, fileEntryType, ActionKeys.VIEW)) {
+
+				iterator.remove();
+			}
+		}
+
+		return dlFileEntryTypes;
 	}
 
 }

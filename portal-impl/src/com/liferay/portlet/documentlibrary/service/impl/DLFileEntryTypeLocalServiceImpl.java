@@ -28,7 +28,6 @@ import com.liferay.portal.model.User;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.documentlibrary.DuplicateFileEntryTypeException;
-import com.liferay.portlet.documentlibrary.NoSuchFolderException;
 import com.liferay.portlet.documentlibrary.NoSuchMetadataSetException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryMetadata;
@@ -220,6 +219,22 @@ public class DLFileEntryTypeLocalServiceImpl
 		throws SystemException {
 
 		return dlFileEntryTypePersistence.findByGroupId(groupIds);
+	}
+
+	public long getFileEntryTypesPrimaryFolderId(long folderId)
+		throws PortalException, SystemException {
+
+		while (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			DLFolder dlFolder = dlFolderPersistence.findByPrimaryKey(folderId);
+
+			if (dlFolder.isOverrideFileEntryTypes()) {
+				break;
+			}
+
+			folderId = dlFolder.getParentFolderId();
+		}
+
+		return folderId;
 	}
 
 	public List<DLFileEntryType> getFolderFileEntryTypes(
@@ -487,22 +502,6 @@ public class DLFileEntryTypeLocalServiceImpl
 		}
 
 		return fileEntryTypeIds;
-	}
-
-	protected long getFileEntryTypesPrimaryFolderId(long folderId)
-		throws NoSuchFolderException, SystemException {
-
-		while (folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
-			DLFolder dlFolder = dlFolderPersistence.findByPrimaryKey(folderId);
-
-			if (dlFolder.isOverrideFileEntryTypes()) {
-				break;
-			}
-
-			folderId = dlFolder.getParentFolderId();
-		}
-
-		return folderId;
 	}
 
 	protected long updateDDMStructure(

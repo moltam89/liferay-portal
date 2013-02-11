@@ -334,6 +334,12 @@ public class DLFileEntryTypeLocalServiceWrapper
 		return _dlFileEntryTypeLocalService.getFileEntryTypes(groupIds);
 	}
 
+	public long getFileEntryTypesPrimaryFolderId(long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _dlFileEntryTypeLocalService.getFileEntryTypesPrimaryFolderId(folderId);
+	}
+
 	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileEntryType> getFolderFileEntryTypes(
 		long[] groupIds, long folderId, boolean inherited)
 		throws com.liferay.portal.kernel.exception.PortalException,
