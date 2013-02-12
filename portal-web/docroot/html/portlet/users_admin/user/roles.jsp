@@ -22,6 +22,13 @@ List<Group> groups = (List<Group>)request.getAttribute("user.groups");
 List<Organization> organizations = (List<Organization>)request.getAttribute("user.organizations");
 Long[] organizationIds = UsersAdminUtil.getOrganizationIds(organizations);
 List<Role> roles = (List<Role>)request.getAttribute("user.roles");
+
+List<Role> filteredRoles = roles;
+
+if (!filterManageableRoles) {
+	filteredRoles = UsersAdminUtil.filterRoles(permissionChecker, roles);
+}
+
 List<UserGroupRole> organizationRoles = (List<UserGroupRole>)request.getAttribute("user.organizationRoles");
 List<UserGroupRole> siteRoles = (List<UserGroupRole>)request.getAttribute("user.siteRoles");
 List<Group> allGroups = (List<Group>)request.getAttribute("user.allGroups");
@@ -30,6 +37,14 @@ List<UserGroupRole> userGroupRoles = new ArrayList<UserGroupRole>();
 
 userGroupRoles.addAll(organizationRoles);
 userGroupRoles.addAll(siteRoles);
+
+List<UserGroupRole> filteredUserGroupRoles = userGroupRoles;
+
+if (!filterManageableUserGroupRoles) {
+	filteredUserGroupRoles = UsersAdminUtil.filterUserGroupRoles(permissionChecker, userGroupRoles);
+}
+
+boolean displayRoleSelector = filterManageableRoles || permissionChecker.hasPermission(0, Role.class.getName(), company.getCompanyId(), ActionKeys.ASSIGN_MEMBERS);
 %>
 
 <liferay-util:buffer var="removeRoleIcon">
@@ -67,17 +82,17 @@ userGroupRoles.addAll(siteRoles);
 			value="<%= HtmlUtil.escape(role.getTitle(locale)) %>"
 		/>
 
-		<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
-			<liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text>
+			<c:if test="<%= filterManageableRoles || filteredRoles.contains(role) %>">
 				<a class="modify-link" data-rowId="<%= role.getRoleId() %>" href="javascript:;"><%= removeRoleIcon %></a>
-			</liferay-ui:search-container-column-text>
-		</c:if>
+			</c:if>
+		</liferay-ui:search-container-column-text>	
 	</liferay-ui:search-container-row>
 
 	<liferay-ui:search-iterator paginate="<%= false %>" />
 </liferay-ui:search-container>
 
-<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
+<c:if test="<%= displayRoleSelector %>">
 	<liferay-ui:icon
 		cssClass="modify-link"
 		image="add"
@@ -171,11 +186,11 @@ userGroupRoles.addAll(siteRoles);
 				value="<%= HtmlUtil.escape(userGroupRole.getGroup().getDescriptiveName(locale)) %>"
 			/>
 
-			<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
-				<liferay-ui:search-container-column-text>
+			<liferay-ui:search-container-column-text>
+				<c:if test="<%= filterManageableUserGroupRoles || filteredUserGroupRoles.contains(userGroupRole) %>">
 					<a class="modify-link" data-groupId="<%= userGroupRole.getGroupId() %>" data-rowId="<%= userGroupRole.getRoleId() %>" href="javascript:;"><%= removeRoleIcon %></a>
-				</liferay-ui:search-container-column-text>
-			</c:if>
+				</c:if>
+			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>
 
 		<liferay-ui:search-iterator paginate="<%= false %>" />
@@ -202,7 +217,7 @@ userGroupRoles.addAll(siteRoles);
 	</aui:script>
 </c:if>
 
-<c:if test="<%= !organizations.isEmpty() && !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
+<c:if test="<%= !organizations.isEmpty() && displayRoleSelector %>">
 	<liferay-ui:icon
 		cssClass="modify-link"
 		image="add"
@@ -248,17 +263,17 @@ userGroupRoles.addAll(siteRoles);
 					value="<%= HtmlUtil.escape(userGroupRole.getGroup().getDescriptiveName(locale)) %>"
 				/>
 
-				<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
-					<liferay-ui:search-container-column-text>
+				<liferay-ui:search-container-column-text>
+					<c:if test="<%= filterManageableUserGroupRoles || filteredUserGroupRoles.contains(userGroupRole) %>">
 						<a class="modify-link" data-groupId="<%= userGroupRole.getGroupId() %>" data-rowId="<%= userGroupRole.getRoleId() %>" href="javascript:;"><%= removeRoleIcon %></a>
-					</liferay-ui:search-container-column-text>
-				</c:if>
+					</c:if>
+				</liferay-ui:search-container-column-text>
 			</liferay-ui:search-container-row>
 
 			<liferay-ui:search-iterator paginate="<%= false %>" />
 		</liferay-ui:search-container>
 
-		<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
+		<c:if test="<%= displayRoleSelector %>">
 			<liferay-ui:icon
 				cssClass="modify-link"
 				image="add"

@@ -49,17 +49,17 @@ List<UserGroup> userGroups = (List<UserGroup>)request.getAttribute("user.userGro
 			property="name"
 		/>
 
-		<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
-			<liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text>
+			<c:if test="<%= filterManageableUserGroups || UserGroupPermissionUtil.contains(permissionChecker, userGroup.getUserGroupId(), ActionKeys.ASSIGN_MEMBERS) %>">
 				<a class="modify-link" data-rowId="<%= userGroup.getUserGroupId() %>" href="javascript:;"><%= removeUserGroupIcon %></a>
-			</liferay-ui:search-container-column-text>
-		</c:if>
+			</c:if>
+		</liferay-ui:search-container-column-text>
 	</liferay-ui:search-container-row>
 
 	<liferay-ui:search-iterator paginate="<%= false %>" />
 </liferay-ui:search-container>
 
-<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
+<c:if test="<%= filterManageableUserGroups || permissionChecker.hasPermission(0, UserGroup.class.getName(), company.getCompanyId(), ActionKeys.ASSIGN_MEMBERS) %>">
 	<br />
 
 	<liferay-ui:icon
