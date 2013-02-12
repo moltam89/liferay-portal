@@ -53,6 +53,7 @@ page import="com.liferay.portal.UserScreenNameException" %><%@
 page import="com.liferay.portal.UserSmsException" %><%@
 page import="com.liferay.portal.WebsiteURLException" %><%@
 page import="com.liferay.portal.service.permission.OrganizationPermissionUtil" %><%@
+page import="com.liferay.portal.service.permission.UserGroupPermissionUtil" %><%@
 page import="com.liferay.portal.service.permission.UserPermissionUtil" %><%@
 page import="com.liferay.portlet.announcements.model.AnnouncementsDelivery" %><%@
 page import="com.liferay.portlet.announcements.model.AnnouncementsEntryConstants" %><%@
@@ -103,10 +104,22 @@ else if (permissionChecker.isCompanyAdmin()) {
 	filterManageableUserGroups = false;
 }
 
+if (filterManageableGroups && permissionChecker.hasPermission(0, Group.class.getName(), company.getCompanyId(), ActionKeys.VIEW)) {
+	filterManageableGroups = false;
+}
+
 if (filterManageableOrganizations && permissionChecker.hasPermission(0, Organization.class.getName(), company.getCompanyId(), ActionKeys.VIEW)) {
 	filterManageableOrganizations = false;
 }
 
+if (filterManageableRoles && permissionChecker.hasPermission(0, Role.class.getName(), company.getCompanyId(), ActionKeys.VIEW)) {
+	filterManageableRoles = false;
+	filterManageableUserGroupRoles = false;
+}
+
+if (filterManageableUserGroups && permissionChecker.hasPermission(0, UserGroup.class.getName(), company.getCompanyId(), ActionKeys.VIEW)) {
+	filterManageableUserGroups = false;
+}
 %>
 
 <%@ include file="/html/portlet/users_admin/init-ext.jsp" %>
