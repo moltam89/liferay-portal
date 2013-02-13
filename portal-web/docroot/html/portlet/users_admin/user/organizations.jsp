@@ -85,7 +85,7 @@ List<Organization> organizations = (List<Organization>)request.getAttribute("use
 		</liferay-ui:search-container-column-text>
 
 		<liferay-ui:search-container-column-text>
-			<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
+			<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) && OrganizationPermissionUtil.contains(permissionChecker, organization.getOrganizationId(), ActionKeys.ASSIGN_MEMBERS) %>">
 				<a class="modify-link" data-rowId="<%= organization.getOrganizationId() %>" href="javascript:;"><%= removeOrganizationIcon %></a>
 			</c:if>
 		</liferay-ui:search-container-column-text>
@@ -94,7 +94,7 @@ List<Organization> organizations = (List<Organization>)request.getAttribute("use
 	<liferay-ui:search-iterator paginate="<%= false %>" />
 </liferay-ui:search-container>
 
-<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
+<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) && permissionChecker.hasPermission(0, Organization.class.getName(), company.getCompanyId(), ActionKeys.ASSIGN_MEMBERS) %>">
 	<br />
 
 	<liferay-ui:icon
