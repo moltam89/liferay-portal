@@ -84,11 +84,11 @@ List<Organization> organizations = (List<Organization>)request.getAttribute("use
 
 		</liferay-ui:search-container-column-text>
 
-		<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
-			<liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text>
+			<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
 				<a class="modify-link" data-rowId="<%= organization.getOrganizationId() %>" href="javascript:;"><%= removeOrganizationIcon %></a>
-			</liferay-ui:search-container-column-text>
-		</c:if>
+			</c:if>
+		</liferay-ui:search-container-column-text>
 	</liferay-ui:search-container-row>
 
 	<liferay-ui:search-iterator paginate="<%= false %>" />

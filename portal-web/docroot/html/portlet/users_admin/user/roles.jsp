@@ -75,11 +75,11 @@ userGroupRoles.addAll(siteRoles);
 		Set<Role> mandatoryRoles = MembershipPolicyUtil.getMandatoryRoles(selUser);
 		%>
 
-		<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) && !mandatoryRoles.contains(role) %>">
-			<liferay-ui:search-container-column-text>
+		<liferay-ui:search-container-column-text>
+			<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) && !mandatoryRoles.contains(role) %>">
 				<a class="modify-link" data-rowId="<%= role.getRoleId() %>" href="javascript:;"><%= removeRoleIcon %></a>
-			</liferay-ui:search-container-column-text>
-		</c:if>
+			</c:if>
+		</liferay-ui:search-container-column-text>
 	</liferay-ui:search-container-row>
 
 	<liferay-ui:search-iterator paginate="<%= false %>" />
@@ -179,11 +179,11 @@ userGroupRoles.addAll(siteRoles);
 				value="<%= HtmlUtil.escape(userGroupRole.getGroup().getDescriptiveName(locale)) %>"
 			/>
 
-			<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
-				<liferay-ui:search-container-column-text>
+			<liferay-ui:search-container-column-text>
+				<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
 					<a class="modify-link" data-groupId="<%= userGroupRole.getGroupId() %>" data-rowId="<%= userGroupRole.getRoleId() %>" href="javascript:;"><%= removeRoleIcon %></a>
-				</liferay-ui:search-container-column-text>
-			</c:if>
+				</c:if>
+			</liferay-ui:search-container-column-text>
 		</liferay-ui:search-container-row>
 
 		<liferay-ui:search-iterator paginate="<%= false %>" />
@@ -256,11 +256,11 @@ userGroupRoles.addAll(siteRoles);
 					value="<%= HtmlUtil.escape(userGroupRole.getGroup().getDescriptiveName(locale)) %>"
 				/>
 
-				<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
-					<liferay-ui:search-container-column-text>
+				<liferay-ui:search-container-column-text>
+					<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
 						<a class="modify-link" data-groupId="<%= userGroupRole.getGroupId() %>" data-rowId="<%= userGroupRole.getRoleId() %>" href="javascript:;"><%= removeRoleIcon %></a>
-					</liferay-ui:search-container-column-text>
-				</c:if>
+					</c:if>
+				</liferay-ui:search-container-column-text>
 			</liferay-ui:search-container-row>
 
 			<liferay-ui:search-iterator paginate="<%= false %>" />
