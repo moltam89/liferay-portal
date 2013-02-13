@@ -104,8 +104,21 @@ else if (permissionChecker.isCompanyAdmin()) {
 	filterManageableUserGroups = false;
 }
 
+if (filterManageableGroups && permissionChecker.hasPermission(0, Group.class.getName(), company.getCompanyId(), ActionKeys.VIEW)) {
+	filterManageableGroups = false;
+}
+
 if (filterManageableOrganizations && permissionChecker.hasPermission(0, Organization.class.getName(), company.getCompanyId(), ActionKeys.VIEW)) {
 	filterManageableOrganizations = false;
+}
+
+if (filterManageableRoles && permissionChecker.hasPermission(0, Role.class.getName(), company.getCompanyId(), ActionKeys.VIEW)) {
+	filterManageableRoles = false;
+	filterManageableUserGroupRoles = false;
+}
+
+if (filterManageableUserGroups && permissionChecker.hasPermission(0, UserGroup.class.getName(), company.getCompanyId(), ActionKeys.VIEW)) {
+	filterManageableUserGroups = false;
 }
 %>
 
