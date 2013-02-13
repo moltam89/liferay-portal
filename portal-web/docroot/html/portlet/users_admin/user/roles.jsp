@@ -30,6 +30,8 @@ List<UserGroupRole> userGroupRoles = new ArrayList<UserGroupRole>();
 
 userGroupRoles.addAll(organizationRoles);
 userGroupRoles.addAll(siteRoles);
+
+boolean showRoleSelector = !portletName.equals(PortletKeys.MY_ACCOUNT) && permissionChecker.hasPermission(0, Role.class.getName(), company.getCompanyId(), ActionKeys.ASSIGN_MEMBERS);
 %>
 
 <liferay-ui:error-marker key="errorSection" value="roles" />
@@ -76,7 +78,7 @@ userGroupRoles.addAll(siteRoles);
 		%>
 
 		<liferay-ui:search-container-column-text>
-			<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) && !mandatoryRoles.contains(role) %>">
+			<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) && !mandatoryRoles.contains(role) && RolePermissionUtil.contains(permissionChecker, role.getRoleId(), ActionKeys.ASSIGN_MEMBERS) %>">
 				<a class="modify-link" data-rowId="<%= role.getRoleId() %>" href="javascript:;"><%= removeRoleIcon %></a>
 			</c:if>
 		</liferay-ui:search-container-column-text>
@@ -85,7 +87,7 @@ userGroupRoles.addAll(siteRoles);
 	<liferay-ui:search-iterator paginate="<%= false %>" />
 </liferay-ui:search-container>
 
-<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
+<c:if test="<%= showRoleSelector %>">
 	<liferay-ui:icon
 		cssClass="modify-link"
 		image="add"
@@ -180,7 +182,7 @@ userGroupRoles.addAll(siteRoles);
 			/>
 
 			<liferay-ui:search-container-column-text>
-				<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
+				<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) && UserGroupRolePermissionUtil.contains(permissionChecker, userGroupRole.getGroupId(), userGroupRole.getRoleId()) %>">
 					<a class="modify-link" data-groupId="<%= userGroupRole.getGroupId() %>" data-rowId="<%= userGroupRole.getRoleId() %>" href="javascript:;"><%= removeRoleIcon %></a>
 				</c:if>
 			</liferay-ui:search-container-column-text>
@@ -210,7 +212,7 @@ userGroupRoles.addAll(siteRoles);
 	</aui:script>
 </c:if>
 
-<c:if test="<%= !organizations.isEmpty() && !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
+<c:if test="<%= !organizations.isEmpty() && showRoleSelector %>">
 	<liferay-ui:icon
 		cssClass="modify-link"
 		image="add"
@@ -257,7 +259,7 @@ userGroupRoles.addAll(siteRoles);
 				/>
 
 				<liferay-ui:search-container-column-text>
-					<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
+					<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) && UserGroupRolePermissionUtil.contains(permissionChecker, userGroupRole.getGroupId(), userGroupRole.getRoleId()) %>">
 						<a class="modify-link" data-groupId="<%= userGroupRole.getGroupId() %>" data-rowId="<%= userGroupRole.getRoleId() %>" href="javascript:;"><%= removeRoleIcon %></a>
 					</c:if>
 				</liferay-ui:search-container-column-text>
@@ -266,7 +268,7 @@ userGroupRoles.addAll(siteRoles);
 			<liferay-ui:search-iterator paginate="<%= false %>" />
 		</liferay-ui:search-container>
 
-		<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
+		<c:if test="<%= showRoleSelector %>">
 			<liferay-ui:icon
 				cssClass="modify-link"
 				image="add"

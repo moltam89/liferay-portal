@@ -82,7 +82,7 @@ List<Group> groups = (List<Group>)request.getAttribute("user.groups");
 		%>
 
 		<liferay-ui:search-container-column-text>
-			<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) && !mandatoryGroups.contains(group) %>">
+			<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) && !mandatoryGroups.contains(group) && GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.ASSIGN_MEMBERS) %>">
 				<a class="modify-link" data-rowId="<%= group.getGroupId() %>" href="javascript:;"><%= removeGroupIcon %></a>
 			</c:if>
 		</liferay-ui:search-container-column-text>
@@ -91,7 +91,7 @@ List<Group> groups = (List<Group>)request.getAttribute("user.groups");
 	<liferay-ui:search-iterator paginate="<%= false %>" />
 </liferay-ui:search-container>
 
-<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) %>">
+<c:if test="<%= !portletName.equals(PortletKeys.MY_ACCOUNT) && permissionChecker.hasPermission(0, Group.class.getName(), company.getCompanyId(), ActionKeys.ASSIGN_MEMBERS) %>">
 	<br />
 
 	<liferay-ui:icon
