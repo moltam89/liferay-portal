@@ -86,13 +86,7 @@ if (!(portletName.equals(PortletKeys.PASSWORD_POLICIES_ADMIN) || portletName.equ
 }
 
 boolean filterManageableGroups = true;
-
 boolean filterManageableOrganizations = true;
-
-if (permissionChecker.hasPermission(0, Organization.class.getName(), company.getCompanyId(), ActionKeys.VIEW)) {
-	filterManageableOrganizations = false;
-}
-
 boolean filterManageableRoles = true;
 boolean filterManageableUserGroupRoles = true;
 boolean filterManageableUserGroups = true;
@@ -108,6 +102,10 @@ else if (permissionChecker.isCompanyAdmin()) {
 	filterManageableGroups = false;
 	filterManageableOrganizations = false;
 	filterManageableUserGroups = false;
+}
+
+if (filterManageableOrganizations && permissionChecker.hasPermission(0, Organization.class.getName(), company.getCompanyId(), ActionKeys.VIEW)) {
+	filterManageableOrganizations = false;
 }
 %>
 
