@@ -306,6 +306,7 @@ public class DataFactory {
 		dlFileEntry.setCompanyId(companyId);
 		dlFileEntry.setUserId(userId);
 		dlFileEntry.setCreateDate(newCreateDate());
+		dlFileEntry.setModifiedDate(newCreateDate());
 		dlFileEntry.setRepositoryId(groupId);
 		dlFileEntry.setFolderId(folderId);
 		dlFileEntry.setName(name);
