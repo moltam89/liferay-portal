@@ -302,8 +302,10 @@ if (Validator.isNull(mainLanguageValue)) {
 		var languageSelectorTrigger = A.one('#<%= randomNamespace %>languageSelectorTrigger');
 
 		if (languageSelectorTrigger) {
+			languageSelectorTrigger.setData('panelInstance', panel);
+
 			Liferay.component(
-				'<%= namespace + name %>languageSelector',
+				'<%= randomNamespace %>languageSelector',
 				function(event) {
 					if (handle) {
 						handle.detach();
@@ -322,14 +324,13 @@ if (Validator.isNull(mainLanguageValue)) {
 					);
 
 					languageSelectorTrigger.setData('autoFieldsInstance', autoFields);
-					languageSelectorTrigger.setData('panelInstance', panel);
 				}
 			);
 
 			var handle = languageSelectorTrigger.once(
 				'click',
 				function(event) {
-					Liferay.component('<%= namespace + name %>languageSelector');
+					Liferay.component('<%= randomNamespace %>languageSelector');
 				}
 			);
 		}
