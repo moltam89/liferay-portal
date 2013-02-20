@@ -1211,7 +1211,7 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 
 		Calendar birthdayCal = CalendarFactoryUtil.getCalendar();
 
-		birthdayCal.setTime(user.getContact().getBirthday());
+		birthdayCal.setTime(ldapUser.getContact().getBirthday());
 
 		int birthdayMonth = birthdayCal.get(Calendar.MONTH);
 		int birthdayDay = birthdayCal.get(Calendar.DAY_OF_MONTH);
