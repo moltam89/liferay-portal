@@ -21,6 +21,7 @@ Group group = (Group)request.getAttribute("site.group");
 Group liveGroup = (Group)request.getAttribute("site.liveGroup");
 LayoutSetPrototype layoutSetPrototype = (LayoutSetPrototype)request.getAttribute("site.layoutSetPrototype");
 boolean showPrototypes = GetterUtil.getBoolean(request.getAttribute("site.showPrototypes"));
+int membershipType;
 
 List<LayoutSetPrototype> layoutSetPrototypes = LayoutSetPrototypeServiceUtil.search(company.getCompanyId(), Boolean.TRUE, null);
 
@@ -31,6 +32,15 @@ boolean privateLayoutSetPrototypeLinkEnabled = true;
 LayoutSet publicLayoutSet = null;
 LayoutSetPrototype publicLayoutSetPrototype = null;
 boolean publicLayoutSetPrototypeLinkEnabled = true;
+
+if (liveGroup != null)
+{
+	membershipType = liveGroup.getType();
+}
+else
+{
+	membershipType = -1;
+}
 
 if (showPrototypes && (group != null)) {
 	try {
@@ -110,10 +120,10 @@ if (showPrototypes && (group != null)) {
 
 	<aui:input name="description" />
 
-	<aui:select label="membership-type" name="type">
-		<aui:option label="open" value="<%= GroupConstants.TYPE_SITE_OPEN %>" />
-		<aui:option label="restricted" value="<%= GroupConstants.TYPE_SITE_RESTRICTED %>" />
-		<aui:option label="private" value="<%= GroupConstants.TYPE_SITE_PRIVATE %>" />
+	<aui:select label="membership-type" name='<%= "type"  %>'>
+		<aui:option label="open"  selected="<%= membershipType == GroupConstants.TYPE_SITE_OPEN %>"  value="<%= GroupConstants.TYPE_SITE_OPEN %>" />
+		<aui:option label="restricted" selected="<%= membershipType == GroupConstants.TYPE_SITE_RESTRICTED %>" value="<%= GroupConstants.TYPE_SITE_RESTRICTED %>" />
+		<aui:option label="private" selected="<%= membershipType == GroupConstants.TYPE_SITE_PRIVATE %>" value="<%= GroupConstants.TYPE_SITE_PRIVATE %>" />
 	</aui:select>
 
 	<aui:input name="active" value="<%= true %>" />
