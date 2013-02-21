@@ -56,6 +56,36 @@
 				[$PRIM_KEYS$]
 		]]>
 	</sql>
+	<sql id="com.liferay.portal.service.impl.LayoutLocalServiceImpl.updatePriorityGreaterThan">
+		<![CDATA[
+			UPDATE
+				Layout
+			SET
+				priority = (priority + 1),
+				modifiedDate = ?
+			WHERE
+				(groupId = ?) AND
+				(privateLayout = ?) AND
+				(parentLayoutId= ?) AND
+				(priority >= ?) AND
+				(priority < ?)
+		]]>
+	</sql>
+	<sql id="com.liferay.portal.service.impl.LayoutLocalServiceImpl.updatePriorityLessThan">
+		<![CDATA[
+			UPDATE
+				Layout
+			SET
+				priority = (priority - 1),
+				modifieddate = ?
+			WHERE
+				(groupId = ?) AND
+				(privateLayout = ?) AND
+				(parentLayoutId= ?) AND
+				(priority > ?) AND
+				(priority <= ?)
+		]]>
+	</sql>
 	<sql id="com.liferay.portal.service.impl.ResourceBlockLocalServiceImpl.deleteResourceBlock">
 		<![CDATA[
 			DELETE FROM

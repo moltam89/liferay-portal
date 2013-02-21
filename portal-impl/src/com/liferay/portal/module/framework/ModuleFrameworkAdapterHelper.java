@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.kernel.util.ReflectionUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.util.ClassLoaderUtil;
+import com.liferay.portal.util.FileImpl;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.File;
@@ -130,6 +131,12 @@ public class ModuleFrameworkAdapterHelper {
 
 	private static void _initDir(String sourcePath, String destinationPath)
 		throws Exception {
+
+		if (FileUtil.getFile() == null) {
+			FileUtil fileUtil = new FileUtil();
+
+			fileUtil.setFile(new FileImpl());
+		}
 
 		if (FileUtil.exists(destinationPath)) {
 			return;
