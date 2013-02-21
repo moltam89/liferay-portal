@@ -26,14 +26,19 @@ import com.liferay.portal.kernel.dao.orm.Projection;
 import com.liferay.portal.kernel.dao.orm.ProjectionFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.QueryPos;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
+import com.liferay.portal.kernel.dao.orm.SQLQuery;
+import com.liferay.portal.kernel.dao.orm.Session;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.io.unsync.UnsyncByteArrayInputStream;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.transaction.Isolation;
+import com.liferay.portal.kernel.transaction.Propagation;
+import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -74,6 +79,7 @@ import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.expando.model.ExpandoBridge;
 import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroupInstance;
 import com.liferay.portlet.sites.util.SitesUtil;
+import com.liferay.util.dao.orm.CustomSQLUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -2139,6 +2145,9 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 	 * @return the updated layout
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Transactional(
+		isolation = Isolation.READ_COMMITTED,
+		propagation = Propagation.REQUIRES_NEW)
 	public Layout updatePriority(Layout layout, int priority)
 		throws SystemException {
 
@@ -2148,8 +2157,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		Date now = new Date();
 
-		layout.setModifiedDate(now);
-
 		int oldPriority = layout.getPriority();
 
 		int nextPriority = layoutLocalServiceHelper.getNextPriority(
@@ -2157,41 +2164,73 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			layout.getParentLayoutId(), layout.getSourcePrototypeLayoutUuid(),
 			priority);
 
-		layout.setPriority(nextPriority);
+		Session session = null;
 
-		layoutPersistence.update(layout);
+		try {
+			session = layoutPersistence.openSession();
 
-		List<Layout> layouts = layoutPersistence.findByG_P_P(
-			layout.getGroupId(), layout.isPrivateLayout(),
-			layout.getParentLayoutId());
+			boolean lessThan = oldPriority < nextPriority;
+			String sql = null;
 
-		boolean lessThan = false;
+			if (lessThan) {
+				sql = CustomSQLUtil.get(_UPDATE_PRIORITY_LESS_THAN);
+			}
+			else {
+				sql = CustomSQLUtil.get(_UPDATE_PRIORITY_GREATER_THAN);
+			}
 
-		if (oldPriority < nextPriority) {
-			lessThan = true;
+			SQLQuery sqlQuery = session.createSQLQuery(sql);
+			QueryPos qPos = QueryPos.getInstance(sqlQuery);
+
+			// modifieddate
+
+			qPos.add(now);
+
+			// groupId
+
+			qPos.add(layout.getGroupId());
+
+			// privateLayout
+
+			qPos.add(layout.isPrivateLayout());
+
+			// parentLayoutId
+
+			qPos.add(layout.getParentLayoutId());
+
+			if (lessThan) {
+
+				// priority range lower end
+
+				qPos.add(oldPriority);
+
+				// priority range higher end
+
+				qPos.add(nextPriority);
+			}
+			else {
+
+				// priority range lower end
+
+				qPos.add(nextPriority);
+
+				// priority range higher end
+
+				qPos.add(oldPriority);
+			}
+
+			sqlQuery.executeUpdate();
 		}
-
-		layouts = ListUtil.sort(
-			layouts, new LayoutPriorityComparator(layout, lessThan));
-
-		priority = 0;
-
-		for (Layout curLayout : layouts) {
-			curLayout.setModifiedDate(now);
-
-			int curNextPriority = layoutLocalServiceHelper.getNextPriority(
-				layout.getGroupId(), layout.isPrivateLayout(),
-				layout.getParentLayoutId(),
-				curLayout.getSourcePrototypeLayoutUuid(), priority++);
-
-			curLayout.setPriority(curNextPriority);
-
-			layoutPersistence.update(curLayout);
-
-			if (curLayout.equals(layout)) {
-				layout = curLayout;
+		finally {
+			if (session != null) {
+				layoutPersistence.closeSession(session);
 			}
 		}
+
+		layout.setPriority(nextPriority);
+		layout.setModifiedDate(now);
+
+		layoutPersistence.update(layout);
 
 		return layout;
 	}
@@ -2385,5 +2424,13 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 	@BeanReference(type = LayoutLocalServiceHelper.class)
 	protected LayoutLocalServiceHelper layoutLocalServiceHelper;
+
+	private static final String _UPDATE_PRIORITY_GREATER_THAN =
+					LayoutLocalServiceImpl.class.getName() +
+						".updatePriorityGreaterThan";
+
+	private static final String _UPDATE_PRIORITY_LESS_THAN =
+					LayoutLocalServiceImpl.class.getName() +
+						".updatePriorityLessThan";
 
 }
