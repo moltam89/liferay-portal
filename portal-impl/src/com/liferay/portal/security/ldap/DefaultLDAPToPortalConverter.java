@@ -146,35 +146,6 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 
 		Contact contact = ContactUtil.create(0);
 
-		try {
-			Date birthday = DateUtil.parseDate(
-				LDAPUtil.getAttributeString(
-					attributes, contactMappings, ContactConverterKeys.BIRTHDAY),
-				LocaleUtil.getDefault());
-
-			contact.setBirthday(birthday);
-		}
-		catch (ParseException pe) {
-			Calendar birthdayCalendar = CalendarFactoryUtil.getCalendar(
-				1970, Calendar.JANUARY, 1);
-
-			contact.setBirthday(birthdayCalendar.getTime());
-		}
-
-		String gender = LDAPUtil.getAttributeString(
-			attributes, contactMappings, ContactConverterKeys.GENDER);
-
-		gender = gender.toLowerCase();
-
-		if (gender.equals(StringPool.FALSE) || gender.equals("female") ||
-			gender.equals("f")) {
-
-			contact.setMale(false);
-		}
-		else {
-			contact.setMale(true);
-		}
-
 		List<ListType> prefixes = ListTypeServiceUtil.getListTypes(
 			ListTypeConstants.CONTACT_PREFIX);
 
@@ -211,6 +182,39 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 
 		contact.setSuffixId(suffixId);
 
+		String gender = LDAPUtil.getAttributeString(
+			attributes, contactMappings, ContactConverterKeys.GENDER);
+
+		gender = gender.toLowerCase();
+
+		if (gender.equals(StringPool.FALSE) || gender.equals("female") ||
+			gender.equals("f")) {
+
+			contact.setMale(false);
+		}
+		else {
+			contact.setMale(true);
+		}
+
+		try {
+			Date birthday = DateUtil.parseDate(
+				LDAPUtil.getAttributeString(
+					attributes, contactMappings, ContactConverterKeys.BIRTHDAY),
+				LocaleUtil.getDefault());
+
+			contact.setBirthday(birthday);
+		}
+		catch (ParseException pe) {
+			Calendar birthdayCalendar = CalendarFactoryUtil.getCalendar(
+				1970, Calendar.JANUARY, 1);
+
+			contact.setBirthday(birthdayCalendar.getTime());
+		}
+
+		contact.setSmsSn(
+			LDAPUtil.getAttributeString(
+				attributes, contactMappings, ContactConverterKeys.SMS_SN));
+
 		contact.setAimSn(
 			LDAPUtil.getAttributeString(
 				attributes, contactMappings, ContactConverterKeys.AIM_SN));
@@ -219,11 +223,6 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 			LDAPUtil.getAttributeString(
 				attributes, contactMappings, ContactConverterKeys.FACEBOOK_SN));
 
-		contact.setHoursOfOperation(
-			LDAPUtil.getAttributeString(
-				attributes, contactMappings,
-				ContactConverterKeys.HOURS_OF_OPERATION));
-
 		contact.setIcqSn(
 			LDAPUtil.getAttributeString(
 				attributes, contactMappings, ContactConverterKeys.ICQ_SN));
@@ -231,14 +230,6 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 		contact.setJabberSn(
 			LDAPUtil.getAttributeString(
 				attributes, contactMappings, ContactConverterKeys.JABBER_SN));
-
-		contact.setJobClass(
-			LDAPUtil.getAttributeString(
-				attributes, contactMappings, ContactConverterKeys.JOB_CLASS));
-
-		contact.setJobTitle(
-			LDAPUtil.getAttributeString(
-				attributes, contactMappings, ContactConverterKeys.JOB_TITLE));
 
 		contact.setMsnSn(
 			LDAPUtil.getAttributeString(
@@ -252,10 +243,6 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 			LDAPUtil.getAttributeString(
 				attributes, contactMappings, ContactConverterKeys.SKYPE_SN));
 
-		contact.setSmsSn(
-			LDAPUtil.getAttributeString(
-				attributes, contactMappings, ContactConverterKeys.SMS_SN));
-
 		contact.setTwitterSn(
 			LDAPUtil.getAttributeString(
 				attributes, contactMappings, ContactConverterKeys.TWITTER_SN));
@@ -263,6 +250,19 @@ public class DefaultLDAPToPortalConverter implements LDAPToPortalConverter {
 		contact.setYmSn(
 			LDAPUtil.getAttributeString(
 				attributes, contactMappings, ContactConverterKeys.YM_SN));
+
+		contact.setJobTitle(
+			LDAPUtil.getAttributeString(
+				attributes, contactMappings, ContactConverterKeys.JOB_TITLE));
+
+		contact.setJobClass(
+			LDAPUtil.getAttributeString(
+				attributes, contactMappings, ContactConverterKeys.JOB_CLASS));
+
+		contact.setHoursOfOperation(
+			LDAPUtil.getAttributeString(
+				attributes, contactMappings,
+				ContactConverterKeys.HOURS_OF_OPERATION));
 
 		ldapUser.setContact(contact);
 
