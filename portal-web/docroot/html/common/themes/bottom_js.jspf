@@ -120,6 +120,8 @@ if (layout != null) {
 						layoutIds: [
 
 							<%
+							boolean hasManageLayoutsPermission = GroupPermissionUtil.contains(themeDisplay.getPermissionChecker(), layout.getGroup(), ActionKeys.MANAGE_LAYOUTS);
+
 							for (int i = 0; (layouts != null) && (i < layouts.size()); i++) {
 								Layout curLayout = (Layout)layouts.get(i);
 
@@ -130,7 +132,7 @@ if (layout != null) {
 								{
 									deletable: <%= deleteable %>,
 									id: <%= curLayout.getLayoutId() %>,
-									updateable: <%= updateable %>
+									updateable: <%= hasManageLayoutsPermission && updateable %>
 								},
 
 							<%
