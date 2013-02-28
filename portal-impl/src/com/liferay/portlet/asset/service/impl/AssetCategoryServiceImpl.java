@@ -100,7 +100,7 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 			}
 
 			if (AssetCategoryPermission.contains(
-				permissionChecker, categoryId, ActionKeys.DELETE)) {
+					permissionChecker, categoryId, ActionKeys.DELETE)) {
 
 				assetCategoryLocalService.deleteCategory(category);
 			}
@@ -113,8 +113,8 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 			}
 		}
 
-		if (failedToDeleteIndex > 0 &&
-			failedToDeleteIndex < categoryIds.length) {
+		if ((failedToDeleteIndex > 0) &&
+			(failedToDeleteIndex < categoryIds.length)) {
 
 			failedToDeleteIds = ArrayUtil.subset(
 				failedToDeleteIds, 0, failedToDeleteIndex);

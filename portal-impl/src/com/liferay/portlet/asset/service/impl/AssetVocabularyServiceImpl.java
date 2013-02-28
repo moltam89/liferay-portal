@@ -106,7 +106,7 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 			}
 
 			if (AssetVocabularyPermission.contains(
-				permissionChecker, vocabulary, ActionKeys.DELETE)) {
+					permissionChecker, vocabulary, ActionKeys.DELETE)) {
 
 				assetVocabularyLocalService.deleteVocabulary(vocabulary);
 			}
@@ -119,8 +119,8 @@ public class AssetVocabularyServiceImpl extends AssetVocabularyServiceBaseImpl {
 			}
 		}
 
-		if (failedToDeleteIndex > 0 &&
-			failedToDeleteIndex < vocabularyIds.length) {
+		if ((failedToDeleteIndex > 0) &&
+			(failedToDeleteIndex < vocabularyIds.length)) {
 
 			failedToDeleteIds = ArrayUtil.subset(
 				failedToDeleteIds, 0, failedToDeleteIndex);
