@@ -18,7 +18,16 @@
 
 <%
 String redirect = ParamUtil.getString(request, "redirect");
+
+if(!Validator.isUrl(redirect)) {
+	redirect = "";
+}
+
 String backURL = ParamUtil.getString(request, "backURL");
+
+if(!Validator.isUrl(backURL)) {
+	backURL = "";
+}
 
 String referringPortletResource = ParamUtil.getString(request, "referringPortletResource");
 
