@@ -28,6 +28,7 @@ boolean checkContentDisplayPage = ParamUtil.getBoolean(request, "checkContentDis
 boolean defaultStateChecked = ParamUtil.getBoolean(request, "defaultStateChecked", false);
 boolean draggableTree = ParamUtil.getBoolean(request, "draggableTree", true);
 boolean expandFirstNode = ParamUtil.getBoolean(request, "expandFirstNode", true);
+boolean hasManageLayoutsPermission = GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.MANAGE_LAYOUTS);
 boolean saveState = ParamUtil.getBoolean(request, "saveState", true);
 boolean selectableTree = ParamUtil.getBoolean(request, "selectableTree");
 
@@ -464,7 +465,66 @@ if (!selectableTree) {
 	var treeElId = '<portlet:namespace /><%= HtmlUtil.escape(treeId) %>Output';
 
 	var RootNodeType = A.TreeNodeTask;
-	var TreeViewType = A.TreeView;
+
+	TreeViewType = A.Component.create(
+		{
+			NAME: 'TreeViewType',
+
+			EXTENDS: A.TreeViewDD,
+
+			prototype: {
+				_updateNodeState: function(event) {
+					var instance = this;
+					var drag = event.drag;
+					var drop = event.drop;
+					var nodeContent = drop.get('node');
+					var dropNode = nodeContent.get('parentNode');
+					var dragNode = drag.get('node').get('parentNode');
+					var dropTreeNode = dropNode.getData('tree-node');
+
+					var hasManageLayoutsPermission = <%= hasManageLayoutsPermission %>;
+
+					var draggableDropParent = dropTreeNode.get('draggable');
+
+					if (dropTreeNode.get('parentNode').get('id') === rootId) {
+						draggableDropParent = (hasManageLayoutsPermission || draggableDropParent);
+					}
+
+					instance._resetState(instance.nodeContent);
+
+					if ( !dragNode.contains(dropNode) ) {
+						var nArea = nodeContent.get('offsetHeight') / 3;
+						var yTop = nodeContent.getY();
+						var yCenter = yTop + nArea;
+						var yBottom = yTop + nArea*2;
+						var mouseY = drag.mouseXY[1];
+
+						if ((mouseY > yTop) && (mouseY < yCenter) && draggableDropParent) {
+							instance._goingUpState(nodeContent);
+						}
+						else if (mouseY > yBottom && draggableDropParent) {
+							instance._goingDownState(nodeContent);
+						}
+						else if ((mouseY > yCenter) && (mouseY < yBottom)) {
+							if (dropTreeNode && !dropTreeNode.isLeaf()) {
+								instance._appendState(nodeContent);
+							}
+							else if (draggableDropParent) {
+								if (instance.direction === UP) {
+									instance._goingUpState(nodeContent);
+								}
+								else {
+									instance._goingDownState(nodeContent);
+								}
+							}
+						}
+					}
+
+					instance.nodeContent = nodeContent;
+				},
+			}
+		}
+	);
 
 	<c:if test="<%= !selectableTree %>">
 		RootNodeType = A.TreeNodeIO;
