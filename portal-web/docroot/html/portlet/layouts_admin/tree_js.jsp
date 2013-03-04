@@ -28,7 +28,7 @@ boolean checkContentDisplayPage = ParamUtil.getBoolean(request, "checkContentDis
 boolean defaultStateChecked = ParamUtil.getBoolean(request, "defaultStateChecked", false);
 boolean draggableTree = ParamUtil.getBoolean(request, "draggableTree", true);
 boolean expandFirstNode = ParamUtil.getBoolean(request, "expandFirstNode", true);
-boolean hasSiteUpdatePermission = GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.UPDATE);
+boolean hasManageLayoutsPermission = GroupPermissionUtil.contains(permissionChecker, group.getGroupId(), ActionKeys.MANAGE_LAYOUTS);
 boolean saveState = ParamUtil.getBoolean(request, "saveState", true);
 boolean selectableTree = ParamUtil.getBoolean(request, "selectableTree");
 
@@ -482,13 +482,12 @@ if (!selectableTree) {
 					var dragNode = drag.get('node').get('parentNode');
 					var dropTreeNode = dropNode.getData('tree-node');
 
-					var hasSiteUpdatePermission = <%= hasSiteUpdatePermission %>;
+					var hasManageLayoutsPermission = <%= hasManageLayoutsPermission %>;
 
-					var draggableDropParent =
-						dropTreeNode.get('parentNode').get('draggable');
+					var draggableDropParent = dropTreeNode.get('draggable');
 
 					if (dropTreeNode.get('parentNode').get('id') === rootId) {
-						draggableDropParent = (hasSiteUpdatePermission || draggableDropParent);
+						draggableDropParent = (hasManageLayoutsPermission || draggableDropParent);
 					}
 
 					instance._resetState(instance.nodeContent);
