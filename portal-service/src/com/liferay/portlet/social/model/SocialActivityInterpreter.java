@@ -14,12 +14,14 @@
 
 package com.liferay.portlet.social.model;
 
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.service.ServiceContext;
 
 /**
  * @author Brian Wing Shun Chan
  */
 public interface SocialActivityInterpreter {
+	public static final String[] _CLASS_NAMES = new String[] {StringPool.BLANK};
 
 	public String[] getClassNames();
 
