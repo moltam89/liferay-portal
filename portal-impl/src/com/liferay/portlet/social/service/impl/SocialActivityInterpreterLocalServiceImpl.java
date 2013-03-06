@@ -16,6 +16,7 @@ package com.liferay.portlet.social.service.impl;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -139,6 +140,10 @@ public class SocialActivityInterpreterLocalServiceImpl
 			if (mirrorActivity != null) {
 				activity = mirrorActivity;
 			}
+		}
+
+		if (selector.equals(StringPool.BLANK)) {
+			selector = PortalUtil.getClassName(activity.getClassNameId());
 		}
 
 		List<SocialActivityInterpreter> activityInterpreters =

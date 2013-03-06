@@ -45,7 +45,7 @@ public abstract class BaseSocialActivityInterpreter
 	implements SocialActivityInterpreter {
 
 	public String getSelector() {
-		return StringPool.BLANK;
+		return getClassNames()[0];
 	}
 
 	public SocialActivityFeedEntry interpret(
