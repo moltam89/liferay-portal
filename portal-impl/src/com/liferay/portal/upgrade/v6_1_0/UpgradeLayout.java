@@ -119,40 +119,22 @@ public class UpgradeLayout extends UpgradeProcess {
 		}
 
 		if (Validator.isNotNull(typeSettings)) {
-			Locale defaultLocale = LocaleUtil.getDefault();
-			String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
-
 			UnicodeProperties typeSettingsProperties = new UnicodeProperties(
 				true);
 
 			typeSettingsProperties.load(typeSettings);
 
-			String defaultDescription = typeSettingsProperties.getProperty(
-				"meta-description_" + defaultLanguageId);
+			typeSettingsProperties = updateMetaField(
+				plid, typeSettingsProperties, "meta-description_",
+				"Description", "description");
 
-			if (Validator.isNotNull(defaultDescription)) {
-				typeSettingsProperties = updateMetaField(
-					plid, typeSettingsProperties, "meta-description_",
-					"Description", "description");
-			}
+			typeSettingsProperties = updateMetaField(
+				plid, typeSettingsProperties, "meta-keywords_", "Keywords",
+				"keywords");
 
-			String defaultKeywords = typeSettingsProperties.getProperty(
-				"meta-keywords_" + defaultLanguageId);
-
-			if (Validator.isNotNull(defaultKeywords)) {
-				typeSettingsProperties = updateMetaField(
-					plid, typeSettingsProperties, "meta-keywords_", "Keywords",
-					"keywords");
-			}
-
-			String defaultRobots = typeSettingsProperties.getProperty(
-				"meta-robots_" + defaultLanguageId);
-
-			if (Validator.isNotNull(defaultRobots)) {
-				typeSettingsProperties = updateMetaField(
-					plid, typeSettingsProperties, "meta-robots_", "Robots",
-					"robots");
-			}
+			typeSettingsProperties = updateMetaField(
+				plid, typeSettingsProperties, "meta-robots_", "Robots",
+				"robots");
 
 			String javaScript1 = typeSettingsProperties.getProperty(
 				"javascript-1");
