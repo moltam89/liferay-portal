@@ -717,15 +717,17 @@ serverURL.setParameter("tabs3", tabs3);
 				</aui:button-row>
 			</c:when>
 			<c:when test='<%= tabs2.equals("shutdown") %>'>
-				<aui:fieldset>
-					<aui:input label="number-of-minutes" name="minutes" size="3" type="text" />
-
-					<aui:input cssClass="lfr-textarea-container" label="custom-message" name='<%= "message" + GetterUtil.getString(ShutdownUtil.getMessage()) %>' type="textarea" />
-				</aui:fieldset>
+				<liferay-ui:error key="minutes" message="the-number-of-minutes-is-not-correct" />
 
 				<aui:button-row>
 					<c:choose>
 						<c:when test="<%= ShutdownUtil.isInProcess() %>">
+
+							<aui:fieldset>
+								<aui:input label="number-of-minutes" name="minutes" size="3" type="hidden" />
+
+								<aui:input cssClass="lfr-textarea-container" label="custom-message" name='<%= "message" + GetterUtil.getString(ShutdownUtil.getMessage()) %>' type="hidden" />
+							</aui:fieldset>
 
 							<%
 							String taglibCancelShutdown = "document." + renderResponse.getNamespace() + "fm." + renderResponse.getNamespace() + "minutes.value = 0;" + renderResponse.getNamespace() + "saveServer('shutdown');";
@@ -734,6 +736,12 @@ serverURL.setParameter("tabs3", tabs3);
 							<aui:button onClick="<%= taglibCancelShutdown %>" value="cancel-shutdown" />
 						</c:when>
 						<c:otherwise>
+
+							<aui:fieldset>
+								<aui:input label="number-of-minutes" name="minutes" size="3" type="text" />
+
+								<aui:input cssClass="lfr-textarea-container" label="custom-message" name='<%= "message" + GetterUtil.getString(ShutdownUtil.getMessage()) %>' type="textarea" />
+							</aui:fieldset>
 
 							<%
 							String taglibShutdown = renderResponse.getNamespace() + "saveServer('shutdown');";
