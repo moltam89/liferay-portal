@@ -25,12 +25,14 @@ if (Validator.isNotNull(portletResource)) {
 	preferences = PortletPreferencesFactoryUtil.getPortletSetup(request, portletResource);
 }
 
-String displayStyle = PrefsParamUtil.getString(preferences, renderRequest, "displayStyle", "horizontal");
+String defaultDisplayStyle = Validator.isNotNull(PropsValues.BREADCRUMB_DISPLAY_STYLE_OPTIONS) ? PropsValues.BREADCRUMB_DISPLAY_STYLE_OPTIONS[0] : "horizontal";
+
+String displayStyle = PrefsParamUtil.getString(preferences, renderRequest, "displayStyle", defaultDisplayStyle);
 boolean showCurrentGroup = PrefsParamUtil.getBoolean(preferences, renderRequest, "showCurrentGroup", true);
 boolean showCurrentPortlet = PrefsParamUtil.getBoolean(preferences, renderRequest, "showCurrentPortlet", true);
-boolean showGuestGroup = PrefsParamUtil.getBoolean(preferences, renderRequest, "showGuestGroup", true);
+boolean showGuestGroup = PrefsParamUtil.getBoolean(preferences, renderRequest, "showGuestGroup", PropsValues.BREADCRUMB_SHOW_GUEST_GROUP);
 boolean showLayout = PrefsParamUtil.getBoolean(preferences, renderRequest, "showLayout", true);
-boolean showParentGroups = PrefsParamUtil.getBoolean(preferences, renderRequest, "showParentGroups", true);
+boolean showParentGroups = PrefsParamUtil.getBoolean(preferences, renderRequest, "showParentGroups", PropsValues.BREADCRUMB_SHOW_PARENT_GROUPS);
 boolean showPortletBreadcrumb = PrefsParamUtil.getBoolean(preferences, renderRequest, "showPortletBreadcrumb", true);
 %>
 
