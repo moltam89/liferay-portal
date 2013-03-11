@@ -12,13 +12,35 @@
  * details.
  */
 
-package com.liferay.portal.security.auth;
+package com.liferay.portal.cache.ehcache;
+
+import net.sf.ehcache.Ehcache;
 
 /**
- * @author Brian Wing Shun Chan
+ * <p>
+ * See http://issues.liferay.com/browse/LPS-11061.
+ * </p>
+ *
+ * @author Shuyang Zhou
  */
-public interface MembershipPolicyFactory {
+public class JGroupsBootstrapCacheLoader
+	extends net.sf.ehcache.distribution.jgroups.JGroupsBootstrapCacheLoader {
 
-	public MembershipPolicy getMembershipPolicy();
+	public JGroupsBootstrapCacheLoader(
+		boolean asynchronous, int maximumChunkSize) {
+
+		super(asynchronous, maximumChunkSize);
+	}
+
+	@Override
+	public Object clone() {
+		return new JGroupsBootstrapCacheLoader(
+			asynchronous, maximumChunkSizeBytes);
+	}
+
+	@Override
+	public void load(Ehcache cache) {
+		return;
+	}
 
 }
