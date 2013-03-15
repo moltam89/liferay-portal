@@ -517,19 +517,14 @@ public class EditServerAction extends PortletAction {
 	}
 
 	protected void shutdown(ActionRequest actionRequest) throws Exception {
-		String minutesTest = ParamUtil.getString(actionRequest, "minutes");
-		long minutes =
-				ParamUtil.getInteger(actionRequest, "minutes") * Time.MINUTE;
-
 		if (ShutdownUtil.isInProcess()) {
-			if (minutes <= 0) {
-				ShutdownUtil.cancel();
-			}
+			ShutdownUtil.cancel();
 		}
 		else {
-			if (!Validator.isNumber(minutesTest) ||
-					Validator.equals(minutes, 0)) {
+			long minutes =
+				ParamUtil.getInteger(actionRequest, "minutes") * Time.MINUTE;
 
+			if (minutes <= 0) {
 				SessionErrors.add(actionRequest, "minutes");
 			}
 			else {
