@@ -84,7 +84,7 @@ if (referer.equals(themeDisplay.getPathMain() + "/portal/update_reminder_query")
 				else {
 					customQuestionContainer.hide();
 
-					Liferay.Util.focusFormField('#reminderQueryAnswer');
+					<%--Liferay.Util.focusFormField('#reminderQueryAnswer'); --%>
 				}
 			}
 		);
