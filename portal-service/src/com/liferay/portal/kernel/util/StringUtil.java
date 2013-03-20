@@ -307,6 +307,56 @@ public class StringUtil {
 	}
 
 	/**
+	 * Returns <code>true</code> if the string contains any or all elements of
+	 * searchArray.
+	 *
+	 * <p>
+	 * Examples:
+	 * </p>
+	 *
+	 * <pre>
+	 * <code>
+	 * contains("three...two...one", new String[] {"1", "two"}, true)
+	 * returns true
+	 * contains("three...two...one", new String[] {"1", "2"}, true)
+	 * returns false
+	 * contains("three...two...one", new String[] {"1", "two"}, false)
+	 * returns false
+	 * contains("three...two...one", new String[] {"one", "two"}, false)
+	 * returns true
+	 * </code>
+	 * </pre>
+	 *
+	 * @param  s the string in which to search
+	 * @param  textArray the strings to search for in the string
+	 * @param  any whether containing any element of textArray is acceptable
+	 * @return <code>true</code> if the string contains any or all elements of
+	 * searchArray; <code>false</code> otherwise
+	 */
+	public static boolean contains(String s, String[] textArray, boolean any) {
+		if ((s == null) || (textArray == null)) {
+			return false;
+		}
+
+		for (String text : textArray) {
+			if (any && s.contains(text)) {
+				return true;
+			}
+
+			if (!any && !s.contains(text)) {
+				return false;
+			}
+		}
+
+		if (any) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+
+	/**
 	 * Returns the number of times the text appears in the string.
 	 *
 	 * @param  s the string in which to search
