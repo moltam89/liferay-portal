@@ -60,6 +60,10 @@ import org.apache.commons.lang.time.StopWatch;
  */
 public class DynamicCSSUtil {
 
+	public static final String[] PATH_REPLACEMENTS = new String[] {
+		"@portal_ctx@", "@theme_image_path@"
+	};
+
 	public static void init() {
 		try {
 			_rubyScript = StringUtil.read(
@@ -172,10 +176,7 @@ public class DynamicCSSUtil {
 		}
 
 		parsedContent = StringUtil.replace(
-			parsedContent,
-			new String[] {
-				"@portal_ctx@", "@theme_image_path@"
-			},
+			parsedContent, PATH_REPLACEMENTS,
 			new String[] {
 				PortalUtil.getPathContext(),
 				_getThemeImagesPath(request, themeDisplay, theme)

@@ -47,6 +47,24 @@ public class StringUtilTest extends TestCase {
 			StringUtil.appendParentheticalSuffix("Hello (World)", "Liferay"));
 	}
 
+	public void testContains() throws Exception {
+		assertTrue(
+			StringUtil.contains(
+				"three...two...one",new String[] {"1", "two"}, true));
+
+		assertFalse(
+			StringUtil.contains(
+				"three...two...one", new String[] {"1", "2"}, true));
+
+		assertFalse(
+			StringUtil.contains(
+				"three...two...one", new String[] {"1", "two"}, false));
+
+		assertTrue(
+			StringUtil.contains(
+				"three...two...one", new String[] {"one", "two"}, false));
+	}
+
 	public void testHighlight() throws Exception {
 		assertEquals(
 			"<span class=\"highlight\">Hello</span> World <span " +

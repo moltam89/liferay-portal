@@ -48,6 +48,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -177,6 +180,58 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 
 				importContent = StringUtil.replace(
 					importContent, "[$TEMP_RELATIVE_PATH$]", StringPool.BLANK);
+
+				if (importDepth > 0) {
+					Matcher matcher = _CSS_URL_PATTERN.matcher(importContent);
+
+					StringBundler modifiedContent = new StringBundler();
+
+					int importPos = 0;
+
+					while (matcher.find()) {
+						modifiedContent.append(
+							importContent.substring(
+								importPos, matcher.start()));
+
+						if (StringUtil.contains(
+								matcher.group(2),
+								DynamicCSSUtil.PATH_REPLACEMENTS, true) ||
+							matcher.group(2).startsWith(StringPool.SLASH)) {
+
+							modifiedContent.append(matcher.group());
+						}
+						else {
+							String path =
+								importDir.substring(1) + matcher.group(2);
+
+							List<String> chunks =
+								new LinkedList<String>(
+									Arrays.asList(
+										path.split(StringPool.SLASH)));
+
+							for (int i = 1; i < chunks.size(); i++) {
+								if (chunks.get(i).equals("..") && (i > 0)) {
+									chunks.remove(i);
+									chunks.remove(i - 1);
+									i -= 2;
+								}
+							}
+
+							modifiedContent.append(
+								matcher.group(1) + StringUtil.merge(
+									chunks.toArray(),
+									StringPool.SLASH) + matcher.group(3));
+						}
+
+						importPos = matcher.end();
+					}
+
+					modifiedContent.append(
+						importContent.substring(
+							importPos, importContent.length()));
+
+					importContent = modifiedContent.toString();
+				}
 
 				if (Validator.isNotNull(mediaQuery)) {
 					sb.append(_CSS_MEDIA_QUERY);
@@ -567,6 +622,9 @@ public class AggregateFilter extends IgnoreModuleRequestFilter {
 	private static final String _CSS_IMPORT_END = ");";
 
 	private static final String _CSS_MEDIA_QUERY = "@media";
+
+	private static final Pattern _CSS_URL_PATTERN = Pattern.compile(
+		"(?<!@import )(url\\((?!\\s*\\))['\"]?)([^'\"]+?)(['\"]?\\))");
 
 	private static final String _JAVASCRIPT_EXTENSION = ".js";
 
