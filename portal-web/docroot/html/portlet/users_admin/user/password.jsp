@@ -171,15 +171,11 @@ else {
 						<%
 						}
 						%>
-
-						Liferay.Util.focusFormField(reminderQueryCustomQuestion);
 					}
 					else {
 						if (customQuestionDiv) {
 							customQuestionDiv.hide();
 						}
-
-						Liferay.Util.focusFormField(A.one('#<portlet:namespace />reminderQueryAnswer'));
 					}
 				}
 			);
