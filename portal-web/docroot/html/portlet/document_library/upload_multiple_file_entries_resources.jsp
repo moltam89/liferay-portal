@@ -90,134 +90,136 @@ long assetClassPK = 0;
 
 			<c:if test="<%= fileEntryTypes.size() > 1 %>">
 				<liferay-ui:panel collapsible="<%= true %>" cssClass="document-type" persistState="<%= true %>" title="document-type">
-					<aui:input name="fileEntryTypeId" type="hidden" value="<%= (fileEntryTypeId > 0) ? fileEntryTypeId : 0 %>" />
+					<aui:fieldset>
+						<aui:input name="fileEntryTypeId" type="hidden" value="<%= (fileEntryTypeId > 0) ? fileEntryTypeId : 0 %>" />
 
-					<div class="document-type-selector">
-						<liferay-ui:icon-menu align="left" direction="down" icon='<%= themeDisplay.getPathThemeImages() + "/common/copy.png" %>' id="groupSelector" message='<%= (fileEntryTypeId > 0) ? HtmlUtil.escape(fileEntryType.getName()) : "basic-document" %>'>
-							<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" var="viewBasicFileEntryTypeURL">
-								<portlet:param name="struts_action" value="/document_library/edit_file_entry" />
-								<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
-								<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
-								<portlet:param name="fileEntryTypeId" value="0" />
-							</liferay-portlet:resourceURL>
-
-							<liferay-ui:icon
-								cssClass="upload-multiple-document-types"
-								id='<%= "fileEntryType_0" %>'
-								image="copy"
-								message="basic-document"
-								method="get"
-								url="<%= viewBasicFileEntryTypeURL %>"
-							/>
-
-							<%
-							for (DLFileEntryType curFileEntryType : fileEntryTypes) {
-							%>
-
-								<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" var="viewFileEntryTypeURL">
+						<div class="document-type-selector">
+							<liferay-ui:icon-menu align="left" direction="down" icon='<%= themeDisplay.getPathThemeImages() + "/common/copy.png" %>' id="groupSelector" message='<%= (fileEntryTypeId > 0) ? HtmlUtil.escape(fileEntryType.getName()) : "basic-document" %>'>
+								<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" var="viewBasicFileEntryTypeURL">
 									<portlet:param name="struts_action" value="/document_library/edit_file_entry" />
 									<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
 									<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
-									<portlet:param name="fileEntryTypeId" value="<%= String.valueOf(curFileEntryType.getFileEntryTypeId()) %>" />
+									<portlet:param name="fileEntryTypeId" value="0" />
 								</liferay-portlet:resourceURL>
 
 								<liferay-ui:icon
 									cssClass="upload-multiple-document-types"
-									id='<%= "fileEntryType_" + String.valueOf(curFileEntryType.getFileEntryTypeId()) %>'
+									id='<%= "fileEntryType_0" %>'
 									image="copy"
-									message="<%= HtmlUtil.escape(curFileEntryType.getName()) %>"
+									message="basic-document"
 									method="get"
-									url="<%= viewFileEntryTypeURL %>"
+									url="<%= viewBasicFileEntryTypeURL %>"
 								/>
 
-							<%
-							}
-							%>
+								<%
+								for (DLFileEntryType curFileEntryType : fileEntryTypes) {
+								%>
 
-						</liferay-ui:icon-menu>
-					</div>
+									<liferay-portlet:resourceURL copyCurrentRenderParameters="<%= false %>" var="viewFileEntryTypeURL">
+										<portlet:param name="struts_action" value="/document_library/edit_file_entry" />
+										<portlet:param name="repositoryId" value="<%= String.valueOf(repositoryId) %>" />
+										<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
+										<portlet:param name="fileEntryTypeId" value="<%= String.valueOf(curFileEntryType.getFileEntryTypeId()) %>" />
+									</liferay-portlet:resourceURL>
+	
+									<liferay-ui:icon
+										cssClass="upload-multiple-document-types"
+										id='<%= "fileEntryType_" + String.valueOf(curFileEntryType.getFileEntryTypeId()) %>'
+										image="copy"
+										message="<%= HtmlUtil.escape(curFileEntryType.getName()) %>"
+										method="get"
+										url="<%= viewFileEntryTypeURL %>"
+									/>
 
-					<%
-					if (fileEntryTypeId > 0) {
-						try {
-							List<DDMStructure> ddmStructures = fileEntryType.getDDMStructures();
-
-							for (DDMStructure ddmStructure : ddmStructures) {
-								Fields fields = null;
-
-								try {
-									DLFileEntryMetadata fileEntryMetadata = DLFileEntryMetadataLocalServiceUtil.getFileEntryMetadata(ddmStructure.getStructureId(), fileVersionId);
-
-									fields = StorageEngineUtil.getFields(fileEntryMetadata.getDDMStorageId());
+								<%
 								}
-								catch (Exception e) {
-								}
-					%>
+								%>
+	
+							</liferay-ui:icon-menu>
+						</div>
 
-									<div class="document-type-fields">
-										<liferay-ddm:html
-											classNameId="<%= PortalUtil.getClassNameId(DDMStructure.class) %>"
-											classPK="<%= ddmStructure.getPrimaryKey() %>"
-											fields="<%= fields %>"
-											fieldsNamespace="<%= String.valueOf(ddmStructure.getPrimaryKey()) %>"
-											requestedLocale="<%= locale %>"
-										/>
-									</div>
-
-					<%
-							}
-						}
-						catch (Exception e) {
-						}
-					}
-					%>
-
-					<aui:script use="aui-base">
-						var groupSelectorMenu = A.one('#<portlet:namespace />groupSelector ul');
-
-						groupSelectorMenu.delegate(
-							'click',
-							function(event) {
-								event.preventDefault();
-
-								var documentTypeForm = A.one('#<portlet:namespace />fm2');
-
-								documentTypeForm.load(
-									event.currentTarget.attr('href'),
-									{
-										where: 'outer'
-									},
-									function() {
-										var selectedFilesCountContainer = A.one('.selected-files-count');
-
-										var totalFiles = A.all('input[name=<portlet:namespace />selectUploadedFileCheckbox]');
-
-										var totalFilesCount = totalFiles.size();
-
-										var selectedFiles = totalFiles.filter(':checked');
-
-										var selectedFilesCount = selectedFiles.size();
-
-										var selectedFilesText = selectedFiles.item(0).attr('data-fileName');
-
-										if (selectedFilesCount > 1) {
-											if (selectedFilesCount == totalFilesCount) {
-												selectedFilesText = '<%= UnicodeLanguageUtil.get(pageContext, "all-files-selected") %>';
-											}
-											else {
-												selectedFilesText = A.Lang.sub('<%= UnicodeLanguageUtil.get(pageContext, "x-files-selected") %>', [selectedFilesCount]);
-											}
-										}
-
-										selectedFilesCountContainer.setContent(selectedFilesText);
-
-										selectedFilesCountContainer.attr('title', selectedFilesText);
+						<%
+						if (fileEntryTypeId > 0) {
+							try {
+								List<DDMStructure> ddmStructures = fileEntryType.getDDMStructures();
+	
+								for (DDMStructure ddmStructure : ddmStructures) {
+									Fields fields = null;
+	
+									try {
+										DLFileEntryMetadata fileEntryMetadata = DLFileEntryMetadataLocalServiceUtil.getFileEntryMetadata(ddmStructure.getStructureId(), fileVersionId);
+	
+										fields = StorageEngineUtil.getFields(fileEntryMetadata.getDDMStorageId());
 									}
-								);
-							},
-							'li a'
-						);
-					</aui:script>
+									catch (Exception e) {
+									}
+						%>
+
+										<div class="document-type-fields">
+											<liferay-ddm:html
+												classNameId="<%= PortalUtil.getClassNameId(DDMStructure.class) %>"
+												classPK="<%= ddmStructure.getPrimaryKey() %>"
+												fields="<%= fields %>"
+												fieldsNamespace="<%= String.valueOf(ddmStructure.getPrimaryKey()) %>"
+												requestedLocale="<%= locale %>"
+											/>
+										</div>
+
+						<%
+								}
+							}
+							catch (Exception e) {
+							}
+						}
+						%>
+
+						<aui:script use="aui-base">
+							var groupSelectorMenu = A.one('#<portlet:namespace />groupSelector ul');
+
+							groupSelectorMenu.delegate(
+								'click',
+								function(event) {
+									event.preventDefault();
+
+									var documentTypeForm = A.one('#<portlet:namespace />fm2');
+
+									documentTypeForm.load(
+										event.currentTarget.attr('href'),
+										{
+											where: 'outer'
+										},
+										function() {
+											var selectedFilesCountContainer = A.one('.selected-files-count');
+
+											var totalFiles = A.all('input[name=<portlet:namespace />selectUploadedFileCheckbox]');
+
+											var totalFilesCount = totalFiles.size();
+
+											var selectedFiles = totalFiles.filter(':checked');
+
+											var selectedFilesCount = selectedFiles.size();
+
+											var selectedFilesText = selectedFiles.item(0).attr('data-fileName');
+
+											if (selectedFilesCount > 1) {
+												if (selectedFilesCount == totalFilesCount) {
+													selectedFilesText = '<%= UnicodeLanguageUtil.get(pageContext, "all-files-selected") %>';
+												}
+												else {
+													selectedFilesText = A.Lang.sub('<%= UnicodeLanguageUtil.get(pageContext, "x-files-selected") %>', [selectedFilesCount]);
+												}
+											}
+
+											selectedFilesCountContainer.setContent(selectedFilesText);
+
+											selectedFilesCountContainer.attr('title', selectedFilesText);
+										}
+									);
+								},
+								'li a'
+							);
+						</aui:script>
+					</aui:fieldset>
 				</liferay-ui:panel>
 			</c:if>
 
