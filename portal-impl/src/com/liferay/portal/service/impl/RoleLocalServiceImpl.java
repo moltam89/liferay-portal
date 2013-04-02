@@ -975,6 +975,8 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         <code>obc</code>
 	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.RoleFinder
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             #search(long, String, Integer[], int, int, Sort)}
 	 */
 	public List<Role> search(
 			long companyId, String keywords, Integer[] types, int start,
@@ -1054,6 +1056,8 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         <code>obc</code>
 	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.RoleFinder
+	 * @deprecated As of 6.2.0, replaced by {@link #search(long, String,
+	 *             Integer[], LinkedHashMap<String, Object>, int, int, Sort)}
 	 */
 	public List<Role> search(
 			long companyId, String keywords, Integer[] types,
@@ -1144,6 +1148,8 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         <code>obc</code>
 	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.RoleFinder
+	 * @deprecated As of 6.2.0, replaced by {@link #search(long, String, String,
+	 *             String, Integer[], boolean, int, int, Sort)}
 	 */
 	public List<Role> search(
 			long companyId, String name, String description, Integer[] types,
@@ -1185,6 +1191,9 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         <code>obc</code>
 	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.RoleFinder
+	 * @deprecated As of 6.2.0, replaced by {@link #search(long, String, String,
+	 *             String, Integer[], LinkedHashMap<String, Object>, boolean,
+	 *             start, end, Sort)}
 	 */
 	public List<Role> search(
 			long companyId, String name, String description, Integer[] types,
@@ -1339,6 +1348,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @param  types the role types (optionally <code>null</code>)
 	 * @return the number of matching roles
 	 * @throws SystemException if a system exception occurred
+	 * @deprecated As of 6.2.0
 	 */
 	public int searchCount(long companyId, String keywords, Integer[] types)
 		throws SystemException {
@@ -1358,6 +1368,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         com.liferay.portal.service.persistence.RoleFinder}
 	 * @return the number of matching roles
 	 * @throws SystemException if a system exception occurred
+	 * @deprecated As of 6.2.0
 	 */
 	public int searchCount(
 			long companyId, String keywords, Integer[] types,
@@ -1376,6 +1387,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @param  types the role types (optionally <code>null</code>)
 	 * @return the number of matching roles
 	 * @throws SystemException if a system exception occurred
+	 * @deprecated As of 6.2.0
 	 */
 	public int searchCount(
 			long companyId, String name, String description, Integer[] types)
@@ -1399,6 +1411,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         com.liferay.portal.service.persistence.RoleFinder}
 	 * @return the number of matching roles
 	 * @throws SystemException if a system exception occurred
+	 * @deprecated As of 6.2.0
 	 */
 	public int searchCount(
 			long companyId, String name, String description, Integer[] types,
