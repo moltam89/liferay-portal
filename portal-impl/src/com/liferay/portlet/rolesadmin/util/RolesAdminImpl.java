@@ -14,10 +14,24 @@
 
 package com.liferay.portlet.rolesadmin.util;
 
+import com.liferay.portal.NoSuchRoleException;
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.search.Document;
+import com.liferay.portal.kernel.search.Field;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.security.pacl.DoPrivileged;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.service.RoleLocalServiceUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Brian Wing Shun Chan
@@ -48,6 +62,35 @@ public class RolesAdminImpl implements RolesAdmin {
 		}
 
 		return "lfr-role " + cssClassName;
+	}
+
+	public Tuple getRoles(Hits hits) throws PortalException, SystemException {
+		List<Role> roles = new ArrayList<Role>();
+		boolean corruptIndex = false;
+
+		List<Document> documents = hits.toList();
+
+		for (Document document : documents) {
+			long roleId = GetterUtil.getLong(document.get(Field.ROLE_ID));
+
+			try {
+				Role role = RoleLocalServiceUtil.getRole(roleId);
+
+				roles.add(role);
+			}
+			catch (NoSuchRoleException nsre) {
+				corruptIndex = true;
+
+				Indexer indexer = IndexerRegistryUtil.getIndexer(Role.class);
+
+				long companyId = GetterUtil.getLong(
+					document.get(Field.COMPANY_ID));
+
+				indexer.delete(companyId, document.getUID());
+			}
+		}
+
+		return new Tuple(roles, corruptIndex);
 	}
 
 }

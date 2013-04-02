@@ -14,6 +14,10 @@
 
 package com.liferay.portlet.rolesadmin.util;
 
+import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.model.Role;
 
 /**
@@ -22,5 +26,7 @@ import com.liferay.portal.model.Role;
 public interface RolesAdmin {
 
 	public String getCssClassName(Role role);
+
+	public Tuple getRoles(Hits hits) throws PortalException, SystemException;
 
 }
