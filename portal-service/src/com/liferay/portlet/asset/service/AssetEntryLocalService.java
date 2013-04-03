@@ -546,6 +546,12 @@ public interface AssetEntryLocalService extends BaseLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException;
 
 	public com.liferay.portlet.asset.model.AssetEntry incrementViewCounter(
+		com.liferay.portal.model.User user, java.lang.String className,
+		long classPK)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	public com.liferay.portlet.asset.model.AssetEntry incrementViewCounter(
 		long userId, java.lang.String className, long classPK, int increment)
 		throws com.liferay.portal.kernel.exception.SystemException;
 
