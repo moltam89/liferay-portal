@@ -597,7 +597,8 @@ public abstract class BaseIndexer implements Indexer {
 	}
 
 	protected void addSearchArrayQuery(
-			BooleanQuery searchQuery, SearchContext searchContext, String field)
+			BooleanQuery searchQuery, SearchContext searchContext, String field,
+			boolean required)
 		throws Exception {
 
 		if (Validator.isNull(field)) {
@@ -622,7 +623,12 @@ public abstract class BaseIndexer implements Indexer {
 			fieldQuery = BooleanQueryFactoryUtil.create(searchContext);
 
 			for (int fieldValue : fieldValuesArray) {
-				fieldQuery.addTerm(field, fieldValue);
+				if (required) {
+					fieldQuery.addRequiredTerm(field, fieldValue);
+				}
+				else {
+					fieldQuery.addTerm(field, fieldValue);
+				}
 			}
 		}
 		else if (fieldValues instanceof Integer[]) {
@@ -635,7 +641,12 @@ public abstract class BaseIndexer implements Indexer {
 			fieldQuery = BooleanQueryFactoryUtil.create(searchContext);
 
 			for (Integer fieldValue : fieldValuesArray) {
-				fieldQuery.addTerm(field, fieldValue);
+				if (required) {
+					fieldQuery.addRequiredTerm(field, fieldValue);
+				}
+				else {
+					fieldQuery.addTerm(field, fieldValue);
+				}
 			}
 		}
 		else if (fieldValues instanceof long[]) {
@@ -648,7 +659,12 @@ public abstract class BaseIndexer implements Indexer {
 			fieldQuery = BooleanQueryFactoryUtil.create(searchContext);
 
 			for (long fieldValue : fieldValuesArray) {
-				fieldQuery.addTerm(field, fieldValue);
+				if (required) {
+					fieldQuery.addRequiredTerm(field, fieldValue);
+				}
+				else {
+					fieldQuery.addTerm(field, fieldValue);
+				}
 			}
 		}
 		else if (fieldValues instanceof Long[]) {
@@ -661,7 +677,12 @@ public abstract class BaseIndexer implements Indexer {
 			fieldQuery = BooleanQueryFactoryUtil.create(searchContext);
 
 			for (Long fieldValue : fieldValuesArray) {
-				fieldQuery.addTerm(field, fieldValue);
+				if (required) {
+					fieldQuery.addRequiredTerm(field, fieldValue);
+				}
+				else {
+					fieldQuery.addTerm(field, fieldValue);
+				}
 			}
 		}
 		else if (fieldValues instanceof short[]) {
@@ -674,7 +695,12 @@ public abstract class BaseIndexer implements Indexer {
 			fieldQuery = BooleanQueryFactoryUtil.create(searchContext);
 
 			for (short fieldValue : fieldValuesArray) {
-				fieldQuery.addTerm(field, fieldValue);
+				if (required) {
+					fieldQuery.addRequiredTerm(field, fieldValue);
+				}
+				else {
+					fieldQuery.addTerm(field, fieldValue);
+				}
 			}
 		}
 		else if (fieldValues instanceof Short[]) {
@@ -687,7 +713,12 @@ public abstract class BaseIndexer implements Indexer {
 			fieldQuery = BooleanQueryFactoryUtil.create(searchContext);
 
 			for (Short fieldValue : fieldValuesArray) {
-				fieldQuery.addTerm(field, fieldValue);
+				if (required) {
+					fieldQuery.addRequiredTerm(field, fieldValue);
+				}
+				else {
+					fieldQuery.addTerm(field, fieldValue);
+				}
 			}
 		}
 

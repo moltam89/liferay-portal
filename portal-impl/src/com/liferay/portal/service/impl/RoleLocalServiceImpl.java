@@ -27,8 +27,14 @@ import com.liferay.portal.kernel.dao.shard.ShardUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
+import com.liferay.portal.kernel.search.Hits;
+import com.liferay.portal.kernel.search.Indexable;
+import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.QueryConfig;
+import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
@@ -58,6 +64,8 @@ import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.usersadmin.util.UsersAdminUtil;
+
+import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -165,6 +173,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public Role addRole(
 			long userId, String className, long classPK, String name,
 			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
@@ -382,6 +391,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         role's resource could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.DELETE)
 	@Override
 	public Role deleteRole(Role role) throws PortalException, SystemException {
 		if (PortalUtil.isSystemRole(role.getName())) {
@@ -965,6 +975,8 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         <code>obc</code>
 	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.RoleFinder
+	 * @deprecated As of 6.2.0, replaced by {@link
+	 *             #search(long, String, Integer[], int, int, Sort)}
 	 */
 	public List<Role> search(
 			long companyId, String keywords, Integer[] types, int start,
@@ -974,6 +986,44 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 		return search(
 			companyId, keywords, types, new LinkedHashMap<String, Object>(),
 			start, end, obc);
+	}
+
+	/**
+	 * Returns an ordered range of all the roles that match the keywords and
+	 * types.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end -
+	 * start</code> instances. <code>start</code> and <code>end</code> are not
+	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
+	 * refers to the first result in the set. Setting both <code>start</code>
+	 * and <code>end</code> to {@link
+	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * result set.
+	 * </p>
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  keywords the keywords (space separated), which may occur in the
+	 *         role's name, title or description (optionally <code>null</code>)
+	 * @param  types the role types (optionally <code>null</code>)
+	 * @param  start the lower bound of the range of roles to return
+	 * @param  end the upper bound of the range of roles to return (not
+	 *         inclusive)
+	 * @param  sort the field and direction to sort by (optionally
+	 *         <code>null</code>)
+	 * @return the ordered range of the matching roles, ordered by
+	 *         <code>sort</code>
+	 * @throws SystemException if a system exception occurred
+	 * @see    com.liferay.portlet.rolesadmin.util.RoleIndexer
+	 */
+	public Hits search(
+		long companyId, String keywords, Integer[] types, int start, int end,
+		Sort sort)
+	throws SystemException {
+
+		return search(
+			companyId, keywords, types, new LinkedHashMap<String, Object>(),
+			start, end, sort);
 	}
 
 	/**
@@ -1006,6 +1056,8 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         <code>obc</code>
 	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.RoleFinder
+	 * @deprecated As of 6.2.0, replaced by {@link #search(long, String,
+	 *             Integer[], LinkedHashMap<String, Object>, int, int, Sort)}
 	 */
 	public List<Role> search(
 			long companyId, String keywords, Integer[] types,
@@ -1015,6 +1067,58 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 
 		return roleFinder.findByKeywords(
 			companyId, keywords, types, params, start, end, obc);
+	}
+
+	/**
+	 * Returns an ordered range of all the roles that match the keywords, types,
+	 * and params.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end -
+	 * start</code> instances. <code>start</code> and <code>end</code> are not
+	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
+	 * refers to the first result in the set. Setting both <code>start</code>
+	 * and <code>end</code> to {@link
+	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * result set.
+	 * </p>
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  keywords the keywords (space separated), which may occur in the
+	 *         role's name or description (optionally <code>null</code>)
+	 * @param  types the role types (optionally <code>null</code>)
+	 * @param  params the indexer parameters (optionally <code>null</code>). For
+	 *         more information see {@link
+	 *         com.liferay.portlet.rolesadmin.util.RoleIndexer}.
+	 * @param  start the lower bound of the range of roles to return
+	 * @param  end the upper bound of the range of roles to return (not
+	 *         inclusive)
+	 * @param  sort the field and direction to sort by (optionally
+	 *         <code>null</code>)
+	 * @return the ordered range of the matching roles, ordered by
+	 *         <code>sort</code>
+	 * @throws SystemException if a system exception occurred
+	 * @see    com.liferay.portlet.rolesadmin.util.RoleIndexer
+	 */
+	public Hits search(
+		long companyId, String keywords, Integer[] types,
+		LinkedHashMap<String, Object> params, int start, int end, Sort sort)
+	throws SystemException {
+
+		String name = null;
+		String title = null;
+		String description = null;
+		boolean andSearch = false;
+
+		if (Validator.isNotNull(keywords)) {
+			name = keywords;
+			title = keywords;
+			description = keywords;
+		}
+
+		return search(
+			companyId, name, title, description, types, params, andSearch,
+			start, end, sort);
 	}
 
 	/**
@@ -1044,6 +1148,8 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         <code>obc</code>
 	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.RoleFinder
+	 * @deprecated As of 6.2.0, replaced by {@link #search(long, String, String,
+	 *             String, Integer[], boolean, int, int, Sort)}
 	 */
 	public List<Role> search(
 			long companyId, String name, String description, Integer[] types,
@@ -1085,6 +1191,9 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         <code>obc</code>
 	 * @throws SystemException if a system exception occurred
 	 * @see    com.liferay.portal.service.persistence.RoleFinder
+	 * @deprecated As of 6.2.0, replaced by {@link #search(long, String, String,
+	 *             String, Integer[], LinkedHashMap<String, Object>, boolean,
+	 *             start, end, Sort)}
 	 */
 	public List<Role> search(
 			long companyId, String name, String description, Integer[] types,
@@ -1097,6 +1206,140 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	}
 
 	/**
+	 * Returns an ordered range of all the roles that match the name, title,
+	 * description, and types.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end -
+	 * start</code> instances. <code>start</code> and <code>end</code> are not
+	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
+	 * refers to the first result in the set. Setting both <code>start</code>
+	 * and <code>end</code> to {@link
+	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * result set.
+	 * </p>
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  name the role's name (optionally <code>null</code>)
+	 * @param  title the role1s title (optionally <code>null</code>)
+	 * @param  description the role's description (optionally <code>null</code>)
+	 * @param  types the role types (optionally <code>null</code>)
+	 * @param  andSearch whether every field must match its keywords, or just
+	 *         one field. For example, &quot;users with the first name 'bob' and
+	 *         last name 'smith'&quot; vs &quot;users with the first name 'bob'
+	 *         or the last name 'smith'&quot;.
+	 * @param  start the lower bound of the range of the roles to return
+	 * @param  end the upper bound of the range of the roles to return (not
+	 *         inclusive)
+	 * @param  sort the field and direction to sort by (optionally
+	 *         <code>null</code>)
+	 * @return the ordered range of the matching roles, ordered by
+	 *         <code>sort</code>
+	 * @throws SystemException if a system exception occurred
+	 * @see    com.liferay.portlet.rolesadmin.util.RoleIndexer
+	 */
+	public Hits search(
+		long companyId, String name, String title, String description,
+		Integer[] types, boolean andSearch, int start, int end, Sort sort)
+	throws SystemException {
+
+		return search(
+			companyId, name, title, description, types,
+			new LinkedHashMap<String, Object>(), andSearch, start, end, sort);
+	}
+
+	/**
+	 * Returns an ordered range of all the roles that match the name, title,
+	 * description, types, and params.
+	 *
+	 * <p>
+	 * Useful when paginating results. Returns a maximum of <code>end -
+	 * start</code> instances. <code>start</code> and <code>end</code> are not
+	 * primary keys, they are indexes in the result set. Thus, <code>0</code>
+	 * refers to the first result in the set. Setting both <code>start</code>
+	 * and <code>end</code> to {@link
+	 * com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	 * result set.
+	 * </p>
+	 *
+	 * @param  companyId the primary key of the company
+	 * @param  name the role's name (optionally <code>null</code>)
+	 * @param  title the role's title (optionally <code>null</code>)
+	 * @param  description the role's description (optionally <code>null</code>)
+	 * @param  types the role types (optionally <code>null</code>)
+	 * @param  params the indexer parameters (optionally <code>null</code>). For
+	 *         more information see {@link
+	 *         com.liferay.portlet.rolesadmin.util.RoleIndexer}.
+	 * @param  andSearch whether every field must match its keywords, or just
+	 *         one field. For example, &quot;users with the first name 'bob' and
+	 *         last name 'smith'&quot; vs &quot;users with the first name 'bob'
+	 *         or the last name 'smith'&quot;.
+	 * @param  start the lower bound of the range of the roles to return
+	 * @param  end the upper bound of the range of the roles to return (not
+	 *         inclusive)
+	 * @param  sort the field and direction to sort by (optionally
+	 *         <code>null</code>)
+	 * @return the ordered range of the matching roles, ordered by
+	 *         <code>sort</code>
+	 * @throws SystemException if a system exception occurred
+	 * @see    com.liferay.portlet.rolesadmin.util.RoleIndexer
+	 */
+	public Hits search(
+			long companyId, String name, String title, String description,
+			Integer[] types, LinkedHashMap<String, Object> params,
+			boolean andSearch, int start, int end, Sort sort)
+		throws SystemException {
+
+		try {
+			SearchContext searchContext = new SearchContext();
+
+			searchContext.setAndSearch(andSearch);
+
+			Map<String, Serializable> attributes =
+				new HashMap<String, Serializable>();
+
+			attributes.put("name", name);
+			attributes.put("title", title);
+			attributes.put("description", description);
+			attributes.put("type", types);
+
+			searchContext.setAttributes(attributes);
+
+			searchContext.setCompanyId(companyId);
+			searchContext.setEnd(end);
+
+			if (params != null) {
+				String keywords = (String)params.remove("keywords");
+
+				if (Validator.isNotNull(keywords)) {
+					searchContext.setKeywords(keywords);
+				}
+			}
+
+			QueryConfig queryConfig = new QueryConfig();
+
+			queryConfig.setHighlightEnabled(false);
+			queryConfig.setScoreEnabled(false);
+
+			searchContext.setQueryConfig(queryConfig);
+
+			if (sort != null) {
+				searchContext.setSorts(new Sort[] {sort});
+			}
+
+			searchContext.setStart(start);
+
+			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+				Role.class);
+
+			return indexer.search(searchContext);
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+	}
+
+	/**
 	 * Returns the number of roles that match the keywords and types.
 	 *
 	 * @param  companyId the primary key of the company
@@ -1105,6 +1348,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @param  types the role types (optionally <code>null</code>)
 	 * @return the number of matching roles
 	 * @throws SystemException if a system exception occurred
+	 * @deprecated As of 6.2.0
 	 */
 	public int searchCount(long companyId, String keywords, Integer[] types)
 		throws SystemException {
@@ -1124,6 +1368,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         com.liferay.portal.service.persistence.RoleFinder}
 	 * @return the number of matching roles
 	 * @throws SystemException if a system exception occurred
+	 * @deprecated As of 6.2.0
 	 */
 	public int searchCount(
 			long companyId, String keywords, Integer[] types,
@@ -1142,6 +1387,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 * @param  types the role types (optionally <code>null</code>)
 	 * @return the number of matching roles
 	 * @throws SystemException if a system exception occurred
+	 * @deprecated As of 6.2.0
 	 */
 	public int searchCount(
 			long companyId, String name, String description, Integer[] types)
@@ -1165,6 +1411,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         com.liferay.portal.service.persistence.RoleFinder}
 	 * @return the number of matching roles
 	 * @throws SystemException if a system exception occurred
+	 * @deprecated As of 6.2.0
 	 */
 	public int searchCount(
 			long companyId, String name, String description, Integer[] types,
@@ -1242,6 +1489,7 @@ public class RoleLocalServiceImpl extends RoleLocalServiceBaseImpl {
 	 *         if the role's name was invalid
 	 * @throws SystemException if a system exception occurred
 	 */
+	@Indexable(type = IndexableType.REINDEX)
 	public Role updateRole(
 			long roleId, String name, Map<Locale, String> titleMap,
 			Map<Locale, String> descriptionMap, String subtype,

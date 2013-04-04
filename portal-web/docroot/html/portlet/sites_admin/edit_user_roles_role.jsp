@@ -47,7 +47,25 @@ RoleSearch searchContainer = new RoleSearch(renderRequest, portletURL);
 <%
 RoleSearchTerms searchTerms = (RoleSearchTerms)searchContainer.getSearchTerms();
 
-List<Role> roles = RoleLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), new Integer[] {roleType}, QueryUtil.ALL_POS, QueryUtil.ALL_POS, searchContainer.getOrderByComparator());
+Sort sort = SortFactoryUtil.getSort(Role.class, searchContainer.getOrderByCol(), searchContainer.getOrderByType());
+
+List<Role> roles = null;
+
+while (true) {
+	Hits hits = null;
+
+	hits = RoleLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), new Integer[] {roleType}, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, sort);
+
+	Tuple tuple = RolesAdminUtil.getRoles(hits);
+
+	boolean corruptIndex = (Boolean)tuple.getObject(1);
+
+	if (!corruptIndex) {
+		roles = (List<Role>)tuple.getObject(0);
+
+		break;
+	}
+}
 
 roles = UsersAdminUtil.filterGroupRoles(permissionChecker, group.getGroupId(), roles);
 

@@ -53,8 +53,26 @@ portletURL.setParameter("callback", callback);
 		<liferay-ui:search-container-results>
 
 			<%
+			Sort sort = SortFactoryUtil.getSort(Role.class, searchContainer.getOrderByCol(), searchContainer.getOrderByType());
+
 			if (filterManageableRoles) {
-				List<Role> roles = RoleLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), new Integer[] {RoleConstants.TYPE_REGULAR}, QueryUtil.ALL_POS, QueryUtil.ALL_POS, searchContainer.getOrderByComparator());
+				List<Role> roles = null;
+
+				while (true) {
+					Hits hits = null;
+
+					hits = RoleLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), new Integer[] {RoleConstants.TYPE_REGULAR}, null, QueryUtil.ALL_POS, QueryUtil.ALL_POS, sort);
+
+					Tuple tuple = RolesAdminUtil.getRoles(hits);
+
+					boolean corruptIndex = (Boolean)tuple.getObject(1);
+
+					if (!corruptIndex) {
+						roles = (List<Role>)tuple.getObject(0);
+
+						break;
+					}
+				}
 
 				roles = UsersAdminUtil.filterRoles(permissionChecker, roles);
 
@@ -62,8 +80,22 @@ portletURL.setParameter("callback", callback);
 				results = ListUtil.subList(roles, searchContainer.getStart(), searchContainer.getEnd());
 			}
 			else {
-				results = RoleLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), new Integer[] {RoleConstants.TYPE_REGULAR}, searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
-				total = RoleLocalServiceUtil.searchCount(company.getCompanyId(), searchTerms.getKeywords(), new Integer[] {RoleConstants.TYPE_REGULAR});
+				while (true) {
+					Hits hits = null;
+
+					hits = RoleLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), new Integer[] {RoleConstants.TYPE_REGULAR}, null, searchContainer.getStart(), searchContainer.getEnd(), sort);
+
+					Tuple tuple = RolesAdminUtil.getRoles(hits);
+
+					boolean corruptIndex = (Boolean)tuple.getObject(1);
+
+					if (!corruptIndex) {
+						results = (List<Role>)tuple.getObject(0);
+						total = hits.getLength();
+
+						break;
+					}
+				}
 			}
 
 			pageContext.setAttribute("results", results);

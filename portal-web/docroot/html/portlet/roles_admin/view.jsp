@@ -51,11 +51,29 @@ String portletURLString = portletURL.toString();
 	<%
 	RoleSearchTerms searchTerms = (RoleSearchTerms)searchContainer.getSearchTerms();
 
-	int total = RoleLocalServiceUtil.searchCount(company.getCompanyId(), searchTerms.getKeywords(), searchTerms.getTypesObj());
+	Sort sort = SortFactoryUtil.getSort(Role.class, searchContainer.getOrderByCol(), searchContainer.getOrderByType());
+
+	List<Role> results = null;
+	int total = 0;
+
+	while (true) {
+		Hits hits = null;
+
+		hits = RoleLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), null, null, searchContainer.getStart(), searchContainer.getEnd(), sort);
+
+		Tuple tuple = RolesAdminUtil.getRoles(hits);
+
+		boolean corruptIndex = (Boolean)tuple.getObject(1);
+
+		if (!corruptIndex) {
+			results = (List<Role>)tuple.getObject(0);
+			total = hits.getLength();
+
+			break;
+		}
+	}
 
 	searchContainer.setTotal(total);
-
-	List results = RoleLocalServiceUtil.search(company.getCompanyId(), searchTerms.getKeywords(), searchTerms.getTypesObj(), searchContainer.getStart(), searchContainer.getEnd(), searchContainer.getOrderByComparator());
 
 	searchContainer.setResults(results);
 

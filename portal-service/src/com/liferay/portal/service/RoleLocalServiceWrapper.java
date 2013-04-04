@@ -1075,6 +1075,8 @@ public class RoleLocalServiceWrapper implements RoleLocalService,
 	<code>obc</code>
 	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.service.persistence.RoleFinder
+	* @deprecated As of 6.2.0, replaced by {@link
+	#search(long, String, Integer[], int, int, Sort)}
 	*/
 	public java.util.List<com.liferay.portal.model.Role> search(
 		long companyId, java.lang.String keywords, java.lang.Integer[] types,
@@ -1082,6 +1084,42 @@ public class RoleLocalServiceWrapper implements RoleLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _roleLocalService.search(companyId, keywords, types, start, end,
 			obc);
+	}
+
+	/**
+	* Returns an ordered range of all the roles that match the keywords and
+	* types.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end -
+	* start</code> instances. <code>start</code> and <code>end</code> are not
+	* primary keys, they are indexes in the result set. Thus, <code>0</code>
+	* refers to the first result in the set. Setting both <code>start</code>
+	* and <code>end</code> to {@link
+	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* result set.
+	* </p>
+	*
+	* @param companyId the primary key of the company
+	* @param keywords the keywords (space separated), which may occur in the
+	role's name, title or description (optionally <code>null</code>)
+	* @param types the role types (optionally <code>null</code>)
+	* @param start the lower bound of the range of roles to return
+	* @param end the upper bound of the range of roles to return (not
+	inclusive)
+	* @param sort the field and direction to sort by (optionally
+	<code>null</code>)
+	* @return the ordered range of the matching roles, ordered by
+	<code>sort</code>
+	* @throws SystemException if a system exception occurred
+	* @see com.liferay.portlet.rolesadmin.util.RoleIndexer
+	*/
+	public com.liferay.portal.kernel.search.Hits search(long companyId,
+		java.lang.String keywords, java.lang.Integer[] types, int start,
+		int end, com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _roleLocalService.search(companyId, keywords, types, start, end,
+			sort);
 	}
 
 	/**
@@ -1114,6 +1152,8 @@ public class RoleLocalServiceWrapper implements RoleLocalService,
 	<code>obc</code>
 	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.service.persistence.RoleFinder
+	* @deprecated As of 6.2.0, replaced by {@link #search(long, String,
+	Integer[], LinkedHashMap<String, Object>, int, int, Sort)}
 	*/
 	public java.util.List<com.liferay.portal.model.Role> search(
 		long companyId, java.lang.String keywords, java.lang.Integer[] types,
@@ -1122,6 +1162,46 @@ public class RoleLocalServiceWrapper implements RoleLocalService,
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return _roleLocalService.search(companyId, keywords, types, params,
 			start, end, obc);
+	}
+
+	/**
+	* Returns an ordered range of all the roles that match the keywords, types,
+	* and params.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end -
+	* start</code> instances. <code>start</code> and <code>end</code> are not
+	* primary keys, they are indexes in the result set. Thus, <code>0</code>
+	* refers to the first result in the set. Setting both <code>start</code>
+	* and <code>end</code> to {@link
+	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* result set.
+	* </p>
+	*
+	* @param companyId the primary key of the company
+	* @param keywords the keywords (space separated), which may occur in the
+	role's name or description (optionally <code>null</code>)
+	* @param types the role types (optionally <code>null</code>)
+	* @param params the indexer parameters (optionally <code>null</code>). For
+	more information see {@link
+	com.liferay.portlet.rolesadmin.util.RoleIndexer}.
+	* @param start the lower bound of the range of roles to return
+	* @param end the upper bound of the range of roles to return (not
+	inclusive)
+	* @param sort the field and direction to sort by (optionally
+	<code>null</code>)
+	* @return the ordered range of the matching roles, ordered by
+	<code>sort</code>
+	* @throws SystemException if a system exception occurred
+	* @see com.liferay.portlet.rolesadmin.util.RoleIndexer
+	*/
+	public com.liferay.portal.kernel.search.Hits search(long companyId,
+		java.lang.String keywords, java.lang.Integer[] types,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		int start, int end, com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _roleLocalService.search(companyId, keywords, types, params,
+			start, end, sort);
 	}
 
 	/**
@@ -1151,6 +1231,8 @@ public class RoleLocalServiceWrapper implements RoleLocalService,
 	<code>obc</code>
 	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.service.persistence.RoleFinder
+	* @deprecated As of 6.2.0, replaced by {@link #search(long, String, String,
+	String, Integer[], boolean, int, int, Sort)}
 	*/
 	public java.util.List<com.liferay.portal.model.Role> search(
 		long companyId, java.lang.String name, java.lang.String description,
@@ -1191,6 +1273,9 @@ public class RoleLocalServiceWrapper implements RoleLocalService,
 	<code>obc</code>
 	* @throws SystemException if a system exception occurred
 	* @see com.liferay.portal.service.persistence.RoleFinder
+	* @deprecated As of 6.2.0, replaced by {@link #search(long, String, String,
+	String, Integer[], LinkedHashMap<String, Object>, boolean,
+	start, end, Sort)}
 	*/
 	public java.util.List<com.liferay.portal.model.Role> search(
 		long companyId, java.lang.String name, java.lang.String description,
@@ -1203,6 +1288,96 @@ public class RoleLocalServiceWrapper implements RoleLocalService,
 	}
 
 	/**
+	* Returns an ordered range of all the roles that match the name, title,
+	* description, and types.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end -
+	* start</code> instances. <code>start</code> and <code>end</code> are not
+	* primary keys, they are indexes in the result set. Thus, <code>0</code>
+	* refers to the first result in the set. Setting both <code>start</code>
+	* and <code>end</code> to {@link
+	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* result set.
+	* </p>
+	*
+	* @param companyId the primary key of the company
+	* @param name the role's name (optionally <code>null</code>)
+	* @param title the role1s title (optionally <code>null</code>)
+	* @param description the role's description (optionally <code>null</code>)
+	* @param types the role types (optionally <code>null</code>)
+	* @param andSearch whether every field must match its keywords, or just
+	one field. For example, &quot;users with the first name 'bob' and
+	last name 'smith'&quot; vs &quot;users with the first name 'bob'
+	or the last name 'smith'&quot;.
+	* @param start the lower bound of the range of the roles to return
+	* @param end the upper bound of the range of the roles to return (not
+	inclusive)
+	* @param sort the field and direction to sort by (optionally
+	<code>null</code>)
+	* @return the ordered range of the matching roles, ordered by
+	<code>sort</code>
+	* @throws SystemException if a system exception occurred
+	* @see com.liferay.portlet.rolesadmin.util.RoleIndexer
+	*/
+	public com.liferay.portal.kernel.search.Hits search(long companyId,
+		java.lang.String name, java.lang.String title,
+		java.lang.String description, java.lang.Integer[] types,
+		boolean andSearch, int start, int end,
+		com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _roleLocalService.search(companyId, name, title, description,
+			types, andSearch, start, end, sort);
+	}
+
+	/**
+	* Returns an ordered range of all the roles that match the name, title,
+	* description, types, and params.
+	*
+	* <p>
+	* Useful when paginating results. Returns a maximum of <code>end -
+	* start</code> instances. <code>start</code> and <code>end</code> are not
+	* primary keys, they are indexes in the result set. Thus, <code>0</code>
+	* refers to the first result in the set. Setting both <code>start</code>
+	* and <code>end</code> to {@link
+	* com.liferay.portal.kernel.dao.orm.QueryUtil#ALL_POS} will return the full
+	* result set.
+	* </p>
+	*
+	* @param companyId the primary key of the company
+	* @param name the role's name (optionally <code>null</code>)
+	* @param title the role's title (optionally <code>null</code>)
+	* @param description the role's description (optionally <code>null</code>)
+	* @param types the role types (optionally <code>null</code>)
+	* @param params the indexer parameters (optionally <code>null</code>). For
+	more information see {@link
+	com.liferay.portlet.rolesadmin.util.RoleIndexer}.
+	* @param andSearch whether every field must match its keywords, or just
+	one field. For example, &quot;users with the first name 'bob' and
+	last name 'smith'&quot; vs &quot;users with the first name 'bob'
+	or the last name 'smith'&quot;.
+	* @param start the lower bound of the range of the roles to return
+	* @param end the upper bound of the range of the roles to return (not
+	inclusive)
+	* @param sort the field and direction to sort by (optionally
+	<code>null</code>)
+	* @return the ordered range of the matching roles, ordered by
+	<code>sort</code>
+	* @throws SystemException if a system exception occurred
+	* @see com.liferay.portlet.rolesadmin.util.RoleIndexer
+	*/
+	public com.liferay.portal.kernel.search.Hits search(long companyId,
+		java.lang.String name, java.lang.String title,
+		java.lang.String description, java.lang.Integer[] types,
+		java.util.LinkedHashMap<java.lang.String, java.lang.Object> params,
+		boolean andSearch, int start, int end,
+		com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _roleLocalService.search(companyId, name, title, description,
+			types, params, andSearch, start, end, sort);
+	}
+
+	/**
 	* Returns the number of roles that match the keywords and types.
 	*
 	* @param companyId the primary key of the company
@@ -1211,6 +1386,7 @@ public class RoleLocalServiceWrapper implements RoleLocalService,
 	* @param types the role types (optionally <code>null</code>)
 	* @return the number of matching roles
 	* @throws SystemException if a system exception occurred
+	* @deprecated As of 6.2.0
 	*/
 	public int searchCount(long companyId, java.lang.String keywords,
 		java.lang.Integer[] types)
@@ -1229,6 +1405,7 @@ public class RoleLocalServiceWrapper implements RoleLocalService,
 	com.liferay.portal.service.persistence.RoleFinder}
 	* @return the number of matching roles
 	* @throws SystemException if a system exception occurred
+	* @deprecated As of 6.2.0
 	*/
 	public int searchCount(long companyId, java.lang.String keywords,
 		java.lang.Integer[] types,
@@ -1246,6 +1423,7 @@ public class RoleLocalServiceWrapper implements RoleLocalService,
 	* @param types the role types (optionally <code>null</code>)
 	* @return the number of matching roles
 	* @throws SystemException if a system exception occurred
+	* @deprecated As of 6.2.0
 	*/
 	public int searchCount(long companyId, java.lang.String name,
 		java.lang.String description, java.lang.Integer[] types)
@@ -1266,6 +1444,7 @@ public class RoleLocalServiceWrapper implements RoleLocalService,
 	com.liferay.portal.service.persistence.RoleFinder}
 	* @return the number of matching roles
 	* @throws SystemException if a system exception occurred
+	* @deprecated As of 6.2.0
 	*/
 	public int searchCount(long companyId, java.lang.String name,
 		java.lang.String description, java.lang.Integer[] types,
