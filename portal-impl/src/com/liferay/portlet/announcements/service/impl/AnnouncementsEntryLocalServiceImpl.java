@@ -87,6 +87,10 @@ public class AnnouncementsEntryLocalServiceImpl
 
 		Date now = new Date();
 
+		if ((displayDate != null) && displayDate.before(now)) {
+			displayDate = now;
+		}
+
 		validate(title, content, url);
 
 		long entryId = counterLocalService.increment();
@@ -319,6 +323,12 @@ public class AnnouncementsEntryLocalServiceImpl
 			expirationDateMonth, expirationDateDay, expirationDateYear,
 			expirationDateHour, expirationDateMinute, user.getTimeZone(),
 			EntryExpirationDateException.class);
+
+		Date now = new Date();
+
+		if ((displayDate != null) && displayDate.before(now)) {
+			displayDate = now;
+		}
 
 		validate(title, content, url);
 
