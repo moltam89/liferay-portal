@@ -55,7 +55,21 @@ viewFullContentURLString = HttpUtil.setParameter(viewFullContentURLString, "redi
 
 String viewURL = viewInContext ? assetRenderer.getURLViewInContext(liferayPortletRequest, liferayPortletResponse, viewFullContentURLString) : viewFullContentURL.toString();
 
-viewURL = _checkViewURL(viewURL, currentURL, themeDisplay);
+String redirectURL = null;
+
+if (layout.getUuid().equals(assetEntry.getLayoutUuid())) {
+	String displayPortletId = layout.getTypeSettingsProperty("default-asset-publisher-portlet-id");
+
+	LiferayPortletURL redirectURLObj = liferayPortletResponse.createRenderURL(displayPortletId);
+
+	redirectURL = redirectURLObj.toString();
+}
+
+if (Validator.isNull(redirectURL)) {
+	redirectURL = currentURL;
+}
+
+viewURL = _checkViewURL(viewURL, redirectURL, themeDisplay);
 %>
 
 	<c:if test="<%= assetEntryIndex == 0 %>">
