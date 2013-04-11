@@ -62,7 +62,7 @@ public class ThreadLastPostDateComparator extends OrderByComparator {
 		}
 
 		int value = DateUtil.compareTo(
-			lastPostDate1, lastPostDate2, ignoreMilliseconds);
+			lastPostDate1, lastPostDate2, false, ignoreMilliseconds);
 
 		if (value == 0) {
 			if (thread1.getThreadId() < thread2.getThreadId()) {
