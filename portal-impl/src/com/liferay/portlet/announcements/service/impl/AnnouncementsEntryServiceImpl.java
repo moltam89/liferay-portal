@@ -43,10 +43,10 @@ public class AnnouncementsEntryServiceImpl
 			long plid, long classNameId, long classPK, String title,
 			String content, String url, String type, int displayDateMonth,
 			int displayDateDay, int displayDateYear, int displayDateHour,
-			int displayDateMinute, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute, int priority,
-			boolean alert)
+			int displayDateMinute, boolean autoDisplayDate,
+			int expirationDateMonth, int expirationDateDay,
+			int expirationDateYear, int expirationDateHour,
+			int expirationDateMinute, int priority, boolean alert)
 		throws PortalException, SystemException {
 
 		PermissionChecker permissionChecker = getPermissionChecker();
@@ -111,6 +111,24 @@ public class AnnouncementsEntryServiceImpl
 			priority, alert);
 	}
 
+	public AnnouncementsEntry addEntry(
+			long plid, long classNameId, long classPK, String title,
+			String content, String url, String type, int displayDateMonth,
+			int displayDateDay, int displayDateYear, int displayDateHour,
+			int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute, int priority,
+			boolean alert)
+		throws PortalException, SystemException {
+
+		return addEntry(
+			plid, classNameId, classPK, title, content, url, type,
+			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
+			displayDateMinute, true, expirationDateMonth, expirationDateDay,
+			expirationDateYear, expirationDateHour, expirationDateMinute,
+			priority, alert);
+	}
+
 	public void deleteEntry(long entryId)
 		throws PortalException, SystemException {
 
@@ -135,9 +153,10 @@ public class AnnouncementsEntryServiceImpl
 	public AnnouncementsEntry updateEntry(
 			long entryId, String title, String content, String url, String type,
 			int displayDateMonth, int displayDateDay, int displayDateYear,
-			int displayDateHour, int displayDateMinute, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute, int priority)
+			int displayDateHour, int displayDateMinute, boolean autoDisplayDate,
+			int expirationDateMonth, int expirationDateDay,
+			int expirationDateYear, int expirationDateHour,
+			int expirationDateMinute, int priority)
 		throws PortalException, SystemException {
 
 		AnnouncementsEntryPermission.check(
@@ -146,7 +165,23 @@ public class AnnouncementsEntryServiceImpl
 		return announcementsEntryLocalService.updateEntry(
 			getUserId(), entryId, title, content, url, type, displayDateMonth,
 			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
-			expirationDateMonth, expirationDateDay, expirationDateYear,
+			autoDisplayDate, expirationDateMonth, expirationDateDay,
+			expirationDateYear, expirationDateHour, expirationDateMinute,
+			priority);
+	}
+
+	public AnnouncementsEntry updateEntry(
+			long entryId, String title, String content, String url, String type,
+			int displayDateMonth, int displayDateDay, int displayDateYear,
+			int displayDateHour, int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute, int priority)
+		throws PortalException, SystemException {
+
+		return updateEntry(
+			entryId, title, content, url, type, displayDateMonth,
+			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
+			true, expirationDateMonth, expirationDateDay, expirationDateYear,
 			expirationDateHour, expirationDateMinute, priority);
 	}
 

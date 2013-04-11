@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.PropsKeys;
@@ -65,29 +66,32 @@ public class AnnouncementsEntryLocalServiceImpl
 			long userId, long classNameId, long classPK, String title,
 			String content, String url, String type, int displayDateMonth,
 			int displayDateDay, int displayDateYear, int displayDateHour,
-			int displayDateMinute, int expirationDateMonth,
-			int expirationDateDay, int expirationDateYear,
-			int expirationDateHour, int expirationDateMinute, int priority,
-			boolean alert)
+			int displayDateMinute, boolean autoDisplayDate,
+			int expirationDateMonth, int expirationDateDay,
+			int expirationDateYear, int expirationDateHour,
+			int expirationDateMinute, int priority, boolean alert)
 		throws PortalException, SystemException {
 
 		// Entry
 
 		User user = userPersistence.findByPrimaryKey(userId);
 
-		Date displayDate = PortalUtil.getDate(
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, user.getTimeZone(),
-			EntryDisplayDateException.class);
+		Date now = new Date();
+		Date displayDate = now;
+
+		if (!autoDisplayDate) {
+			displayDate = PortalUtil.getDate(
+				displayDateMonth, displayDateDay, displayDateYear,
+				displayDateHour, displayDateMinute, user.getTimeZone(),
+				EntryDisplayDateException.class);
+		}
 
 		Date expirationDate = PortalUtil.getDate(
 			expirationDateMonth, expirationDateDay, expirationDateYear,
 			expirationDateHour, expirationDateMinute, user.getTimeZone(),
 			EntryExpirationDateException.class);
 
-		Date now = new Date();
-
-		validate(title, content, url);
+		validate(title, content, url, now, displayDate, expirationDate);
 
 		long entryId = counterLocalService.increment();
 
@@ -120,6 +124,24 @@ public class AnnouncementsEntryLocalServiceImpl
 			false, false);
 
 		return entry;
+	}
+
+	public AnnouncementsEntry addEntry(
+			long userId, long classNameId, long classPK, String title,
+			String content, String url, String type, int displayDateMonth,
+			int displayDateDay, int displayDateYear, int displayDateHour,
+			int displayDateMinute, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute, int priority,
+			boolean alert)
+		throws PortalException, SystemException {
+
+		return addEntry(
+			userId, classNameId, classPK, title, content, url, type,
+			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
+			displayDateMinute, true, expirationDateMonth, expirationDateDay,
+			expirationDateYear, expirationDateHour, expirationDateMinute,
+			priority, alert);
 	}
 
 	public void checkEntries() throws PortalException, SystemException {
@@ -301,29 +323,38 @@ public class AnnouncementsEntryLocalServiceImpl
 			long userId, long entryId, String title, String content, String url,
 			String type, int displayDateMonth, int displayDateDay,
 			int displayDateYear, int displayDateHour, int displayDateMinute,
-			int expirationDateMonth, int expirationDateDay,
-			int expirationDateYear, int expirationDateHour,
-			int expirationDateMinute, int priority)
+			boolean autoDisplayDate, int expirationDateMonth,
+			int expirationDateDay, int expirationDateYear,
+			int expirationDateHour, int expirationDateMinute, int priority)
 		throws PortalException, SystemException {
 
 		// Entry
 
 		User user = userPersistence.findByPrimaryKey(userId);
 
-		Date displayDate = PortalUtil.getDate(
-			displayDateMonth, displayDateDay, displayDateYear, displayDateHour,
-			displayDateMinute, user.getTimeZone(),
-			EntryDisplayDateException.class);
+		AnnouncementsEntry entry =
+			announcementsEntryPersistence.findByPrimaryKey(entryId);
+
+		Date displayDate = null;
+
+		if (autoDisplayDate) {
+			displayDate = entry.getCreateDate();
+		}
+		else {
+			displayDate = PortalUtil.getDate(
+				displayDateMonth, displayDateDay, displayDateYear,
+				displayDateHour, displayDateMinute, user.getTimeZone(),
+				EntryDisplayDateException.class);
+		}
 
 		Date expirationDate = PortalUtil.getDate(
 			expirationDateMonth, expirationDateDay, expirationDateYear,
 			expirationDateHour, expirationDateMinute, user.getTimeZone(),
 			EntryExpirationDateException.class);
 
-		validate(title, content, url);
-
-		AnnouncementsEntry entry =
-			announcementsEntryPersistence.findByPrimaryKey(entryId);
+		validate(
+			title, content, url, entry.getCreateDate(), displayDate,
+			expirationDate);
 
 		entry.setModifiedDate(new Date());
 		entry.setTitle(title);
@@ -341,6 +372,22 @@ public class AnnouncementsEntryLocalServiceImpl
 		announcementsFlagLocalService.deleteFlags(entry.getEntryId());
 
 		return entry;
+	}
+
+	public AnnouncementsEntry updateEntry(
+			long userId, long entryId, String title, String content, String url,
+			String type, int displayDateMonth, int displayDateDay,
+			int displayDateYear, int displayDateHour, int displayDateMinute,
+			int expirationDateMonth, int expirationDateDay,
+			int expirationDateYear, int expirationDateHour,
+			int expirationDateMinute, int priority)
+		throws PortalException, SystemException {
+
+		return updateEntry(
+			userId, entryId, title, content, url, type, displayDateMonth,
+			displayDateDay, displayDateYear, displayDateHour, displayDateMinute,
+			true, expirationDateMonth, expirationDateDay, expirationDateYear,
+			expirationDateHour, expirationDateMinute, priority);
 	}
 
 	protected void notifyUsers(AnnouncementsEntry entry)
@@ -494,7 +541,9 @@ public class AnnouncementsEntryLocalServiceImpl
 		subscriptionSender.flushNotificationsAsync();
 	}
 
-	protected void validate(String title, String content, String url)
+	protected void validate(
+			String title, String content, String url, Date createDate,
+			Date displayDate, Date expirationDate)
 		throws PortalException {
 
 		if (Validator.isNull(title)) {
@@ -507,6 +556,18 @@ public class AnnouncementsEntryLocalServiceImpl
 
 		if (Validator.isNotNull(url) && !Validator.isUrl(url)) {
 			throw new EntryURLException();
+		}
+
+		if ((displayDate != null) &&
+			(DateUtil.compareTo(displayDate, createDate, true, true) < 0)) {
+
+			throw new EntryDisplayDateException();
+		}
+
+		if ((expirationDate != null) &&
+			(DateUtil.compareTo(expirationDate, displayDate, true, true) < 0)) {
+
+			throw new EntryExpirationDateException();
 		}
 	}
 
