@@ -69,7 +69,7 @@ if (Validator.equals(layout.getUuid(), assetEntry.getLayoutUuid())) {
 	redirectURL = redirectURLObj.toString();
 }
 
-viewURL = _checkViewURL(viewURL, redirectURL, themeDisplay);
+viewURL = _checkViewURL(viewURL, redirectURL);
 
 request.setAttribute("view.jsp-showIconLabel", false);
 %>

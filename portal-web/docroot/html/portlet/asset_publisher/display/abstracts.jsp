@@ -52,6 +52,7 @@ if (Validator.isNotNull(assetRenderer.getUrlTitle())) {
 String summary = StringUtil.shorten(assetRenderer.getSummary(locale), abstractLength);
 
 String viewURL = null;
+
 String redirectURL = currentURL;
 
 if (viewInContext) {
@@ -77,7 +78,7 @@ if (Validator.isNull(viewURL)) {
 
 String viewURLMessage = viewInContext ? assetRenderer.getViewInContextMessage() : "read-more-x-about-x";
 
-viewURL = _checkViewURL(viewURL, redirectURL, themeDisplay);
+viewURL = _checkViewURL(viewURL, redirectURL);
 %>
 
 <c:if test="<%= show %>">

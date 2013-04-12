@@ -63,7 +63,7 @@ if (Validator.equals(layout.getUuid(), assetEntry.getLayoutUuid())) {
 	redirectURL = redirectURLObj.toString();
 }
 
-viewURL = _checkViewURL(viewURL, redirectURL, themeDisplay);
+viewURL = _checkViewURL(viewURL, redirectURL);
 %>
 
 	<c:if test="<%= assetEntryIndex == 0 %>">
