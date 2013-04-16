@@ -36,7 +36,9 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.model.User;
+import com.liferay.portal.security.auth.CompanyThreadLocal;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
@@ -625,16 +627,26 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 					tag = assetTagLocalService.getTag(siteGroupId, tagName);
 				}
 				catch (NoSuchTagException nste) {
-					ServiceContext serviceContext = new ServiceContext();
+					try {
+						Group globalSiteGroup =
+							groupLocalService.getCompanyGroup(
+								CompanyThreadLocal.getCompanyId());
 
-					serviceContext.setAddGroupPermissions(true);
-					serviceContext.setAddGuestPermissions(true);
-					serviceContext.setScopeGroupId(siteGroupId);
+						tag = assetTagLocalService.getTag(
+							globalSiteGroup.getGroupId(), tagName);
+					}
+					catch (NoSuchTagException nsteg) {
+						ServiceContext serviceContext = new ServiceContext();
 
-					tag = assetTagLocalService.addTag(
-						user.getUserId(), tagName,
-						PropsValues.ASSET_TAG_PROPERTIES_DEFAULT,
-						serviceContext);
+						serviceContext.setAddGroupPermissions(true);
+						serviceContext.setAddGuestPermissions(true);
+						serviceContext.setScopeGroupId(siteGroupId);
+
+						tag = assetTagLocalService.addTag(
+							user.getUserId(), tagName,
+							PropsValues.ASSET_TAG_PROPERTIES_DEFAULT,
+							serviceContext);
+					}
 				}
 
 				if (tag != null) {
