@@ -448,6 +448,13 @@ public class ResourcePermissionLocalServiceImpl
 			long companyId, String name, int scope, String primKey)
 		throws SystemException {
 
+		Boolean skipPermissionCheck =
+			ResourcePermissionsThreadLocal.getSkipPermissionCheck();
+
+		if ((skipPermissionCheck != null) && skipPermissionCheck) {
+			return null;
+		}
+
 		return resourcePermissionPersistence.findByC_N_S_P(
 			companyId, name, scope, primKey);
 	}
@@ -1083,9 +1090,29 @@ public class ResourcePermissionLocalServiceImpl
 			Map<Long, String[]> roleIdsToActionIds)
 		throws PortalException, SystemException {
 
-		updateResourcePermission(
-			companyId, name, scope, primKey, 0, roleIdsToActionIds,
-			ResourcePermissionConstants.OPERATOR_SET);
+		setResourcePermissions(
+			companyId, name, scope, primKey, roleIdsToActionIds, false);
+	}
+
+	public void setResourcePermissions(
+			long companyId, String name, int scope, String primKey,
+			Map<Long, String[]> roleIdsToActionIds, boolean skipPermissionCheck)
+		throws PortalException, SystemException {
+
+		boolean firstSkipPermissionCheckChange =
+			ResourcePermissionsThreadLocal.setSkipPermissionCheck(
+				skipPermissionCheck);
+
+		try {
+			updateResourcePermission(
+				companyId, name, scope, primKey, 0, roleIdsToActionIds,
+				ResourcePermissionConstants.OPERATOR_SET);
+		}
+		finally {
+			if (firstSkipPermissionCheckChange) {
+				ResourcePermissionsThreadLocal.setSkipPermissionCheck(null);
+			}
+		}
 	}
 
 	protected void doUpdateResourcePermission(
@@ -1102,8 +1129,14 @@ public class ResourcePermissionLocalServiceImpl
 			resourcePermission = resourcePermissionsMap.get(roleId);
 		}
 		else {
-			resourcePermission = resourcePermissionPersistence.fetchByC_N_S_P_R(
-				companyId, name, scope, primKey, roleId);
+			Boolean skipPermissionCheck =
+				ResourcePermissionsThreadLocal.getSkipPermissionCheck();
+
+			if ((skipPermissionCheck == null) || !skipPermissionCheck) {
+				resourcePermission =
+					resourcePermissionPersistence.fetchByC_N_S_P_R(
+						companyId, name, scope, primKey, roleId);
+			}
 		}
 
 		if (resourcePermission == null) {
