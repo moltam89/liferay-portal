@@ -282,8 +282,18 @@ public class AssetPublisherImpl implements AssetPublisher {
 			int max, boolean checkPermission)
 		throws PortalException, SystemException {
 
-		AssetEntryQuery assetEntryQuery = getAssetEntryQuery(
-			preferences, new long[] {scopeGroupId});
+		long[] groupIds = getGroupIds(preferences, scopeGroupId, layout);
+
+		AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
+
+		if (!ArrayUtil.contains(groupIds, scopeGroupId)) {
+			assetEntryQuery = AssetPublisherUtil.getAssetEntryQuery(
+				preferences, ArrayUtil.append(groupIds, scopeGroupId));
+		}
+		else {
+			assetEntryQuery = AssetPublisherUtil.getAssetEntryQuery(
+				preferences, groupIds);
+		}
 
 		boolean anyAssetType = GetterUtil.getBoolean(
 			preferences.getValue("anyAssetType", null), true);
@@ -314,8 +324,6 @@ public class AssetPublisherImpl implements AssetPublisher {
 			preferences.getValue("excludeZeroViewCount", null));
 
 		assetEntryQuery.setExcludeZeroViewCount(excludeZeroViewCount);
-
-		long[] groupIds = getGroupIds(preferences, scopeGroupId, layout);
 
 		assetEntryQuery.setGroupIds(groupIds);
 
