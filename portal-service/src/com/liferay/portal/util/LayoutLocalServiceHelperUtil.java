@@ -24,10 +24,6 @@ import com.liferay.portal.model.LayoutSetPrototype;
  */
 public class LayoutLocalServiceHelperUtil {
 
-	public static String getBeanIdentifier() {
-		return getLayoutLocalServiceHelper().getBeanIdentifier();
-	}
-
 	public static String getFriendlyURL(
 			long groupId, boolean privateLayout, long layoutId, String name,
 			String friendlyURL)
@@ -72,10 +68,6 @@ public class LayoutLocalServiceHelperUtil {
 
 		return getLayoutLocalServiceHelper().hasLayoutSetPrototypeLayout(
 			layoutSetPrototype, layoutUuid);
-	}
-
-	public static void setBeanIdentifier(String beanIdentifier) {
-		getLayoutLocalServiceHelper().setBeanIdentifier(beanIdentifier);
 	}
 
 	public static void validate(

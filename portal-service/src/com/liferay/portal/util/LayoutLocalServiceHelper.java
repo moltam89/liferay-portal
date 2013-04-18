@@ -23,8 +23,6 @@ import com.liferay.portal.model.LayoutSetPrototype;
  */
 public interface LayoutLocalServiceHelper {
 
-	public String getBeanIdentifier();
-
 	public String getFriendlyURL(
 			long groupId, boolean privateLayout, long layoutId, String name,
 			String friendlyURL)
@@ -44,8 +42,6 @@ public interface LayoutLocalServiceHelper {
 	public boolean hasLayoutSetPrototypeLayout(
 			LayoutSetPrototype layoutSetPrototype, String layoutUuid)
 		throws PortalException, SystemException;
-
-	public void setBeanIdentifier(String beanIdentifier);
 
 	public void validate(
 			long groupId, boolean privateLayout, long layoutId,
