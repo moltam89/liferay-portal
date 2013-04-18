@@ -15,7 +15,6 @@
 package com.liferay.portal.service.impl;
 
 import com.liferay.counter.service.CounterLocalServiceUtil;
-import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -46,6 +45,7 @@ import com.liferay.portal.service.persistence.LayoutRevisionUtil;
 import com.liferay.portal.service.persistence.LayoutUtil;
 import com.liferay.portal.staging.StagingAdvicesThreadLocal;
 import com.liferay.portal.util.ClassLoaderUtil;
+import com.liferay.portal.util.LayoutLocalServiceHelperUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -213,17 +213,17 @@ public class LayoutLocalServiceStagingAdvice implements MethodInterceptor {
 
 		// Layout
 
-		parentLayoutId = layoutLocalServiceHelper.getParentLayoutId(
+		parentLayoutId = LayoutLocalServiceHelperUtil.getParentLayoutId(
 			groupId, privateLayout, parentLayoutId);
 		String name = nameMap.get(LocaleUtil.getDefault());
-		friendlyURL = layoutLocalServiceHelper.getFriendlyURL(
+		friendlyURL = LayoutLocalServiceHelperUtil.getFriendlyURL(
 			groupId, privateLayout, layoutId, StringPool.BLANK, friendlyURL);
 
-		layoutLocalServiceHelper.validate(
+		LayoutLocalServiceHelperUtil.validate(
 			groupId, privateLayout, layoutId, parentLayoutId, name, type,
 			hidden, friendlyURL);
 
-		layoutLocalServiceHelper.validateParentLayoutId(
+		LayoutLocalServiceHelperUtil.validateParentLayoutId(
 			groupId, privateLayout, layoutId, parentLayoutId);
 
 		Layout originalLayout = LayoutUtil.findByG_P_L(
@@ -242,7 +242,7 @@ public class LayoutLocalServiceStagingAdvice implements MethodInterceptor {
 		}
 
 		if (parentLayoutId != originalLayout.getParentLayoutId()) {
-			int priority = layoutLocalServiceHelper.getNextPriority(
+			int priority = LayoutLocalServiceHelperUtil.getNextPriority(
 				groupId, privateLayout, parentLayoutId,
 				originalLayout.getSourcePrototypeLayoutUuid(), -1);
 
@@ -431,7 +431,7 @@ public class LayoutLocalServiceStagingAdvice implements MethodInterceptor {
 			return layoutLocalService.updateName(layout, name, languageId);
 		}
 
-		layoutLocalServiceHelper.validateName(name, languageId);
+		LayoutLocalServiceHelperUtil.validateName(name, languageId);
 
 		layout.setName(name, LocaleUtil.fromLanguageId(languageId));
 
@@ -559,9 +559,6 @@ public class LayoutLocalServiceStagingAdvice implements MethodInterceptor {
 
 		return returnValue;
 	}
-
-	@BeanReference(type = LayoutLocalServiceHelper.class)
-	protected LayoutLocalServiceHelper layoutLocalServiceHelper;
 
 	private static Log _log = LogFactoryUtil.getLog(
 		LayoutLocalServiceStagingAdvice.class);
