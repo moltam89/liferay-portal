@@ -25,8 +25,10 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
+import com.liferay.portal.security.auth.CompanyThreadLocal;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
@@ -157,25 +159,44 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 			guestPermissions);
 	}
 
-	public void checkTags(long userId, long groupId, String[] names)
+	public List<AssetTag> checkTags(long userId, long groupId, String[] names)
 		throws PortalException, SystemException {
 
+		List<AssetTag> tags = new ArrayList<AssetTag>(names.length);
+
 		for (String name : names) {
+			AssetTag tag = null;
+
 			try {
-				getTag(groupId, name);
+				tag = getTag(groupId, name);
 			}
 			catch (NoSuchTagException nste) {
-				ServiceContext serviceContext = new ServiceContext();
+				try {
+					Group globalSiteGroup =
+						groupLocalService.getCompanyGroup(
+							CompanyThreadLocal.getCompanyId());
 
-				serviceContext.setAddGroupPermissions(true);
-				serviceContext.setAddGuestPermissions(true);
-				serviceContext.setScopeGroupId(groupId);
+					tag = getTag(globalSiteGroup.getGroupId(), name);
+				}
+				catch (NoSuchTagException nste2) {
+					ServiceContext serviceContext = new ServiceContext();
 
-				addTag(
-					userId, name, PropsValues.ASSET_TAG_PROPERTIES_DEFAULT,
-					serviceContext);
+					serviceContext.setAddGroupPermissions(true);
+					serviceContext.setAddGuestPermissions(true);
+					serviceContext.setScopeGroupId(groupId);
+
+					tag = addTag(
+						userId, name, PropsValues.ASSET_TAG_PROPERTIES_DEFAULT,
+						serviceContext);
+				}
+			}
+
+			if (tag != null) {
+				tags.add(tag);
 			}
 		}
+
+		return tags;
 	}
 
 	public AssetTag decrementAssetCount(long tagId, long classNameId)
