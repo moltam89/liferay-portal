@@ -785,6 +785,11 @@
 			<bean class="com.liferay.portal.util.CustomJspRegistryImpl" />
 		</property>
 	</bean>
+	<bean id="com.liferay.portal.util.LayoutLocalServiceHelperUtil" class="com.liferay.portal.util.LayoutLocalServiceHelperUtil">
+		<property name="LayoutLocalServiceHelper">
+			<bean class="com.liferay.portal.util.LayoutLocalServiceHelperImpl" />
+		</property>
+	</bean>
 	<bean id="com.liferay.portal.util.LayoutTypePortletFactoryUtil" class="com.liferay.portal.util.LayoutTypePortletFactoryUtil">
 		<property name="layoutTypePortletFactory">
 			<bean class="com.liferay.portal.util.LayoutTypePortletFactoryImpl" />
