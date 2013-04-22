@@ -17,7 +17,6 @@ package com.liferay.portal.service.impl;
 import com.liferay.portal.LocaleException;
 import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.RequiredLayoutException;
-import com.liferay.portal.kernel.bean.BeanReference;
 import com.liferay.portal.kernel.dao.orm.Criterion;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQueryFactoryUtil;
@@ -67,6 +66,7 @@ import com.liferay.portal.model.impl.PortletPreferencesImpl;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.LayoutLocalServiceBaseImpl;
 import com.liferay.portal.util.ClassLoaderUtil;
+import com.liferay.portal.util.LayoutLocalServiceHelperUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.comparator.LayoutComparator;
@@ -195,15 +195,15 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		User user = userPersistence.findByPrimaryKey(userId);
 		long layoutId = getNextLayoutId(groupId, privateLayout);
-		parentLayoutId = layoutLocalServiceHelper.getParentLayoutId(
+		parentLayoutId = LayoutLocalServiceHelperUtil.getParentLayoutId(
 			groupId, privateLayout, parentLayoutId);
 		String name = nameMap.get(LocaleUtil.getDefault());
-		friendlyURL = layoutLocalServiceHelper.getFriendlyURL(
+		friendlyURL = LayoutLocalServiceHelperUtil.getFriendlyURL(
 			groupId, privateLayout, layoutId, name, friendlyURL);
-		int priority = layoutLocalServiceHelper.getNextPriority(
+		int priority = LayoutLocalServiceHelperUtil.getNextPriority(
 			groupId, privateLayout, parentLayoutId, null, -1);
 
-		layoutLocalServiceHelper.validate(
+		LayoutLocalServiceHelperUtil.validate(
 			groupId, privateLayout, layoutId, parentLayoutId, name, type,
 			hidden, friendlyURL);
 
@@ -452,7 +452,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 				if (firstLayout.getLayoutId() == layout.getLayoutId()) {
 					Layout secondLayout = rootLayouts.get(1);
 
-					layoutLocalServiceHelper.validateFirstLayout(
+					LayoutLocalServiceHelperUtil.validateFirstLayout(
 						secondLayout.getType());
 				}
 			}
@@ -958,7 +958,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			throw new NoSuchLayoutException();
 		}
 
-		friendlyURL = layoutLocalServiceHelper.getFriendlyURL(friendlyURL);
+		friendlyURL = LayoutLocalServiceHelperUtil.getFriendlyURL(friendlyURL);
 
 		Layout layout = layoutPersistence.fetchByG_P_F(
 			groupId, privateLayout, friendlyURL);
@@ -1373,7 +1373,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			layoutSetPrototypeLocalService.getLayoutSetPrototype(
 				layoutSetPrototypeId);
 
-		return layoutLocalServiceHelper.hasLayoutSetPrototypeLayout(
+		return LayoutLocalServiceHelperUtil.hasLayoutSetPrototypeLayout(
 			layoutSetPrototype, layoutUuid);
 	}
 
@@ -1386,7 +1386,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 				getLayoutSetPrototypeByUuidAndCompanyId(
 					layoutSetPrototypeUuid, companyId);
 
-		return layoutLocalServiceHelper.hasLayoutSetPrototypeLayout(
+		return LayoutLocalServiceHelperUtil.hasLayoutSetPrototypeLayout(
 			layoutSetPrototype, layoutUuid);
 	}
 
@@ -1691,11 +1691,11 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		Layout layout = layoutPersistence.findByPrimaryKey(plid);
 
-		friendlyURL = layoutLocalServiceHelper.getFriendlyURL(
+		friendlyURL = LayoutLocalServiceHelperUtil.getFriendlyURL(
 			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
 			StringPool.BLANK, friendlyURL);
 
-		layoutLocalServiceHelper.validateFriendlyURL(
+		LayoutLocalServiceHelperUtil.validateFriendlyURL(
 			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
 			friendlyURL);
 
@@ -1766,17 +1766,17 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		// Layout
 
-		parentLayoutId = layoutLocalServiceHelper.getParentLayoutId(
+		parentLayoutId = LayoutLocalServiceHelperUtil.getParentLayoutId(
 			groupId, privateLayout, parentLayoutId);
 		String name = nameMap.get(LocaleUtil.getDefault());
-		friendlyURL = layoutLocalServiceHelper.getFriendlyURL(
+		friendlyURL = LayoutLocalServiceHelperUtil.getFriendlyURL(
 			groupId, privateLayout, layoutId, StringPool.BLANK, friendlyURL);
 
-		layoutLocalServiceHelper.validate(
+		LayoutLocalServiceHelperUtil.validate(
 			groupId, privateLayout, layoutId, parentLayoutId, name, type,
 			hidden, friendlyURL);
 
-		layoutLocalServiceHelper.validateParentLayoutId(
+		LayoutLocalServiceHelperUtil.validateParentLayoutId(
 			groupId, privateLayout, layoutId, parentLayoutId);
 
 		Date now = new Date();
@@ -1788,7 +1788,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			layout.getNameMap(), nameMap);
 
 		if (parentLayoutId != layout.getParentLayoutId()) {
-			int priority = layoutLocalServiceHelper.getNextPriority(
+			int priority = LayoutLocalServiceHelperUtil.getNextPriority(
 				groupId, privateLayout, parentLayoutId,
 				layout.getSourcePrototypeLayoutUuid(), -1);
 
@@ -1959,7 +1959,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		Date now = new Date();
 
-		layoutLocalServiceHelper.validateName(name, languageId);
+		LayoutLocalServiceHelperUtil.validateName(name, languageId);
 
 		layout.setModifiedDate(now);
 		layout.setName(name, LocaleUtil.fromLanguageId(languageId));
@@ -2034,10 +2034,10 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			long parentLayoutId)
 		throws PortalException, SystemException {
 
-		parentLayoutId = layoutLocalServiceHelper.getParentLayoutId(
+		parentLayoutId = LayoutLocalServiceHelperUtil.getParentLayoutId(
 			groupId, privateLayout, parentLayoutId);
 
-		layoutLocalServiceHelper.validateParentLayoutId(
+		LayoutLocalServiceHelperUtil.validateParentLayoutId(
 			groupId, privateLayout, layoutId, parentLayoutId);
 
 		Date now = new Date();
@@ -2046,7 +2046,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			groupId, privateLayout, layoutId);
 
 		if (parentLayoutId != layout.getParentLayoutId()) {
-			int priority = layoutLocalServiceHelper.getNextPriority(
+			int priority = LayoutLocalServiceHelperUtil.getNextPriority(
 				groupId, privateLayout, parentLayoutId,
 				layout.getSourcePrototypeLayoutUuid(), -1);
 
@@ -2093,15 +2093,15 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			}
 		}
 
-		parentLayoutId = layoutLocalServiceHelper.getParentLayoutId(
+		parentLayoutId = LayoutLocalServiceHelperUtil.getParentLayoutId(
 			layout.getGroupId(), layout.isPrivateLayout(), parentLayoutId);
 
-		layoutLocalServiceHelper.validateParentLayoutId(
+		LayoutLocalServiceHelperUtil.validateParentLayoutId(
 			layout.getGroupId(), layout.isPrivateLayout(), layout.getLayoutId(),
 			parentLayoutId);
 
 		if (parentLayoutId != layout.getParentLayoutId()) {
-			int priority = layoutLocalServiceHelper.getNextPriority(
+			int priority = LayoutLocalServiceHelperUtil.getNextPriority(
 				layout.getGroupId(), layout.isPrivateLayout(), parentLayoutId,
 				layout.getSourcePrototypeLayoutUuid(), -1);
 
@@ -2131,7 +2131,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			groupId, privateLayout);
 
 		for (Layout layout : layouts) {
-			int nextPriority = layoutLocalServiceHelper.getNextPriority(
+			int nextPriority = LayoutLocalServiceHelperUtil.getNextPriority(
 				layout.getGroupId(), layout.isPrivateLayout(),
 				layout.getParentLayoutId(),
 				layout.getSourcePrototypeLayoutUuid(), layout.getPriority());
@@ -2159,7 +2159,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		int oldPriority = layout.getPriority();
 
-		int nextPriority = layoutLocalServiceHelper.getNextPriority(
+		int nextPriority = LayoutLocalServiceHelperUtil.getNextPriority(
 			layout.getGroupId(), layout.isPrivateLayout(),
 			layout.getParentLayoutId(), layout.getSourcePrototypeLayoutUuid(),
 			priority);
@@ -2189,7 +2189,7 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		priority = 0;
 
 		for (Layout curLayout : layouts) {
-			int curNextPriority = layoutLocalServiceHelper.getNextPriority(
+			int curNextPriority = LayoutLocalServiceHelperUtil.getNextPriority(
 				layout.getGroupId(), layout.isPrivateLayout(),
 				layout.getParentLayoutId(),
 				curLayout.getSourcePrototypeLayoutUuid(), priority++);
@@ -2397,8 +2397,5 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		updateScopedPortletNames(
 			groupId, privateLayout, layoutId, map, locales);
 	}
-
-	@BeanReference(type = LayoutLocalServiceHelper.class)
-	protected LayoutLocalServiceHelper layoutLocalServiceHelper;
 
 }
