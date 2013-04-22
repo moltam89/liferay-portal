@@ -5109,6 +5109,12 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 				headerMap, parameterMap);
 		}
 
+		boolean skipLiferayCheck = false;
+
+		if (authResult == Authenticator.SKIP_LIFERAY_CHECK) {
+			skipLiferayCheck = true;
+		}
+
 		// Get user
 
 		User user = null;
@@ -5178,7 +5184,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		// Post-authentication pipeline
 
-		if (authResult == Authenticator.SUCCESS) {
+		if ((authResult == Authenticator.SUCCESS) || skipLiferayCheck) {
 			if (authType.equals(CompanyConstants.AUTH_TYPE_EA)) {
 				authResult = AuthPipeline.authenticateByEmailAddress(
 					PropsKeys.AUTH_PIPELINE_POST, companyId, login, password,
@@ -5205,7 +5211,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 			boolean updateDigest = true;
 
-			if (PropsValues.AUTH_PIPELINE_ENABLE_LIFERAY_CHECK) {
+			if (!skipLiferayCheck &&
+				PropsValues.AUTH_PIPELINE_ENABLE_LIFERAY_CHECK) {
+
 				if (Validator.isNotNull(user.getDigest())) {
 					updateDigest = false;
 				}

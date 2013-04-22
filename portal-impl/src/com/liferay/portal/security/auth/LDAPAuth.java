@@ -363,7 +363,15 @@ public class LDAPAuth implements Authenticator {
 			companyId, emailAddress, screenName, userId, password);
 
 		if (preferredLDAPServerResult == SUCCESS) {
-			return preferredLDAPServerResult;
+			if (PrefsPropsUtil.getBoolean(
+					companyId, PropsKeys.LDAP_AUTH_REQUIRED)) {
+
+				return preferredLDAPServerResult;
+			}
+			else {
+				return Authenticator.SKIP_LIFERAY_CHECK;
+			}
+
 		}
 
 		long[] ldapServerIds = StringUtil.split(
@@ -375,7 +383,15 @@ public class LDAPAuth implements Authenticator {
 				password);
 
 			if (result == SUCCESS) {
-				return result;
+				if (PrefsPropsUtil.getBoolean(
+						companyId, PropsKeys.LDAP_AUTH_REQUIRED)) {
+
+					return result;
+				}
+				else {
+					return Authenticator.SKIP_LIFERAY_CHECK;
+				}
+
 			}
 		}
 
@@ -394,7 +410,14 @@ public class LDAPAuth implements Authenticator {
 				password);
 
 			if (result == SUCCESS) {
-				return result;
+				if (PrefsPropsUtil.getBoolean(
+						companyId, PropsKeys.LDAP_AUTH_REQUIRED)) {
+
+					return result;
+				}
+				else {
+					return Authenticator.SKIP_LIFERAY_CHECK;
+				}
 			}
 		}
 
