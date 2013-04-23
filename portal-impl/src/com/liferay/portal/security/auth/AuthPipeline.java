@@ -212,8 +212,10 @@ public class AuthPipeline {
 
 		Authenticator[] authenticators = _authenticators.get(key);
 
+		boolean skipLiferayCheck = false;
+
 		if ((authenticators == null) || (authenticators.length == 0)) {
-			return 1;
+			return Authenticator.SUCCESS;
 		}
 
 		for (Authenticator authenticator : authenticators) {
@@ -235,7 +237,10 @@ public class AuthPipeline {
 						companyId, userId, password, headerMap, parameterMap);
 				}
 
-				if (authResult != Authenticator.SUCCESS) {
+				if (authResult == Authenticator.SKIP_LIFERAY_CHECK) {
+					skipLiferayCheck = true;
+				}
+				else if (authResult != Authenticator.SUCCESS) {
 					return authResult;
 				}
 			}
@@ -247,7 +252,12 @@ public class AuthPipeline {
 			}
 		}
 
-		return Authenticator.SUCCESS;
+		if (skipLiferayCheck) {
+			return Authenticator.SKIP_LIFERAY_CHECK;
+		}
+		else {
+			return Authenticator.SUCCESS;
+		}
 	}
 
 	private void _onFailure(
