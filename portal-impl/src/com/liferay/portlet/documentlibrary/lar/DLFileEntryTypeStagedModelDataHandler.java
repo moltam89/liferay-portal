@@ -59,8 +59,8 @@ public class DLFileEntryTypeStagedModelDataHandler
 			DLFileEntryType fileEntryType)
 		throws Exception {
 
-		Element fileEntryTypeElement =
-			portletDataContext.getExportDataStagedModelElement(fileEntryType);
+		Element fileEntryTypeElement = portletDataContext.getExportDataElement(
+			fileEntryType);
 
 		List<DDMStructure> ddmStructures = fileEntryType.getDDMStructures();
 
@@ -91,7 +91,7 @@ public class DLFileEntryTypeStagedModelDataHandler
 			fileEntryType.getName(), 2);
 
 		List<Element> ddmStructureElements =
-			portletDataContext.getReferencedDataElements(
+			portletDataContext.getReferenceDataElements(
 				fileEntryType, DDMStructure.class);
 
 		for (Element ddmStructureElement : ddmStructureElements) {

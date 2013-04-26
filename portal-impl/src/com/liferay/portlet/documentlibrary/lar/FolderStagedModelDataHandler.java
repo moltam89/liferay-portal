@@ -114,9 +114,8 @@ public class FolderStagedModelDataHandler
 		String path = ExportImportPathUtil.getModelPath(
 			portletDataContext, Folder.class.getName(), folder.getFolderId());
 
-		Element folderElement =
-			portletDataContext.getImportDataStagedModelElement(
-				Folder.class.getSimpleName(), "path", path);
+		Element folderElement = portletDataContext.getImportDataElement(
+			Folder.class.getSimpleName(), "path", path);
 
 		Element referencesElement = folderElement.element("references");
 

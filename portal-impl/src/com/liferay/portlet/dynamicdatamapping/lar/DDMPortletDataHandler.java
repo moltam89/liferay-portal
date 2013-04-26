@@ -37,7 +37,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.RepositoryEntry;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
@@ -53,6 +52,7 @@ import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUt
 import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMStructureActionableDynamicQuery;
 import com.liferay.portlet.dynamicdatamapping.service.persistence.DDMTemplateActionableDynamicQuery;
+import com.liferay.portlet.journal.model.JournalArticle;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,7 +71,7 @@ public class DDMPortletDataHandler extends BasePortletDataHandler {
 
 	public static final String NAMESPACE = "dynamic_data_mapping";
 
-	public static String exportReferencedContent(
+	public static String exportReferenceContent(
 			PortletDataContext portletDataContext,
 			Element dlFileEntryTypesElement, Element dlFoldersElement,
 			Element dlFileEntriesElement, Element dlFileRanksElement,
@@ -86,9 +86,11 @@ public class DDMPortletDataHandler extends BasePortletDataHandler {
 		content = exportLayoutFriendlyURLs(portletDataContext, content);
 		content = exportLinksToLayout(portletDataContext, content);
 
-		String entityElementName = entityElement.getName();
+		Element groupElement = entityElement.getParent();
 
-		if (!entityElementName.equals("article")) {
+		String groupElementName = groupElement.getName();
+
+		if (!groupElementName.equals(JournalArticle.class.getSimpleName())) {
 			content = StringUtil.replace(
 				content, StringPool.AMPERSAND_ENCODED, StringPool.AMPERSAND);
 		}
@@ -339,17 +341,9 @@ public class DDMPortletDataHandler extends BasePortletDataHandler {
 					"default-repository",
 					String.valueOf(fileEntry.isDefaultRepository()));
 
-				String path = null;
-
-				if (fileEntry.isDefaultRepository()) {
-					path = ExportImportPathUtil.getModelPath(
-						(DLFileEntry)fileEntry.getModel());
-
-				}
-				else {
-					path = ExportImportPathUtil.getModelPath(
-						(RepositoryEntry)fileEntry.getModel());
-				}
+				String path = ExportImportPathUtil.getModelPath(
+					fileEntry.getGroupId(), FileEntry.class.getName(),
+					fileEntry.getFileEntryId());
 
 				dlReferenceElement.addAttribute("path", path);
 

@@ -119,7 +119,10 @@ public interface PortletDataContext extends Serializable {
 		String className, long classPK, List<RatingsEntry> ratingsEntries);
 
 	public Element addReferenceElement(
-		Element element, ClassedModel referencedClassedModel);
+		Element element, ClassedModel classedModel);
+
+	public Element addReferenceElement(
+		Element element, ClassedModel classedModel, String binPath);
 
 	public void addZipEntry(String path, byte[] bytes) throws SystemException;
 
@@ -175,14 +178,17 @@ public interface PortletDataContext extends Serializable {
 
 	public Map<String, List<ExpandoColumn>> getExpandoColumns();
 
+	public Element getExportDataElement(ClassedModel classedModel);
+
 	public Element getExportDataGroupElement(
 		Class<? extends StagedModel> clazz);
 
 	public Element getExportDataRootElement();
 
-	public Element getExportDataStagedModelElement(StagedModel stagedModel);
-
 	public long getGroupId();
+
+	public Element getImportDataElement(
+		String name, String attribute, String value);
 
 	public Element getImportDataGroupElement(
 		Class<? extends StagedModel> clazz);
@@ -190,9 +196,6 @@ public interface PortletDataContext extends Serializable {
 	public Element getImportDataRootElement();
 
 	public Element getImportDataStagedModelElement(StagedModel stagedModel);
-
-	public Element getImportDataStagedModelElement(
-		String name, String attribute, String value);
 
 	/**
 	 * @deprecated As of 6.2.0, replaced by {@link
@@ -225,8 +228,11 @@ public interface PortletDataContext extends Serializable {
 
 	public Map<String, List<RatingsEntry>> getRatingsEntries();
 
-	public List<Element> getReferencedDataElements(
-		StagedModel parentStagedModel, Class<? extends StagedModel> clazz);
+	public List<Element> getReferenceDataElements(
+		Element parentElement, Class<?> clazz);
+
+	public List<Element> getReferenceDataElements(
+		StagedModel parentStagedModel, Class<?> clazz);
 
 	/**
 	 * @deprecated As of 6.2.0, replaced by {@link

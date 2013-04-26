@@ -128,8 +128,8 @@ public class DDMTemplateStagedModelDataHandler
 		Element dlRepositoryEntriesElement =
 			portletDataContext.getExportDataGroupElement(RepositoryEntry.class);
 
-		Element templateElement =
-			portletDataContext.getExportDataStagedModelElement(template);
+		Element templateElement = portletDataContext.getExportDataElement(
+			template);
 
 		if (template.isSmallImage()) {
 			Image smallImage = ImageUtil.fetchByPrimaryKey(
@@ -137,7 +137,7 @@ public class DDMTemplateStagedModelDataHandler
 
 			if (Validator.isNotNull(template.getSmallImageURL())) {
 				String smallImageURL =
-					DDMPortletDataHandler.exportReferencedContent(
+					DDMPortletDataHandler.exportReferenceContent(
 						portletDataContext, dlFileEntryTypesElement,
 						dlFoldersElement, dlFileEntriesElement,
 						dlFileRanksElement, dlRepositoriesElement,
@@ -164,7 +164,7 @@ public class DDMTemplateStagedModelDataHandler
 		if (portletDataContext.getBooleanParameter(
 				DDMPortletDataHandler.NAMESPACE, "embedded-assets")) {
 
-			String content = DDMPortletDataHandler.exportReferencedContent(
+			String content = DDMPortletDataHandler.exportReferenceContent(
 				portletDataContext, dlFileEntryTypesElement, dlFoldersElement,
 				dlFileEntriesElement, dlFileRanksElement, dlRepositoriesElement,
 				dlRepositoryEntriesElement, templateElement,
@@ -212,7 +212,7 @@ public class DDMTemplateStagedModelDataHandler
 
 			if (Validator.isNotNull(template.getSmallImageURL())) {
 				String smallImageURL =
-					JournalPortletDataHandler.importReferencedContent(
+					JournalPortletDataHandler.importReferenceContent(
 						portletDataContext, element,
 						template.getSmallImageURL());
 
@@ -265,6 +265,13 @@ public class DDMTemplateStagedModelDataHandler
 
 		portletDataContext.importClassedModel(
 			template, importedTemplate, DDMPortletDataHandler.NAMESPACE);
+
+		Map<String, String> ddmTemplateKeys =
+			(Map<String, String>)portletDataContext.getNewPrimaryKeysMap(
+				DDMTemplate.class + ".ddmTemplateKey");
+
+		ddmTemplateKeys.put(
+			template.getTemplateKey(), importedTemplate.getTemplateKey());
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(

@@ -150,7 +150,7 @@ public class BlogsPortletDataHandler extends BasePortletDataHandler {
 		Element entriesElement = rootElement.element("entries");
 
 		if (entriesElement != null) {
-			JournalPortletDataHandler.importReferencedData(
+			JournalPortletDataHandler.importReferenceData(
 				portletDataContext, entriesElement);
 		}
 		else {
@@ -211,7 +211,7 @@ public class BlogsPortletDataHandler extends BasePortletDataHandler {
 			entryElement = entriesElement.addElement("entry");
 		}
 
-		String content = DDMPortletDataHandler.exportReferencedContent(
+		String content = DDMPortletDataHandler.exportReferenceContent(
 			portletDataContext, dlFileEntryTypesElement, dlFoldersElement,
 			dlFileEntriesElement, dlFileRanksElement, dlRepositoriesElement,
 			dlRepositoryEntriesElement, entryElement, entry.getContent());
@@ -228,7 +228,7 @@ public class BlogsPortletDataHandler extends BasePortletDataHandler {
 
 			if (Validator.isNotNull(entry.getSmallImageURL())) {
 				String smallImageURL =
-					DDMPortletDataHandler.exportReferencedContent(
+					DDMPortletDataHandler.exportReferenceContent(
 						portletDataContext, dlFileEntryTypesElement,
 						dlFoldersElement, dlFileEntriesElement,
 						dlFileRanksElement, dlRepositoriesElement,
@@ -310,7 +310,7 @@ public class BlogsPortletDataHandler extends BasePortletDataHandler {
 
 		long userId = portletDataContext.getUserId(entry.getUserUuid());
 
-		String content = JournalPortletDataHandler.importReferencedContent(
+		String content = JournalPortletDataHandler.importReferenceContent(
 			portletDataContext, entryElement, entry.getContent());
 
 		entry.setContent(content);
@@ -344,7 +344,7 @@ public class BlogsPortletDataHandler extends BasePortletDataHandler {
 
 				if (Validator.isNotNull(entry.getSmallImageURL())) {
 					String smallImageURL =
-						JournalPortletDataHandler.importReferencedContent(
+						JournalPortletDataHandler.importReferenceContent(
 							portletDataContext, entryElement,
 							entry.getSmallImageURL());
 
