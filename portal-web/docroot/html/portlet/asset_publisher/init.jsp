@@ -20,6 +20,7 @@
 page import="com.liferay.portal.kernel.search.Hits" %><%@
 page import="com.liferay.portal.kernel.template.TemplateHandler" %><%@
 page import="com.liferay.portal.kernel.template.TemplateHandlerRegistryUtil" %><%@
+page import="com.liferay.portal.kernel.util.DateFormatFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.xml.Document" %><%@
 page import="com.liferay.portal.kernel.xml.Element" %><%@
 page import="com.liferay.portal.kernel.xml.SAXReaderUtil" %><%@
@@ -48,7 +49,7 @@ page import="com.liferay.portlet.assetpublisher.util.AssetPublisherHelperUtil" %
 page import="com.liferay.portlet.assetpublisher.util.AssetPublisherUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.util.DocumentConversionUtil" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.model.DDMStructure" %><%@
-page import="com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil" %><%@
+page import="com.liferay.portlet.dynamicdatamapping.util.DDMImpl" %><%@
 page import="com.liferay.portlet.dynamicdatamapping.util.DDMIndexerUtil" %><%@
 page import="com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateConstants" %><%@
 page import="com.liferay.portlet.portletdisplaytemplate.util.PortletDisplayTemplateUtil" %><%@
@@ -95,9 +96,12 @@ AssetEntryQuery assetEntryQuery = new AssetEntryQuery();
 long[] allAssetCategoryIds = new long[0];
 String[] allAssetTagNames = new String[0];
 
+String ddmStructureDisplayFieldValue = StringPool.BLANK;
 String ddmStructureFieldLabel = StringPool.BLANK;
 String ddmStructureFieldName = StringPool.BLANK;
-String ddmStructureFieldValue = StringPool.BLANK;
+Serializable ddmStructureFieldValue = null;
+
+boolean subtypeFieldsFilterEnabled = GetterUtil.getBoolean(preferences.getValue("subtypeFieldsFilterEnabled", Boolean.FALSE.toString()));
 
 if (selectionStyle.equals("dynamic")) {
 	if (!ArrayUtil.contains(groupIds, scopeGroupId)) {
@@ -112,19 +116,30 @@ if (selectionStyle.equals("dynamic")) {
 	assetEntryQuery.setClassTypeIds(classTypeIds);
 
 	if ((classNameIds.length == 1) && (classTypeIds.length == 1)) {
-		DDMStructure ddmStructure = DDMStructureLocalServiceUtil.fetchDDMStructure(classTypeIds[0]);
+		AssetRendererFactory assetRendererFactory = AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClassName(PortalUtil.getClassName(classNameIds[0]));
 
-		if (ddmStructure != null) {
-			ddmStructureFieldName = GetterUtil.getString(preferences.getValue("ddmStructureFieldName", StringPool.BLANK));
-			ddmStructureFieldValue = GetterUtil.getString(preferences.getValue("ddmStructureFieldValue", StringPool.BLANK));
+		ddmStructureDisplayFieldValue = GetterUtil.getString(preferences.getValue("ddmStructureDisplayFieldValue", StringPool.BLANK));
+		ddmStructureFieldName = GetterUtil.getString(preferences.getValue("ddmStructureFieldName", StringPool.BLANK));
+		ddmStructureFieldValue = preferences.getValue("ddmStructureFieldValue", StringPool.BLANK);
 
-			Set<String> fieldNames = ddmStructure.getFieldNames();
+		if (Validator.isNotNull(ddmStructureFieldName) && Validator.isNotNull(ddmStructureFieldValue)) {
+			List<Tuple> classTypeFieldNames = assetRendererFactory.getClassTypeFieldNames(classTypeIds[0], locale, QueryUtil.ALL_POS, QueryUtil.ALL_POS);
 
-			if (Validator.isNotNull(ddmStructureFieldName) && fieldNames.contains(ddmStructureFieldName) && Validator.isNotNull(ddmStructureFieldValue)) {
-				ddmStructureFieldLabel = ddmStructure.getFieldProperty(ddmStructureFieldName, "label");
+			for (Tuple classTypeFieldName : classTypeFieldNames) {
+				String fieldName = (String)classTypeFieldName.getObject(1);
 
-				assetEntryQuery.setAttribute("ddmStructureFieldName", DDMIndexerUtil.encodeName(ddmStructure.getStructureId(), ddmStructureFieldName, locale));
-				assetEntryQuery.setAttribute("ddmStructureFieldValue", ddmStructureFieldValue);
+				if (fieldName.equals(ddmStructureFieldName)) {
+					ddmStructureFieldLabel = (String)classTypeFieldName.getObject(0);
+
+					if (subtypeFieldsFilterEnabled) {
+						long ddmStructureId = GetterUtil.getLong(classTypeFieldName.getObject(3));
+
+						assetEntryQuery.setAttribute("ddmStructureFieldName", DDMIndexerUtil.encodeName(ddmStructureId, ddmStructureFieldName, locale));
+						assetEntryQuery.setAttribute("ddmStructureFieldValue", ddmStructureFieldValue);
+					}
+
+					break;
+				}
 			}
 		}
 	}
@@ -211,6 +226,9 @@ if (portletName.equals(PortletKeys.RECENT_CONTENT)) {
 }
 
 String paginationType = GetterUtil.getString(preferences.getValue("paginationType", "none"));
+
+assetEntryQuery.setPaginationType(paginationType);
+
 boolean showAvailableLocales = GetterUtil.getBoolean(preferences.getValue("showAvailableLocales", null));
 boolean showMetadataDescriptions = GetterUtil.getBoolean(preferences.getValue("showMetadataDescriptions", null), true);
 

@@ -14,6 +14,7 @@
 
 package com.liferay.portlet.documentlibrary.asset;
 
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -22,6 +23,7 @@ import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
@@ -86,7 +88,8 @@ public class DLFileEntryAssetRendererFactory extends BaseAssetRendererFactory {
 	}
 
 	@Override
-	public List<Tuple> getClassTypeFieldNames(long classTypeId, Locale locale)
+	public List<Tuple> getClassTypeFieldNames(
+			long classTypeId, Locale locale, int start, int end)
 		throws Exception {
 
 		List<Tuple> classTypeFieldNames = new ArrayList<Tuple>();
@@ -101,7 +104,31 @@ public class DLFileEntryAssetRendererFactory extends BaseAssetRendererFactory {
 				getDDMStructureFieldNames(ddmStructure, locale));
 		}
 
+		if ((start != QueryUtil.ALL_POS) || (end != QueryUtil.ALL_POS)) {
+			classTypeFieldNames = ListUtil.subList(
+				classTypeFieldNames, start, end);
+		}
+
 		return classTypeFieldNames;
+	}
+
+	@Override
+	public int getClassTypeFieldNamesCount(long classTypeId, Locale locale)
+		throws Exception {
+
+		List<Tuple> classTypeFieldNames = new ArrayList<Tuple>();
+
+		DLFileEntryType dlFileEntryType =
+			DLFileEntryTypeLocalServiceUtil.getDLFileEntryType(classTypeId);
+
+		List<DDMStructure> ddmStructures = dlFileEntryType.getDDMStructures();
+
+		for (DDMStructure ddmStructure : ddmStructures) {
+			classTypeFieldNames.addAll(
+				getDDMStructureFieldNames(ddmStructure, locale));
+		}
+
+		return classTypeFieldNames.size();
 	}
 
 	@Override

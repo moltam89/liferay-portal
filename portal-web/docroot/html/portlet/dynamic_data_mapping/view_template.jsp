@@ -40,16 +40,17 @@ portletURL.setParameter("backURL", backURL);
 portletURL.setParameter("classNameId", String.valueOf(classNameId));
 portletURL.setParameter("classPK", String.valueOf(classPK));
 
-String title = StringPool.BLANK;
+DDMDisplay ddmDisplay = DDMDisplayRegistryUtil.getDDMDisplay(refererPortletName);
 
-if (!portletName.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES)) {
-	if (structure != null) {
-		title = LanguageUtil.format(pageContext, (Validator.isNull(templateHeaderTitle) ? "templates-for-structure-x" : templateHeaderTitle), structure.getName(locale), false);
-	}
-	else {
-		title = "application-display-templates";
-	}
+boolean controlPanel = false;
+
+if (layout != null) {
+	Group group = layout.getGroup();
+
+	controlPanel = group.isControlPanel();
 }
+
+String title = ddmDisplay.getViewTemplatesTitle(structure, controlPanel, locale);
 %>
 
 <liferay-ui:error exception="<%= RequiredTemplateException.class %>">
@@ -63,7 +64,7 @@ if (!portletName.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES)) {
 </portlet:renderURL>
 
 <liferay-ui:header
-	backURL="<%= portletName.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES) ? backURL : viewRecordsURL %>"
+	backURL="<%= refererPortletName.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES) ? backURL : viewRecordsURL %>"
 	title="<%= title %>"
 />
 
@@ -120,10 +121,11 @@ if (!portletName.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES)) {
 
 			rowURL.setParameter("struts_action", "/dynamic_data_mapping/edit_template");
 			rowURL.setParameter("redirect", currentURL);
+			rowURL.setParameter("backURL", currentURL);
 			rowURL.setParameter("groupId", String.valueOf(template.getGroupId()));
 			rowURL.setParameter("templateId", String.valueOf(template.getTemplateId()));
 			rowURL.setParameter("classNameId", String.valueOf(classNameId));
-			rowURL.setParameter("classPK", String.valueOf(classPK));
+			rowURL.setParameter("classPK", String.valueOf(template.getClassPK()));
 			rowURL.setParameter("type", template.getType());
 
 			String rowHREF = rowURL.toString();
@@ -134,48 +136,61 @@ if (!portletName.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES)) {
 				value="<%= rowHREF %>"
 			/>
 
-			<liferay-ui:search-container-column-text
-				href="<%= rowHREF %>"
-				name="id"
-				orderable="<%= true %>"
-				orderableProperty="id"
-				property="templateId"
-			/>
+			<%
+			Set<String> excludedColumnNames = ddmDisplay.getViewTemplatesExcludedColumnNames();
+			%>
 
-			<liferay-ui:search-container-column-text
-				href="<%= rowHREF %>"
-				name="name"
-				value="<%= HtmlUtil.escape(LanguageUtil.get(pageContext, template.getName(locale))) %>"
-			/>
+			<c:if test='<%= !excludedColumnNames.contains("id") %>'>
+				<liferay-ui:search-container-column-text
+					href="<%= rowHREF %>"
+					name="id"
+					orderable="<%= true %>"
+					orderableProperty="id"
+					property="templateId"
+				/>
+			</c:if>
+
+			<c:if test='<%= !excludedColumnNames.contains("name") %>'>
+				<liferay-ui:search-container-column-text
+					href="<%= rowHREF %>"
+					name="name"
+					value="<%= HtmlUtil.escape(LanguageUtil.get(pageContext, template.getName(locale))) %>"
+				/>
+			</c:if>
 
 			<liferay-ui:search-container-column-jsp
 				name="description"
 				path="/html/portlet/dynamic_data_mapping/template_description.jsp"
 			/>
 
-			<c:if test="<%= Validator.isNull(templateTypeValue) && (classNameId == 0) %>">
+			<c:if test='<%= !excludedColumnNames.contains("structure") && (structure == null) %>'>
 
 				<%
-				String value = null;
+				String structureName = StringPool.BLANK;
 
-				if (portletName.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES)) {
-					TemplateHandler templateHandler = TemplateHandlerRegistryUtil.getTemplateHandler(template.getClassNameId());
+				if (template.getClassPK() > 0) {
+					DDMStructure templateStructure = DDMStructureServiceUtil.getStructure(template.getClassPK());
 
-					value = templateHandler.getName(locale);
-				}
-				else if (Validator.isNull(templateTypeValue)) {
-					value = LanguageUtil.get(pageContext, template.getType());
+					structureName = templateStructure.getName();
 				}
 				%>
 
 				<liferay-ui:search-container-column-text
 					href="<%= rowHREF %>"
-					name="type"
-					value="<%= value %>"
+					name="structure"
+					value="<%= structureName %>"
 				/>
 			</c:if>
 
-			<c:if test="<%= !portletName.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES) %>">
+			<c:if test='<%= !excludedColumnNames.contains("type") && Validator.isNull(templateTypeValue) && (classNameId == 0) %>'>
+				<liferay-ui:search-container-column-text
+					href="<%= rowHREF %>"
+					name="type"
+					value="<%= ddmDisplay.getTemplateType(template, locale) %>"
+				/>
+			</c:if>
+
+			<c:if test='<%= !excludedColumnNames.contains("mode") %>'>
 				<liferay-ui:search-container-column-text
 					href="<%= rowHREF %>"
 					name="mode"
@@ -183,27 +198,29 @@ if (!portletName.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES)) {
 				/>
 			</c:if>
 
-			<c:if test="<%= !portletName.equals(PortletKeys.PORTLET_DISPLAY_TEMPLATES) %>">
+			<c:if test='<%= !excludedColumnNames.contains("language") %>'>
 				<liferay-ui:search-container-column-text
 					href="<%= rowHREF %>"
 					name="language"
-					value="<%= LanguageUtil.get(pageContext, template.getLanguage()) %>"
+					value='<%= LanguageUtil.get(pageContext, template.getLanguage() + "[stands-for]") %>'
 				/>
 			</c:if>
 
-			<liferay-ui:search-container-column-text
-				buffer="buffer"
-				href="<%= rowHREF %>"
-				name="modified-date"
-				orderable="<%= true %>"
-				orderableProperty="modified-date"
-			>
+			<c:if test='<%= !excludedColumnNames.contains("modified-date") %>'>
+				<liferay-ui:search-container-column-text
+					buffer="buffer"
+					href="<%= rowHREF %>"
+					name="modified-date"
+					orderable="<%= true %>"
+					orderableProperty="modified-date"
+				>
 
-				<%
-				buffer.append(dateFormatDateTime.format(template.getModifiedDate()));
-				%>
+					<%
+					buffer.append(dateFormatDateTime.format(template.getModifiedDate()));
+					%>
 
-			</liferay-ui:search-container-column-text>
+				</liferay-ui:search-container-column-text>
+			</c:if>
 
 			<liferay-ui:search-container-column-jsp
 				align="right"

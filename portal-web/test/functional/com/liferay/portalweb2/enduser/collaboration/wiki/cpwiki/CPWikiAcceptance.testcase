@@ -15,7 +15,6 @@
 		<var name="wikiNodeName" value="Wiki Node Name" />
 
 		<execute macro="WikiNode#cpAdd" />
-
 		<execute macro="WikiNode#cpDelete" />
 	</command>
 
@@ -26,13 +25,12 @@
 		<var name="wikiNodeNameNew" value="Wiki Node Name Edit" />
 
 		<execute macro="WikiNode#cpAdd" />
-
 		<execute macro="WikiNode#cpEdit" />
 	</command>
 
 	<tear-down>
 		<execute macro="WikiNode#cpTearDown" />
 
-		<execute macro="User#pgLogout" />
+		<execute macro="WikiPage#cpTearDown" />
 	</tear-down>
 </definition>

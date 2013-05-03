@@ -24,6 +24,21 @@
 	<td></td>
 </tr>
 <tr>
+	<td>SITE_URL_PRIVATE</td>
+	<td>/group/site-name/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_URL_PUBLIC</td>
+	<td>/web/site-name/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>SITE_NAME</td>
+	<td>//h1[@class='site-title']/span</td>
+	<td></td>
+</tr>
+<tr>
 	<td></td>
 	<td></td>
 	<td></td>
@@ -31,17 +46,32 @@
 <!--PAGE-->
 <tr>
 	<td>PAGE_1</td>
-	<td>xPath=(//li[contains(@class,'lfr-nav-deletable')])[1]/a/span</td>
+	<td>xpath=(//li[contains(@class,'lfr-nav-deletable')])[1]/a/span</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_1_CHILD_PAGE_1</td>
+	<td>xpath=(//li[contains(@class,'lfr-nav-deletable')])[1]/ul[@class='child-menu']/li/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_1_CHILD_PAGE_2</td>
+	<td>xpath=(//li[contains(@class,'lfr-nav-deletable')])[1]/ul[@class='child-menu']/li/a</td>
+	<td></td>
+</tr>
+<tr>
+	<td>PAGE_1_CHILD_PAGE_3</td>
+	<td>xpath=(//li[contains(@class,'lfr-nav-deletable')])[1]/ul[@class='child-menu']/li/a</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PAGE_2</td>
-	<td>xPath=(//li[contains(@class,'lfr-nav-deletable')])[2]/a/span</td>
+	<td>xpath=(//li[contains(@class,'lfr-nav-deletable')])[2]/a/span</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PAGE_3</td>
-	<td>xPath=(//li[contains(@class,'lfr-nav-deletable')])[3]/a/span</td>
+	<td>xpath=(//li[contains(@class,'lfr-nav-deletable')])[3]/a/span</td>
 	<td></td>
 </tr>
 <tr>
@@ -51,26 +81,53 @@
 </tr>
 <tr>
 	<td>PAGE_DELETE_1</td>
-	<td>xPath=(//li[contains(@class,'lfr-nav-deletable')])[1]/span[@class='delete-tab']</td>
+	<td>xpath=(//li[contains(@class,'lfr-nav-deletable')])[1]/span[@class='delete-tab']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PAGE_DELETE_2</td>
-	<td>xPath=(//li[contains(@class,'lfr-nav-deletable')])[2]/span[@class='delete-tab']</td>
+	<td>xpath=(//li[contains(@class,'lfr-nav-deletable')])[2]/span[@class='delete-tab']</td>
 	<td></td>
 </tr>
 <tr>
 	<td>PAGE_DELETE_3</td>
-	<td>xPath=(//li[contains(@class,'lfr-nav-deletable')])[3]/span[@class='delete-tab']</td>
+	<td>xpath=(//li[contains(@class,'lfr-nav-deletable')])[3]/span[@class='delete-tab']</td>
 	<td></td>
 </tr>
 <tr>
-	<td>PAGE_NAME</td>
-	<td>//li[@class='add-page']//input[contains(@class,'input-text')]</td>
-	<td>test</td>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--BREADCRUMB-->
+<tr>
+	<td>BREADCRUMB_1</td>
+	<td>xpath=(//nav[@id='breadcrumbs']/ul/li/span/a)[1]</td>
+	<td></td>
 </tr>
 <tr>
-	<td>PAGE_SAVE</td>
+	<td>BREADCRUMB_2</td>
+	<td>xpath=(//nav[@id='breadcrumbs']/ul/li/span/a)[2]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>BREADCRUMB_3</td>
+	<td>xpath=(//nav[@id='breadcrumbs']/ul/li/span/a)[3]</td>
+	<td></td>
+</tr>
+<tr>
+	<td></td>
+	<td></td>
+	<td></td>
+</tr>
+<!--NEW_PAGE-->
+<tr>
+	<td>NEW_PAGE_FIELD</td>
+	<td>//li[@class='add-page']//input[contains(@class,'input-text')]</td>
+	<td></td>
+</tr>
+<tr>
+	<td>NEW_PAGE_SAVE</td>
 	<td>//button[contains(@id,'Save')]</td>
 	<td></td>
 </tr>

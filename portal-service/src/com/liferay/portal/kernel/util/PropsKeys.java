@@ -1603,10 +1603,6 @@ public interface PropsKeys {
 
 	public static final String MODULE_FRAMEWORK_BEGINNING_START_LEVEL = "module.framework.beginning.start.level";
 
-	public static final String MODULE_FRAMEWORK_CORE_DIR = "module.framework.core.dir";
-
-	public static final String MODULE_FRAMEWORK_ENABLED = "module.framework.enabled";
-
 	public static final String MODULE_FRAMEWORK_INITIAL_BUNDLES = "module.framework.initial.bundles";
 
 	public static final String MODULE_FRAMEWORK_PORTAL_DIR = "module.framework.portal.dir";
@@ -2506,6 +2502,8 @@ public interface PropsKeys {
 	public static final String WEBDAV_NONCE_EXPIRATION = "webdav.nonce.expiration";
 
 	public static final String WEBDAV_SERVLET_HTTPS_REQUIRED = "webdav.servlet.https.required";
+
+	public static final String WEBLOGIC_REQUEST_WRAP_NON_SERIALIZABLE = "weblogic.request.wrap.non.serializable";
 
 	public static final String WIDGET_SERVLET_MAPPING = "widget.servlet.mapping";
 

@@ -573,7 +573,7 @@
 	</library>
 	<library>
 		<file-name>lib/development/mockito.jar</file-name>
-		<version>1.9.0</version>
+		<version>1.9.5</version>
 		<project-name>Mockito</project-name>
 		<project-url>http://code.google.com/p/mockito</project-url>
 		<licenses>
@@ -674,7 +674,7 @@
 	</library>
 	<library>
 		<file-name>lib/development/powermock-mockito.jar</file-name>
-		<version>1.4.11</version>
+		<version>1.5</version>
 		<project-name>Powermock</project-name>
 		<project-url>http://code.google.com/p/powermock</project-url>
 		<licenses>
@@ -2688,28 +2688,6 @@
 		</licenses>
 	</library>
 	<library>
-		<file-name>lib/portal/oauth.jar</file-name>
-		<version>20100601</version>
-		<project-name>OAuth Core</project-name>
-		<project-url>http://code.google.com/p/oauth</project-url>
-		<licenses>
-			<license>
-				<license-name>Apache License 2.0</license-name>
-			</license>
-		</licenses>
-	</library>
-	<library>
-		<file-name>lib/portal/oauth-provider.jar</file-name>
-		<version>20100601</version>
-		<project-name>OAuth Core: Provider</project-name>
-		<project-url>http://code.google.com/p/oauth</project-url>
-		<licenses>
-			<license>
-				<license-name>Apache License 2.0</license-name>
-			</license>
-		</licenses>
-	</library>
-	<library>
 		<file-name>lib/portal/odmg.jar</file-name>
 		<version></version>
 		<project-name>ODMG - Object Data Management Group Java Bindings</project-name>
@@ -3643,7 +3621,7 @@
 		</licenses>
 	</library>
 	<library>
-		<file-name>osgi/lib/common/portal/osgi.core.jar</file-name>
+		<file-name>osgi/lib/common/core/osgi.core.jar</file-name>
 		<version>4.3.1.201210102023</version>
 		<project-name>OSGi Core Specification</project-name>
 		<project-url>http://www.osgi.org</project-url>
@@ -3654,98 +3632,10 @@
 		</licenses>
 	</library>
 	<library>
-		<file-name>osgi/lib/common/portal/javax.servlet.jsp.jstl.jar</file-name>
-		<version>1.2.0.v201105211821</version>
-		<project-name>Glassfish</project-name>
-		<project-url>http://glassfish.java.net</project-url>
-		<licenses>
-			<license>
-				<license-name>CDDL 1.0</license-name>
-			</license>
-		</licenses>
-	</library>
-	<library>
-		<file-name>osgi/lib/common/portal/jetty-continuation.jar</file-name>
-		<version>7.6.7.v20120910</version>
-		<project-name>Jetty</project-name>
-		<project-url>http://download.eclipse.org/jetty</project-url>
-		<licenses>
-			<license>
-				<license-name>Apache License 2.0</license-name>
-			</license>
-		</licenses>
-	</library>
-	<library>
-		<file-name>osgi/lib/common/portal/jetty-http.jar</file-name>
-		<version>7.6.7.v20120910</version>
-		<project-name>Jetty</project-name>
-		<project-url>http://download.eclipse.org/jetty</project-url>
-		<licenses>
-			<license>
-				<license-name>Apache License 2.0</license-name>
-			</license>
-		</licenses>
-	</library>
-	<library>
-		<file-name>osgi/lib/common/portal/jetty-io.jar</file-name>
-		<version>7.6.7.v20120910</version>
-		<project-name>Jetty</project-name>
-		<project-url>http://download.eclipse.org/jetty</project-url>
-		<licenses>
-			<license>
-				<license-name>Apache License 2.0</license-name>
-			</license>
-		</licenses>
-	</library>
-	<library>
-		<file-name>osgi/lib/common/portal/jetty-security.jar</file-name>
-		<version>7.6.7.v20120910</version>
-		<project-name>Jetty</project-name>
-		<project-url>http://download.eclipse.org/jetty</project-url>
-		<licenses>
-			<license>
-				<license-name>Apache License 2.0</license-name>
-			</license>
-		</licenses>
-	</library>
-	<library>
-		<file-name>osgi/lib/common/portal/jetty-server.jar</file-name>
-		<version>7.6.7.v20120910</version>
-		<project-name>Jetty</project-name>
-		<project-url>http://download.eclipse.org/jetty</project-url>
-		<licenses>
-			<license>
-				<license-name>Apache License 2.0</license-name>
-			</license>
-		</licenses>
-	</library>
-	<library>
-		<file-name>osgi/lib/common/portal/jetty-servlet.jar</file-name>
-		<version>7.6.7.v20120910</version>
-		<project-name>Jetty</project-name>
-		<project-url>http://download.eclipse.org/jetty</project-url>
-		<licenses>
-			<license>
-				<license-name>Apache License 2.0</license-name>
-			</license>
-		</licenses>
-	</library>
-	<library>
-		<file-name>osgi/lib/common/portal/jetty-util.jar</file-name>
-		<version>7.6.7.v20120910</version>
-		<project-name>Jetty</project-name>
-		<project-url>http://download.eclipse.org/jetty</project-url>
-		<licenses>
-			<license>
-				<license-name>Apache License 2.0</license-name>
-			</license>
-		</licenses>
-	</library>
-	<library>
-		<file-name>osgi/lib/common/portal/jetty-websocket.jar</file-name>
-		<version>7.6.7.v20120910</version>
-		<project-name>Jetty</project-name>
-		<project-url>http://download.eclipse.org/jetty</project-url>
+		<file-name>osgi/lib/common/portal/org.apache.felix.scr.jar</file-name>
+		<version>1.6.2</version>
+		<project-name>Apache Felix</project-name>
+		<project-url>http://felix.apache.org</project-url>
 		<licenses>
 			<license>
 				<license-name>Apache License 2.0</license-name>
@@ -3755,17 +3645,6 @@
 	<library>
 		<file-name>osgi/lib/common/portal/org.eclipse.gemini.mgmt.jar</file-name>
 		<version>1.0.1.RELEASE</version>
-		<project-name>Jetty</project-name>
-		<project-url>http://www.eclipse.org/gemini/management</project-url>
-		<licenses>
-			<license>
-				<license-name>Apache License 2.0</license-name>
-			</license>
-		</licenses>
-	</library>
-	<library>
-		<file-name>osgi/lib/common/portal/org.phidias.compile.jar</file-name>
-		<version>0.2.1</version>
 		<project-name>Jetty</project-name>
 		<project-url>http://www.eclipse.org/gemini/management</project-url>
 		<licenses>
@@ -3843,17 +3722,6 @@
 	<library>
 		<file-name>osgi/lib/felix/portal/org.apache.felix.log.jar</file-name>
 		<version>1.0.1</version>
-		<project-name>Apache Felix</project-name>
-		<project-url>http://felix.apache.org</project-url>
-		<licenses>
-			<license>
-				<license-name>Apache License 2.0</license-name>
-			</license>
-		</licenses>
-	</library>
-	<library>
-		<file-name>osgi/lib/felix/portal/org.apache.felix.scr.jar</file-name>
-		<version>1.6.2</version>
 		<project-name>Apache Felix</project-name>
 		<project-url>http://felix.apache.org</project-url>
 		<licenses>

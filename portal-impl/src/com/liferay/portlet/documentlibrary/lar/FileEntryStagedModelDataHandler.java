@@ -125,6 +125,12 @@ public class FileEntryStagedModelDataHandler
 
 			portletDataContext.addReferenceElement(
 				fileEntryElement, repository);
+
+			portletDataContext.addClassedModel(
+				fileEntryElement, fileEntryPath, fileEntry,
+				DLPortletDataHandler.NAMESPACE);
+
+			return;
 		}
 
 		FileVersion fileVersion = fileEntry.getFileVersion();
@@ -224,7 +230,7 @@ public class FileEntryStagedModelDataHandler
 			fileEntry.getFileEntryId());
 
 		Element fileEntryElement =
-			portletDataContext.getImportDataStagedModelElement(
+			portletDataContext.getImportDataElement(
 				FileEntry.class.getSimpleName(), "path", path);
 
 		Element referencesElement = fileEntryElement.element("references");
@@ -246,6 +252,10 @@ public class FileEntryStagedModelDataHandler
 
 				StagedModelDataHandlerUtil.importStagedModel(
 					portletDataContext, referenceStagedModel);
+
+				if (className.equals(Repository.class.getName())) {
+					return;
+				}
 			}
 		}
 

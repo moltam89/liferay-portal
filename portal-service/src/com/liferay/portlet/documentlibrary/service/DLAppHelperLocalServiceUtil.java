@@ -217,9 +217,7 @@ public class DLAppHelperLocalServiceUtil {
 	}
 
 	public static void moveFolder(
-		com.liferay.portal.kernel.repository.model.Folder folder)
-		throws com.liferay.portal.kernel.exception.PortalException,
-			com.liferay.portal.kernel.exception.SystemException {
+		com.liferay.portal.kernel.repository.model.Folder folder) {
 		getService().moveFolder(folder);
 	}
 

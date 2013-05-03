@@ -266,10 +266,6 @@
 	<bean id="com.liferay.portlet.documentlibrary.service.DLFolderService" class="com.liferay.portlet.documentlibrary.service.impl.DLFolderServiceImpl" />
 	<bean id="com.liferay.portlet.documentlibrary.service.persistence.DLFolderPersistence" class="com.liferay.portlet.documentlibrary.service.persistence.DLFolderPersistenceImpl" parent="basePersistence" />
 	<bean id="com.liferay.portlet.documentlibrary.service.persistence.DLFolderFinder" class="com.liferay.portlet.documentlibrary.service.persistence.DLFolderFinderImpl" parent="basePersistence" />
-	<bean id="com.liferay.portlet.documentlibrary.service.DLSyncLocalService" class="com.liferay.portlet.documentlibrary.service.impl.DLSyncLocalServiceImpl" />
-	<bean id="com.liferay.portlet.documentlibrary.service.DLSyncService" class="com.liferay.portlet.documentlibrary.service.impl.DLSyncServiceImpl" />
-	<bean id="com.liferay.portlet.documentlibrary.service.persistence.DLSyncPersistence" class="com.liferay.portlet.documentlibrary.service.persistence.DLSyncPersistenceImpl" parent="basePersistence" />
-	<bean id="com.liferay.portlet.documentlibrary.service.persistence.DLSyncFinder" class="com.liferay.portlet.documentlibrary.service.persistence.DLSyncFinderImpl" parent="basePersistence" />
 	<bean id="com.liferay.portlet.dynamicdatalists.service.DDLRecordLocalService" class="com.liferay.portlet.dynamicdatalists.service.impl.DDLRecordLocalServiceImpl" />
 	<bean id="com.liferay.portlet.dynamicdatalists.service.DDLRecordService" class="com.liferay.portlet.dynamicdatalists.service.impl.DDLRecordServiceImpl" />
 	<bean id="com.liferay.portlet.dynamicdatalists.service.persistence.DDLRecordPersistence" class="com.liferay.portlet.dynamicdatalists.service.persistence.DDLRecordPersistenceImpl" parent="basePersistence" />
@@ -419,6 +415,7 @@
 	<bean id="com.liferay.portlet.social.service.persistence.SocialActivityLimitPersistence" class="com.liferay.portlet.social.service.persistence.SocialActivityLimitPersistenceImpl" parent="basePersistence" />
 	<bean id="com.liferay.portlet.social.service.SocialActivitySetLocalService" class="com.liferay.portlet.social.service.impl.SocialActivitySetLocalServiceImpl" />
 	<bean id="com.liferay.portlet.social.service.persistence.SocialActivitySetPersistence" class="com.liferay.portlet.social.service.persistence.SocialActivitySetPersistenceImpl" parent="basePersistence" />
+	<bean id="com.liferay.portlet.social.service.persistence.SocialActivitySetFinder" class="com.liferay.portlet.social.service.persistence.SocialActivitySetFinderImpl" parent="basePersistence" />
 	<bean id="com.liferay.portlet.social.service.SocialActivitySettingLocalService" class="com.liferay.portlet.social.service.impl.SocialActivitySettingLocalServiceImpl" />
 	<bean id="com.liferay.portlet.social.service.SocialActivitySettingService" class="com.liferay.portlet.social.service.impl.SocialActivitySettingServiceImpl" />
 	<bean id="com.liferay.portlet.social.service.persistence.SocialActivitySettingPersistence" class="com.liferay.portlet.social.service.persistence.SocialActivitySettingPersistenceImpl" parent="basePersistence" />

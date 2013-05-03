@@ -17,6 +17,12 @@
 		</default>
 	</command>
 
+	<command name="assertLocation">
+		<default>
+			<execute function="AssertLocation#assertLocation" />
+		</default>
+	</command>
+
 	<command name="assertNotChecked">
 		<default>
 			<execute function="AssertNotChecked#assertNotChecked" />
@@ -50,6 +56,12 @@
 	<command name="assertTextPresent">
 		<default>
 			<execute function="AssertTextPresent#assertTextPresent" />
+		</default>
+	</command>
+
+	<command name="check">
+		<default>
+			<execute function="Check#clickAt" />
 		</default>
 	</command>
 
@@ -149,6 +161,12 @@
 	<command name="type">
 		<default>
 			<execute function="Type#type" />
+		</default>
+	</command>
+
+	<command name="uncheck">
+		<default>
+			<execute function="Uncheck#clickAt" />
 		</default>
 	</command>
 </definition>

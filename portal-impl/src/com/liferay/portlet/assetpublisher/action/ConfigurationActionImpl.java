@@ -14,7 +14,6 @@
 
 package com.liferay.portlet.assetpublisher.action;
 
-import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.portlet.DefaultConfigurationAction;
@@ -52,7 +51,6 @@ import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.storage.Field;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
-import com.liferay.portlet.dynamicdatamapping.util.DDMImpl;
 import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
 
 import java.io.Serializable;
@@ -215,29 +213,34 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 
 		String type = ddmStructure.getFieldType(fieldName);
 
-		if (fieldValue instanceof Date) {
-			Date valueDate = (Date)fieldValue;
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
+		Serializable displayValue = DDMUtil.getDisplayFieldValue(
+			fieldValue, type, themeDisplay.getLocale());
+
+		jsonObject.put("displayValue", String.valueOf(displayValue));
+
+		if (fieldValue instanceof Boolean) {
+			jsonObject.put("value", (Boolean)fieldValue);
+		}
+		else if (fieldValue instanceof Date) {
 			DateFormat dateFormat = DateFormatFactoryUtil.getSimpleDateFormat(
 				"yyyyMMddHHmmss");
 
-			fieldValue = dateFormat.format(valueDate);
+			jsonObject.put("value", dateFormat.format(fieldValue));
 		}
-		else if (type.equals(DDMImpl.TYPE_RADIO) ||
-				 type.equals(DDMImpl.TYPE_SELECT)) {
-
-			String valueString = String.valueOf(fieldValue);
-
-			JSONArray jsonArray = JSONFactoryUtil.createJSONArray(valueString);
-
-			String[] stringArray = ArrayUtil.toStringArray(jsonArray);
-
-			fieldValue = stringArray[0];
+		else if (fieldValue instanceof Double) {
+			jsonObject.put("value", (Double)fieldValue);
 		}
-
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
-
-		jsonObject.put("value", String.valueOf(fieldValue));
+		else if (fieldValue instanceof Float) {
+			jsonObject.put("value", (Float)fieldValue);
+		}
+		else if (fieldValue instanceof Integer) {
+			jsonObject.put("value", (Integer)fieldValue);
+		}
+		else {
+			jsonObject.put("value", (String)fieldValue);
+		}
 
 		resourceResponse.setContentType(ContentTypes.APPLICATION_JSON);
 
@@ -281,7 +284,7 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 		}
 	}
 
-	protected String[] getClassTypeIds(
+	protected String getAssetClassName(
 			ActionRequest actionRequest, String[] classNameIds)
 		throws Exception {
 
@@ -326,6 +329,19 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 		String assetClassName = AssetPublisherUtil.getClassName(
 			assetRendererFactory);
 
+		return assetClassName;
+	}
+
+	protected String[] getClassTypeIds(
+			ActionRequest actionRequest, String[] classNameIds)
+		throws Exception {
+
+		String assetClassName = getAssetClassName(actionRequest, classNameIds);
+
+		if (assetClassName == null) {
+			return null;
+		}
+
 		String anyAssetClassTypeString = getParameter(
 			actionRequest, "anyClassType" + assetClassName);
 
@@ -346,6 +362,21 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 			return StringUtil.split(
 				getParameter(actionRequest, "classTypeIds" + assetClassName));
 		}
+	}
+
+	protected boolean getSubtypesFieldsFilterEnabled(
+			ActionRequest actionRequest, String[] classNameIds)
+		throws Exception {
+
+		String assetClassName = getAssetClassName(actionRequest, classNameIds);
+
+		if (assetClassName == null) {
+			return false;
+		}
+
+		return GetterUtil.getBoolean(
+			getParameter(
+				actionRequest, "subtypeFieldsFilterEnabled" + assetClassName));
 	}
 
 	protected void moveSelectionDown(
@@ -526,10 +557,15 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 			getParameter(actionRequest, "classNameIds"));
 		String[] classTypeIds = getClassTypeIds(actionRequest, classNameIds);
 		String[] extensions = actionRequest.getParameterValues("extensions");
+		boolean subtypeFieldsFilterEnabled = getSubtypesFieldsFilterEnabled(
+			actionRequest, classNameIds);
 
 		setPreference(actionRequest, "classNameIds", classNameIds);
 		setPreference(actionRequest, "classTypeIds", classTypeIds);
 		setPreference(actionRequest, "extensions", extensions);
+		setPreference(
+			actionRequest, "subtypeFieldsFilterEnabled",
+			String.valueOf(subtypeFieldsFilterEnabled));
 	}
 
 	protected void updateQueryLogic(

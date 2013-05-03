@@ -286,9 +286,6 @@ create index IX_CBC408D8 on DLFolder (uuid_);
 create index IX_DA448450 on DLFolder (uuid_, companyId);
 create unique index IX_3CC1DED2 on DLFolder (uuid_, groupId);
 
-create index IX_B53EC783 on DLSync (companyId, modifiedDate, repositoryId);
-create unique index IX_F9821AB4 on DLSync (fileId);
-
 create index IX_1BB072CA on EmailAddress (companyId);
 create index IX_49D2DEC4 on EmailAddress (companyId, classNameId);
 create index IX_551A519F on EmailAddress (companyId, classNameId, classPK);
@@ -807,6 +804,7 @@ create unique index IX_F1C1A617 on SocialActivityLimit (groupId, userId, classNa
 create index IX_6F9EDE9F on SocialActivityLimit (userId);
 
 create index IX_4460FA14 on SocialActivitySet (classNameId, classPK, type_);
+create index IX_9E13F2DE on SocialActivitySet (groupId);
 create index IX_F71071BD on SocialActivitySet (groupId, userId, type_);
 create index IX_62AC101A on SocialActivitySet (userId, classNameId, classPK, type_);
 

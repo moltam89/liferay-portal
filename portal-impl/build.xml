@@ -1580,7 +1580,7 @@ security-manager-sockets-accept=\</replacevalue>
 
 		<replace file="test/integration/com/liferay/portal/security/pacl/test/dependencies/WEB-INF/classes/META-INF/hibernate-spring.xml">
 			<replacetoken><![CDATA[<bean id="liferayHibernateSessionFactory" class="com.liferay.portal.kernel.spring.util.SpringFactoryUtil" factory-method="newBean">]]></replacetoken>
-			<replacevalue><![CDATA[<bean id="liferayHibernateSessionFactory" class="com.liferay.portal.spring.hibernate.PortalHibernateConfiguration">
+			<replacevalue><![CDATA[<bean id="liferayHibernateSessionFactory" class="com.liferay.portal.spring.hibernate.PortletHibernateConfiguration">
 		<property name="dataSource" ref="liferayDataSource" />
 	</bean>]]></replacevalue>
 		</replace>

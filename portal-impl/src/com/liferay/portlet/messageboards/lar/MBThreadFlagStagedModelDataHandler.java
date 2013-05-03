@@ -68,8 +68,8 @@ public class MBThreadFlagStagedModelDataHandler
 		StagedModelDataHandlerUtil.exportStagedModel(
 			portletDataContext, rootMessage);
 
-		Element threadFlagElement =
-			portletDataContext.getExportDataStagedModelElement(threadFlag);
+		Element threadFlagElement = portletDataContext.getExportDataElement(
+			threadFlag);
 
 		threadFlagElement.addAttribute(
 			"root-message-id", String.valueOf(rootMessage.getMessageId()));
@@ -101,8 +101,9 @@ public class MBThreadFlagStagedModelDataHandler
 			String rootMessagePath = ExportImportPathUtil.getModelPath(
 				portletDataContext, MBMessage.class.getName(), rootMessageId);
 
-			MBMessage rootMessage = (MBMessage)portletDataContext.
-				getZipEntryAsObject(rootMessagePath);
+			MBMessage rootMessage =
+				(MBMessage)portletDataContext.getZipEntryAsObject(
+					rootMessagePath);
 
 			StagedModelDataHandlerUtil.importStagedModel(
 				portletDataContext, rootMessage);

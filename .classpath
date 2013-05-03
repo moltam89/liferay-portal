@@ -2,11 +2,10 @@
 <classpath>
 	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="definitions"/>
 	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="osgi/bootstrap/src"/>
-	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="osgi/modules/http-service/src"/>
-	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="osgi/modules/http-service/test/unit"/>
 	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="portal-impl/src"/>
 	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="portal-impl/test/integration"/>
 	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="portal-impl/test/unit"/>
+	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="portal-pacl/src"/>
 	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="portal-service/src"/>
 	<!--<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="portal-service/test/integration"/>-->
 	<classpathentry excluding="**/.svn/**|.svn/" kind="src" path="portal-service/test/unit"/>
@@ -248,8 +247,6 @@
 	<classpathentry kind="lib" path="lib/portal/msnm.jar"/>
 	<classpathentry kind="lib" path="lib/portal/nekohtml.jar"/>
 	<classpathentry kind="lib" path="lib/portal/netcdf.jar"/>
-	<classpathentry kind="lib" path="lib/portal/oauth.jar"/>
-	<classpathentry kind="lib" path="lib/portal/oauth-provider.jar"/>
 	<classpathentry kind="lib" path="lib/portal/odmg.jar"/>
 	<classpathentry kind="lib" path="lib/portal/openid4java.jar"/>
 	<classpathentry kind="lib" path="lib/portal/oro.jar"/>

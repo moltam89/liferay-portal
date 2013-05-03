@@ -976,6 +976,11 @@ public class JournalArticleLocalServiceImpl
 		journalArticleImageLocalService.deleteImages(
 			article.getGroupId(), article.getArticleId(), article.getVersion());
 
+		// Expando
+
+		expandoValueLocalService.deleteValues(
+			JournalArticle.class.getName(), article.getId());
+
 		// Workflow
 
 		if (!article.isDraft()) {
@@ -1018,11 +1023,6 @@ public class JournalArticleLocalServiceImpl
 			// Small image
 
 			imageLocalService.deleteImage(article.getSmallImageId());
-
-			// Expando
-
-			expandoValueLocalService.deleteValues(
-				JournalArticle.class.getName(), article.getId());
 
 			// Trash
 
@@ -1600,6 +1600,17 @@ public class JournalArticleLocalServiceImpl
 
 		Map<String, String> tokens = JournalUtil.getTokens(
 			article.getGroupId(), themeDisplay, xmlRequest);
+
+		if ((themeDisplay == null) && xmlRequest.equals("<request />")) {
+			tokens.put("company_id", String.valueOf(article.getCompanyId()));
+
+			Group companyGroup = groupLocalService.getCompanyGroup(
+				article.getCompanyId());
+
+			tokens.put(
+				"company_group_id", String.valueOf(companyGroup.getGroupId()));
+			tokens.put("group_id", String.valueOf(article.getGroupId()));
+		}
 
 		tokens.put(
 			"article_resource_pk",
@@ -5264,13 +5275,19 @@ public class JournalArticleLocalServiceImpl
 		for (Element element : root.elements()) {
 			String elInstanceId = element.attributeValue(
 				"instance-id", StringPool.BLANK);
-			String elName = element.attributeValue("name", StringPool.BLANK);
 			String elType = element.attributeValue("type", StringPool.BLANK);
 
 			if (elType.equals("image")) {
+				String elName = element.attributeValue(
+					"name", StringPool.BLANK);
+				String elIndex = element.attributeValue(
+					"index", StringPool.BLANK);
+
+				String name = elName + "_" + elIndex;
+
 				formatImage(
 					groupId, articleId, version, incrementVersion, element,
-					elInstanceId, elName, images);
+					elInstanceId, name, images);
 			}
 			else if (elType.equals("text_area") || elType.equals("text") ||
 					 elType.equals("text_box")) {
@@ -5439,6 +5456,9 @@ public class JournalArticleLocalServiceImpl
 
 					imageLocalService.updateImage(imageId, bytes);
 				}
+				else if (dynamicContent.getText().equals("update")) {
+					dynamicContent.setText(StringPool.BLANK);
+				}
 
 				continue;
 			}
@@ -5448,6 +5468,11 @@ public class JournalArticleLocalServiceImpl
 			if (image != null) {
 				dynamicContent.setText(elContent);
 				dynamicContent.addAttribute("id", String.valueOf(imageId));
+
+				continue;
+			}
+			else if (dynamicContent.getText().equals("update")) {
+				dynamicContent.setText(StringPool.BLANK);
 
 				continue;
 			}

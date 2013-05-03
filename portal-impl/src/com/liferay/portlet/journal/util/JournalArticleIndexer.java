@@ -44,10 +44,12 @@ import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
+import com.liferay.portlet.dynamicdatamapping.StructureFieldException;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.portlet.dynamicdatamapping.storage.Fields;
 import com.liferay.portlet.dynamicdatamapping.util.DDMIndexerUtil;
+import com.liferay.portlet.dynamicdatamapping.util.DDMUtil;
 import com.liferay.portlet.journal.asset.JournalArticleAssetRendererFactory;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.model.JournalArticleConstants;
@@ -58,6 +60,8 @@ import com.liferay.portlet.journal.service.JournalFolderServiceUtil;
 import com.liferay.portlet.journal.service.permission.JournalArticlePermission;
 import com.liferay.portlet.journal.service.persistence.JournalArticleActionableDynamicQuery;
 import com.liferay.portlet.trash.util.TrashUtil;
+
+import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -73,6 +77,7 @@ import javax.portlet.PortletURL;
  * @author Bruno Farache
  * @author Raymond Augé
  * @author Hugo Huijser
+ * @author Tibor Lipusz
  */
 public class JournalArticleIndexer extends BaseIndexer {
 
@@ -125,15 +130,36 @@ public class JournalArticleIndexer extends BaseIndexer {
 
 		addSearchClassTypeIds(contextQuery, searchContext);
 
-		String structureField = (String)searchContext.getAttribute(
+		String ddmStructureFieldName = (String)searchContext.getAttribute(
 			"ddmStructureFieldName");
-		String structureValue = (String)searchContext.getAttribute(
+		Serializable ddmStructureFieldValue = searchContext.getAttribute(
 			"ddmStructureFieldValue");
 
-		if (Validator.isNotNull(structureField) &&
-			Validator.isNotNull(structureValue)) {
+		if (Validator.isNotNull(ddmStructureFieldName) &&
+			Validator.isNotNull(ddmStructureFieldValue)) {
 
-			contextQuery.addRequiredTerm(structureField, structureValue);
+			String[] ddmStructureFieldNameParts = StringUtil.split(
+				ddmStructureFieldName, StringPool.SLASH);
+
+			DDMStructure structure = DDMStructureLocalServiceUtil.getStructure(
+				GetterUtil.getLong(ddmStructureFieldNameParts[1]));
+
+			String fieldName = StringUtil.replaceLast(
+				ddmStructureFieldNameParts[2],
+				StringPool.UNDERLINE.concat(
+					LocaleUtil.toLanguageId(searchContext.getLocale())),
+				StringPool.BLANK);
+
+			try {
+				ddmStructureFieldValue = DDMUtil.getIndexedFieldValue(
+					ddmStructureFieldValue, structure.getFieldType(fieldName));
+			}
+			catch (StructureFieldException sfe) {
+			}
+
+			contextQuery.addRequiredTerm(
+				ddmStructureFieldName,
+				StringPool.QUOTE + ddmStructureFieldValue + StringPool.QUOTE);
 		}
 
 		long[] folderIds = searchContext.getFolderIds();
@@ -304,6 +330,9 @@ public class JournalArticleIndexer extends BaseIndexer {
 		document.addUID(
 			PORTLET_ID, article.getGroupId(), article.getArticleId());
 
+		String articleDefaultLanguageId = LocalizationUtil.getDefaultLocale(
+			article.getContent());
+
 		Locale defaultLocale = LocaleUtil.getDefault();
 
 		String defaultLanguageId = LocaleUtil.toLanguageId(defaultLocale);
@@ -314,20 +343,30 @@ public class JournalArticleIndexer extends BaseIndexer {
 		for (String languageId : languageIds) {
 			String content = extractContent(article, languageId);
 
-			if (languageId.equals(defaultLanguageId)) {
+			String description = article.getDescription(languageId);
+
+			String title = article.getTitle(languageId);
+
+			if (languageId.equals(articleDefaultLanguageId)) {
 				document.addText(Field.CONTENT, content);
+				document.addText(Field.DESCRIPTION, description);
+				document.addText(Field.TITLE, title);
+				document.addText("defaultLanguageId", languageId);
 			}
 
 			document.addText(
 				Field.CONTENT.concat(StringPool.UNDERLINE).concat(languageId),
 				content);
+			document.addText(
+				Field.DESCRIPTION.concat(StringPool.UNDERLINE).concat(
+					languageId), description);
+			document.addText(
+				Field.TITLE.concat(StringPool.UNDERLINE).concat(languageId),
+				title);
 		}
 
-		document.addLocalizedText(
-			Field.DESCRIPTION, article.getDescriptionMap());
 		document.addKeyword(Field.FOLDER_ID, article.getFolderId());
 		document.addKeyword(Field.LAYOUT_UUID, article.getLayoutUuid());
-		document.addLocalizedText(Field.TITLE, article.getTitleMap());
 		document.addKeyword(Field.TYPE, article.getType());
 		document.addKeyword(Field.VERSION, article.getVersion());
 
@@ -388,6 +427,11 @@ public class JournalArticleIndexer extends BaseIndexer {
 
 		Locale snippetLocale = getSnippetLocale(document, locale);
 
+		if (snippetLocale == null) {
+			snippetLocale = LocaleUtil.fromLanguageId(
+				document.get("defaultLanguageId"));
+		}
+
 		String prefix = Field.SNIPPET + StringPool.UNDERLINE;
 
 		String title = document.get(
@@ -397,11 +441,8 @@ public class JournalArticleIndexer extends BaseIndexer {
 			snippetLocale, prefix + Field.DESCRIPTION, prefix + Field.CONTENT);
 
 		if (Validator.isBlank(content)) {
-			content = document.get(locale, Field.DESCRIPTION, Field.CONTENT);
-
-			if (Validator.isBlank(content)) {
-				content = document.get(Field.DESCRIPTION, Field.CONTENT);
-			}
+			content = document.get(
+				snippetLocale, Field.DESCRIPTION, Field.CONTENT);
 		}
 
 		if (content.length() > 200) {

@@ -178,7 +178,7 @@ public class WikiPortletDataHandler extends BasePortletDataHandler {
 		long nodeId = MapUtil.getLong(
 			nodeIds, page.getNodeId(), page.getNodeId());
 
-		String content = JournalPortletDataHandler.importReferencedContent(
+		String content = JournalPortletDataHandler.importReferenceContent(
 			portletDataContext, pageElement, page.getContent());
 
 		page.setContent(content);
@@ -343,7 +343,7 @@ public class WikiPortletDataHandler extends BasePortletDataHandler {
 				pageElement = pagesElement.addElement("page");
 			}
 
-			String content = DDMPortletDataHandler.exportReferencedContent(
+			String content = DDMPortletDataHandler.exportReferenceContent(
 				portletDataContext, dlFileEntryTypesElement, dlFoldersElement,
 				dlFileEntriesElement, dlFileRanksElement, dlRepositoriesElement,
 				dlRepositoryEntriesElement, pageElement, page.getContent());
@@ -564,7 +564,7 @@ public class WikiPortletDataHandler extends BasePortletDataHandler {
 
 		Element pagesElement = rootElement.element("pages");
 
-		JournalPortletDataHandler.importReferencedData(
+		JournalPortletDataHandler.importReferenceData(
 			portletDataContext, pagesElement);
 
 		for (Element pageElement : pagesElement.elements("page")) {

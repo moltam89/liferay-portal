@@ -82,6 +82,12 @@ public class FolderStagedModelDataHandler
 				portletDataContext, repository);
 
 			portletDataContext.addReferenceElement(folderElement, repository);
+
+			portletDataContext.addClassedModel(
+				folderElement, folderPath, folder,
+				DLPortletDataHandler.NAMESPACE);
+
+			return;
 		}
 		else if (!folder.isDefaultRepository()) {
 
@@ -114,9 +120,8 @@ public class FolderStagedModelDataHandler
 		String path = ExportImportPathUtil.getModelPath(
 			portletDataContext, Folder.class.getName(), folder.getFolderId());
 
-		Element folderElement =
-			portletDataContext.getImportDataStagedModelElement(
-				Folder.class.getSimpleName(), "path", path);
+		Element folderElement = portletDataContext.getImportDataElement(
+			Folder.class.getSimpleName(), "path", path);
 
 		Element referencesElement = folderElement.element("references");
 
@@ -127,7 +132,7 @@ public class FolderStagedModelDataHandler
 				String className = referenceElement.attributeValue(
 					"class-name");
 
-				if (!className.equals(Repository.class.getSimpleName())) {
+				if (!className.equals(Repository.class.getName())) {
 					continue;
 				}
 
@@ -142,6 +147,8 @@ public class FolderStagedModelDataHandler
 
 				StagedModelDataHandlerUtil.importStagedModel(
 					portletDataContext, referenceStagedModel);
+
+				return;
 			}
 		}
 

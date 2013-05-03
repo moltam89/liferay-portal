@@ -17,7 +17,6 @@ package com.liferay.portal.security.lang;
 import com.liferay.portal.kernel.security.pacl.NotPrivileged;
 import com.liferay.portal.kernel.security.pacl.permission.PortalServicePermission;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.security.pacl.PACLPolicyManager;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -68,9 +67,22 @@ public class DoPrivilegedHandler
 		if (methodDeclaringClass.equals(DoPrivilegedBean.class) &&
 			methodName.equals("getActualBean")) {
 
-			return getActualBean();
+			return _bean;
 		}
-		else if (!PACLPolicyManager.isActive() || _isNotPrivileged(method)) {
+		else if (methodDeclaringClass.equals(Object.class) &&
+				 methodName.equals("equals")) {
+
+			Object object = arguments[0];
+
+			if (object instanceof DoPrivilegedBean) {
+				DoPrivilegedBean doPrivilegedBean = (DoPrivilegedBean)object;
+
+				object = doPrivilegedBean.getActualBean();
+			}
+
+			return _bean.equals(object);
+		}
+		else if (!SecurityManagerUtil.isActive() || _isNotPrivileged(method)) {
 			return method.invoke(_bean, arguments);
 		}
 

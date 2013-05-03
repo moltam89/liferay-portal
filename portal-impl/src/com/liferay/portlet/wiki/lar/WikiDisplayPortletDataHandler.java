@@ -159,7 +159,7 @@ public class WikiDisplayPortletDataHandler extends WikiPortletDataHandler {
 
 		Element pagesElement = rootElement.element("pages");
 
-		JournalPortletDataHandler.importReferencedData(
+		JournalPortletDataHandler.importReferenceData(
 			portletDataContext, pagesElement);
 
 		for (Element pageElement : pagesElement.elements("page")) {

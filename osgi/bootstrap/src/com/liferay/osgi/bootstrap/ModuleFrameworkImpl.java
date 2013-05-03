@@ -26,6 +26,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
@@ -36,8 +37,9 @@ import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.util.UniqueList;
+import com.liferay.portal.kernel.util.SystemProperties;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.module.framework.ModuleFramework;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.PermissionChecker;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
@@ -52,6 +54,9 @@ import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+
+import java.security.CodeSource;
+import java.security.ProtectionDomain;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -355,7 +360,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 
 		FrameworkFactory frameworkFactory = frameworkFactories.get(0);
 
-		Map<String, String> properties = _buildFrameworkProperties();
+		Map<String, String> properties = _buildFrameworkProperties(
+			frameworkFactory.getClass());
 
 		_framework = frameworkFactory.newFramework(properties);
 
@@ -465,7 +471,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		}
 	}
 
-	private Map<String, String> _buildFrameworkProperties() {
+	private Map<String, String> _buildFrameworkProperties(Class<?> clazz) {
 		Map<String, String> properties = new HashMap<String, String>();
 
 		properties.put(
@@ -484,7 +490,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			String.valueOf(PropsValues.MODULE_FRAMEWORK_AUTO_DEPLOY_INTERVAL));
 		properties.put(
 			FrameworkPropsKeys.FELIX_FILEINSTALL_TMPDIR,
-			System.getProperty("java.io.tmpdir"));
+			SystemProperties.get(SystemProperties.TMP_DIR));
 		properties.put(
 			Constants.FRAMEWORK_BEGINNING_STARTLEVEL,
 			String.valueOf(PropsValues.MODULE_FRAMEWORK_BEGINNING_START_LEVEL));
@@ -494,6 +500,20 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		properties.put(
 			Constants.FRAMEWORK_STORAGE,
 			PropsValues.MODULE_FRAMEWORK_STATE_DIR);
+
+		ProtectionDomain protectionDomain = clazz.getProtectionDomain();
+
+		CodeSource codeSource = protectionDomain.getCodeSource();
+
+		URL codeSourceURL = codeSource.getLocation();
+
+		properties.put(
+			FrameworkPropsKeys.OSGI_FRAMEWORK, codeSourceURL.toExternalForm());
+
+		File frameworkFile = new File(codeSourceURL.getFile());
+
+		properties.put(
+			FrameworkPropsKeys.OSGI_INSTALL_AREA, frameworkFile.getParent());
 
 		Properties extraProperties = PropsUtil.getProperties(
 			PropsKeys.MODULE_FRAMEWORK_PROPERTIES, true);
@@ -651,6 +671,20 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 	}
 
 	private String _getSystemPackagesExtra() {
+		File coreDir = new File(
+			PropsValues.LIFERAY_WEB_PORTAL_CONTEXT_TEMPDIR, "osgi");
+
+		File cacheFile = new File(coreDir, "system-packages.txt");
+
+		if (cacheFile.exists()) {
+			try {
+				return FileUtil.read(cacheFile);
+			}
+			catch (IOException ioe) {
+				_log.error(ioe, ioe);
+			}
+		}
+
 		_extraPackageMap = new TreeMap<String, List<URL>>();
 
 		StringBundler sb = new StringBundler();
@@ -662,8 +696,6 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			sb.append(StringPool.COMMA);
 		}
 
-		List<URL> urls = new UniqueList<URL>();
-
 		ClassLoader classLoader = ClassLoaderUtil.getPortalClassLoader();
 
 		try {
@@ -673,17 +705,14 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			while (enu.hasMoreElements()) {
 				URL url = enu.nextElement();
 
-				urls.add(url);
+				_processURL(
+					sb, url,
+					PropsValues.
+						MODULE_FRAMEWORK_SYSTEM_BUNDLE_IGNORED_FRAGMENTS);
 			}
 		}
 		catch (IOException ioe) {
 			_log.error(ioe, ioe);
-		}
-
-		for (URL url : urls) {
-			_processURL(
-				sb, url,
-				PropsValues.MODULE_FRAMEWORK_SYSTEM_BUNDLE_IGNORED_FRAGMENTS);
 		}
 
 		_extraPackageMap = Collections.unmodifiableMap(_extraPackageMap);
@@ -698,6 +727,13 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 			_log.trace(
 				"The portal's system bundle is exporting the following " +
 					"packages:\n" +s);
+		}
+
+		try {
+			FileUtil.write(cacheFile, sb.toString());
+		}
+		catch (IOException ioe) {
+			_log.error(ioe, ioe);
 		}
 
 		return sb.toString();
@@ -983,7 +1019,7 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 	}
 
 	private void _setupInitialBundles() throws Exception {
-		FrameworkWiring frameworkWiring = getFramework().adapt(
+		FrameworkWiring frameworkWiring = _framework.adapt(
 			FrameworkWiring.class);
 
 		List<Bundle> lazyActivationBundles = new ArrayList<Bundle>();
@@ -1019,7 +1055,8 @@ public class ModuleFrameworkImpl implements ModuleFramework {
 		public boolean isLoad(URL url) {
 			String path = url.getPath();
 
-			return path.contains(PropsValues.MODULE_FRAMEWORK_CORE_DIR);
+			return path.contains(
+				PropsValues.LIFERAY_WEB_PORTAL_CONTEXT_TEMPDIR);
 		}
 
 	}

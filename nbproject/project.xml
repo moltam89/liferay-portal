@@ -22,18 +22,6 @@
                     <encoding>UTF-8</encoding>
                 </source-folder>
                 <source-folder>
-                    <label>osgi\modules\http-service\src</label>
-                    <type>java</type>
-                    <location>osgi/modules/http-service/src</location>
-                    <encoding>UTF-8</encoding>
-                </source-folder>
-                <source-folder>
-                    <label>osgi\modules\http-service\test\unit</label>
-                    <type>java</type>
-                    <location>osgi/modules/http-service/test/unit</location>
-                    <encoding>UTF-8</encoding>
-                </source-folder>
-                <source-folder>
                     <label>portal-impl\src</label>
                     <type>java</type>
                     <location>portal-impl/src</location>
@@ -49,6 +37,12 @@
                     <label>portal-impl\test\unit</label>
                     <type>java</type>
                     <location>portal-impl/test/unit</location>
+                    <encoding>UTF-8</encoding>
+                </source-folder>
+                <source-folder>
+                    <label>portal-pacl\src</label>
+                    <type>java</type>
+                    <location>portal-pacl/src</location>
                     <encoding>UTF-8</encoding>
                 </source-folder>
                 <source-folder>
@@ -152,14 +146,6 @@
                         <location>osgi/bootstrap/src</location>
                     </source-folder>
                     <source-folder style="packages">
-                        <label>osgi\modules\http-service\src</label>
-                        <location>osgi/modules/http-service/src</location>
-                    </source-folder>
-                    <source-folder style="packages">
-                        <label>osgi\modules\http-service\test\unit</label>
-                        <location>osgi/modules/http-service/test/unit</location>
-                    </source-folder>
-                    <source-folder style="packages">
                         <label>portal-impl\src</label>
                         <location>portal-impl/src</location>
                     </source-folder>
@@ -237,6 +223,7 @@
                 <package-root>portal-impl/src</package-root>
                 <package-root>portal-impl/test/integration</package-root>
                 <package-root>portal-impl/test/unit</package-root>
+                <package-root>portal-pacl/src</package-root>
                 <package-root>portal-service/src</package-root>
                 <!--<package-root>portal-service/test/integration</package-root>-->
                 <package-root>portal-service/test/unit</package-root>
@@ -477,8 +464,6 @@
                 <classpath mode="compile">lib/portal/msnm.jar</classpath>
                 <classpath mode="compile">lib/portal/nekohtml.jar</classpath>
                 <classpath mode="compile">lib/portal/netcdf.jar</classpath>
-                <classpath mode="compile">lib/portal/oauth.jar</classpath>
-                <classpath mode="compile">lib/portal/oauth-provider.jar</classpath>
                 <classpath mode="compile">lib/portal/odmg.jar</classpath>
                 <classpath mode="compile">lib/portal/openid4java.jar</classpath>
                 <classpath mode="compile">lib/portal/oro.jar</classpath>

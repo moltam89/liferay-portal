@@ -14,12 +14,14 @@
 
 package com.liferay.portlet.journal.asset;
 
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Tuple;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.security.permission.ActionKeys;
@@ -120,13 +122,34 @@ public class JournalArticleAssetRendererFactory
 	}
 
 	@Override
-	public List<Tuple> getClassTypeFieldNames(long classTypeId, Locale locale)
+	public List<Tuple> getClassTypeFieldNames(
+			long classTypeId, Locale locale, int start, int end)
 		throws Exception {
 
 		DDMStructure ddmStructure =
 			DDMStructureLocalServiceUtil.getDDMStructure(classTypeId);
 
-		return getDDMStructureFieldNames(ddmStructure, locale);
+		List<Tuple> fieldNames = getDDMStructureFieldNames(
+			ddmStructure, locale);
+
+		if ((start != QueryUtil.ALL_POS) || (end != QueryUtil.ALL_POS)) {
+			fieldNames = ListUtil.subList(fieldNames, start, end);
+		}
+
+		return fieldNames;
+	}
+
+	@Override
+	public int getClassTypeFieldNamesCount(long classTypeId, Locale locale)
+		throws Exception {
+
+		DDMStructure ddmStructure =
+			DDMStructureLocalServiceUtil.getDDMStructure(classTypeId);
+
+		List<Tuple> fieldNames = getDDMStructureFieldNames(
+			ddmStructure, locale);
+
+		return fieldNames.size();
 	}
 
 	@Override
