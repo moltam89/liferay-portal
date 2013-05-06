@@ -207,6 +207,9 @@ public class LDAPUser {
 		return _contact.isMale();
 	}
 
+	/**
+	 * @deprecated As of 6.2.0, replaced by {@link #setMale(boolean)}
+	 */
 	public void isMale(boolean male) {
 		setMale(male);
 	}
