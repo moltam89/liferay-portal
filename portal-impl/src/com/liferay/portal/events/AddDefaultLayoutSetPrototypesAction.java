@@ -176,8 +176,8 @@ public class AddDefaultLayoutSetPrototypesAction extends SimpleAction {
 		preferences = new HashMap<String, String>();
 
 		preferences.put(
-			"portletSetupTitle_" + LocaleUtil.getDefault(), "Recent Content");
-		preferences.put("portletSetupUseCustomTitle", Boolean.TRUE.toString());
+			"portletSetupTitle_" + LocaleUtil.getDefault(), "Asset Publisher");
+		preferences.put("portletSetupUseCustomTitle", Boolean.FALSE.toString());
 
 		updatePortletSetup(layout, portletId, preferences);
 
