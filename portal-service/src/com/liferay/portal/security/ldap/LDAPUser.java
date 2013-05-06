@@ -208,7 +208,7 @@ public class LDAPUser {
 	}
 
 	public void isMale(boolean male) {
-		_contact.setMale(male);
+		setMale(male);
 	}
 
 	public boolean isPasswordReset() {
@@ -307,6 +307,10 @@ public class LDAPUser {
 
 	public void setLocale(Locale locale) {
 		_user.setLanguageId(LocaleUtil.toLanguageId(locale));
+	}
+
+	public void setMale(boolean male) {
+		_contact.setMale(male);
 	}
 
 	public void setMiddleName(String middleName) {
