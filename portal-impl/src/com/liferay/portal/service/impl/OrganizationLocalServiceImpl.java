@@ -1068,6 +1068,17 @@ public class OrganizationLocalServiceImpl
 			LinkedHashMap<String, Object> params, int start, int end, Sort sort)
 		throws SystemException {
 
+		return search(
+			companyId, parentOrganizationId, keywords, params, start, end, sort,
+			false);
+	}
+
+	public Hits search(
+			long companyId, long parentOrganizationId, String keywords,
+			LinkedHashMap<String, Object> params, int start, int end, Sort sort,
+			boolean fallbackToAnyParent)
+		throws SystemException {
+
 		String name = null;
 		String type = null;
 		String street = null;
@@ -1096,7 +1107,8 @@ public class OrganizationLocalServiceImpl
 
 		return search(
 			companyId, parentOrganizationId, name, type, street, city, zip,
-			region, country, params, andOperator, start, end, sort);
+			region, country, params, andOperator, start, end, sort,
+			fallbackToAnyParent);
 	}
 
 	/**
@@ -1195,13 +1207,23 @@ public class OrganizationLocalServiceImpl
 			OrderByComparator obc)
 		throws SystemException {
 
-		String parentOrganizationIdComparator = StringPool.EQUAL;
+		return search(
+			companyId, parentOrganizationId, keywords, type, regionId,
+			countryId, params, start, end, obc, false);
+	}
 
-		if (parentOrganizationId ==
-				OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+	public List<Organization> search(
+			long companyId, long parentOrganizationId, String keywords,
+			String type, Long regionId, Long countryId,
+			LinkedHashMap<String, Object> params, int start, int end,
+			OrderByComparator obc, boolean fallbackToAnyParent)
+		throws SystemException {
 
-			parentOrganizationIdComparator = StringPool.NOT_EQUAL;
-		}
+		Object[] values = handleFallbackToAnyParent(
+			parentOrganizationId, params, fallbackToAnyParent);
+
+		parentOrganizationId = (Long)values[0];
+		String parentOrganizationIdComparator = (String)values[1];
 
 		return organizationFinder.findByKeywords(
 			companyId, parentOrganizationId, parentOrganizationIdComparator,
@@ -1319,13 +1341,24 @@ public class OrganizationLocalServiceImpl
 			boolean andOperator, int start, int end, OrderByComparator obc)
 		throws SystemException {
 
-		String parentOrganizationIdComparator = StringPool.EQUAL;
+		return search(
+			companyId, parentOrganizationId, name, type, street, city, zip,
+			regionId, countryId, params, true, start, end, obc, false);
+	}
 
-		if (parentOrganizationId ==
-				OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+	public List<Organization> search(
+			long companyId, long parentOrganizationId, String name, String type,
+			String street, String city, String zip, Long regionId,
+			Long countryId, LinkedHashMap<String, Object> params,
+			boolean andOperator, int start, int end, OrderByComparator obc,
+			boolean fallbackToAnyParent)
+		throws SystemException {
 
-			parentOrganizationIdComparator = StringPool.NOT_EQUAL;
-		}
+		Object[] values = handleFallbackToAnyParent(
+			parentOrganizationId, params, fallbackToAnyParent);
+
+		parentOrganizationId = (Long)values[0];
+		String parentOrganizationIdComparator = (String)values[1];
 
 		return organizationFinder.findByC_PO_N_T_S_C_Z_R_C(
 			companyId, parentOrganizationId, parentOrganizationIdComparator,
@@ -1381,6 +1414,19 @@ public class OrganizationLocalServiceImpl
 			boolean andSearch, int start, int end, Sort sort)
 		throws SystemException {
 
+		return search(
+			companyId, parentOrganizationId, name, type, street, city, zip,
+			region, country, params, andSearch, start, end, sort, false);
+	}
+
+	public Hits search(
+			long companyId, long parentOrganizationId, String name, String type,
+			String street, String city, String zip, String region,
+			String country, LinkedHashMap<String, Object> params,
+			boolean andSearch, int start, int end, Sort sort,
+			boolean fallbackToAnyParent)
+		throws SystemException {
+
 		try {
 			SearchContext searchContext = new SearchContext();
 
@@ -1394,9 +1440,13 @@ public class OrganizationLocalServiceImpl
 			attributes.put("name", name);
 			attributes.put("params", params);
 
-			if (parentOrganizationId !=
-					OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+			Object[] values = handleFallbackToAnyParent(
+				parentOrganizationId, params, fallbackToAnyParent);
 
+			parentOrganizationId = (Long)values[0];
+			String parentOrganizationIdComparator = (String)values[1];
+
+			if (parentOrganizationIdComparator.equals(StringPool.EQUAL)) {
 				attributes.put(
 					"parentOrganizationId",
 					String.valueOf(parentOrganizationId));
@@ -1471,13 +1521,22 @@ public class OrganizationLocalServiceImpl
 			LinkedHashMap<String, Object> params)
 		throws SystemException {
 
-		String parentOrganizationIdComparator = StringPool.EQUAL;
+		return searchCount(
+			companyId, parentOrganizationId, keywords, type, regionId,
+			countryId, params, false);
+	}
 
-		if (parentOrganizationId ==
-				OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+	public int searchCount(
+			long companyId, long parentOrganizationId, String keywords,
+			String type, Long regionId, Long countryId,
+			LinkedHashMap<String, Object> params, boolean fallbackToAnyParent)
+		throws SystemException {
 
-			parentOrganizationIdComparator = StringPool.NOT_EQUAL;
-		}
+		Object[] values = handleFallbackToAnyParent(
+			parentOrganizationId, params, fallbackToAnyParent);
+
+		parentOrganizationId = (Long)values[0];
+		String parentOrganizationIdComparator = (String)values[1];
 
 		return organizationFinder.countByKeywords(
 			companyId, parentOrganizationId, parentOrganizationIdComparator,
@@ -1520,13 +1579,23 @@ public class OrganizationLocalServiceImpl
 			boolean andOperator)
 		throws SystemException {
 
-		String parentOrganizationIdComparator = StringPool.EQUAL;
+	return searchCount(
+		companyId, parentOrganizationId, name, type, street, city, zip,
+		regionId, countryId, params, andOperator, false);
+	}
 
-		if (parentOrganizationId ==
-				OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+	public int searchCount(
+			long companyId, long parentOrganizationId, String name, String type,
+			String street, String city, String zip, Long regionId,
+			Long countryId, LinkedHashMap<String, Object> params,
+			boolean andOperator, boolean fallbackToAnyParent)
+		throws SystemException {
 
-			parentOrganizationIdComparator = StringPool.NOT_EQUAL;
-		}
+		Object[] values = handleFallbackToAnyParent(
+			parentOrganizationId, params, fallbackToAnyParent);
+
+		parentOrganizationId = (Long)values[0];
+		String parentOrganizationIdComparator = (String)values[1];
 
 		return organizationFinder.countByC_PO_N_T_S_C_Z_R_C(
 			companyId, parentOrganizationId, parentOrganizationIdComparator,
@@ -1864,6 +1933,42 @@ public class OrganizationLocalServiceImpl
 		}
 
 		return organizationIds;
+	}
+
+	@SuppressWarnings("unchecked")
+	protected Object[] handleFallbackToAnyParent(
+		long parentOrganizationId, LinkedHashMap<String, Object> params,
+		boolean fallbackToAnyParent) {
+
+		List<Organization> organizationsTree = (List<Organization>)params.get(
+			"organizationsTree");
+
+		if (fallbackToAnyParent && (organizationsTree != null) &&
+			(parentOrganizationId ==
+				OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID)) {
+
+			for (Organization organizationNode : organizationsTree) {
+				if (organizationNode.getOrganizationId() !=
+						OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID) {
+
+					parentOrganizationId =
+						OrganizationConstants.ANY_PARENT_ORGANIZATION_ID;
+
+					break;
+				}
+			}
+		}
+
+		String parentOrganizationIdComparator = StringPool.EQUAL;
+
+		if (parentOrganizationId ==
+				OrganizationConstants.ANY_PARENT_ORGANIZATION_ID) {
+
+			parentOrganizationIdComparator = StringPool.NOT_EQUAL;
+		}
+
+		return new Object[] {
+			parentOrganizationId, parentOrganizationIdComparator};
 	}
 
 	protected boolean isOrganizationGroup(long organizationId, long groupId)
