@@ -17,6 +17,7 @@ package com.liferay.portal.service;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Organization;
@@ -28,6 +29,7 @@ import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.OrganizationTestUtil;
 import com.liferay.portal.util.TestPropsValues;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.junit.Assert;
@@ -260,6 +262,16 @@ public class OrganizationLocalServiceTest {
 			organizationB.getGroupId(), groupAA.getParentGroupId());
 	}
 
+	@Test
+	public void testSearchCountWithFallbackToAnyParent() throws Exception {
+		testSearchCount(true);
+	}
+
+	@Test
+	public void testSearchCountWithoutFallbackToAnyParent() throws Exception {
+		testSearchCount(false);
+	}
+
 	protected Organization[] createOrganizations(
 			boolean[] associateWithMainSite)
 		throws Exception {
@@ -278,6 +290,120 @@ public class OrganizationLocalServiceTest {
 
 		return new Organization[] {
 			organizationA, organizationAA, organizationB};
+	}
+
+	protected void doTestSearchCount(
+			int expected, long parentOrganizationId,
+			List<Organization> organizations, boolean fallbackToAnyParent)
+		throws Exception {
+
+		LinkedHashMap<String, Object> params =
+			new LinkedHashMap<String, Object>();
+
+		params.put("organizationsTree", organizations);
+
+		int actual = OrganizationLocalServiceUtil.searchCount(
+			TestPropsValues.getCompanyId(), parentOrganizationId, null, null,
+			null, null, params, fallbackToAnyParent);
+
+		Assert.assertEquals(expected, actual);
+	}
+
+	protected void testSearchCount(boolean fallbackToAnyParent)
+		throws Exception {
+
+		Organization[] organizations = createOrganizations(
+			new boolean[] {false, false, false});
+
+		Organization organizationA = organizations[0];
+		Organization organizationAA = organizations[1];
+		Organization organizationB = organizations[2];
+
+		List<Organization> allOrganizations = ListUtil.fromArray(organizations);
+
+		List<Organization> subOrganizations = ListUtil.fromArray(
+			new Organization[] {organizationAA});
+
+		List<Organization> toplevelOrganizations = ListUtil.fromArray(
+			new Organization[] {organizationA, organizationB});
+
+		// Test with OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID
+
+		int expected = 2;
+
+		if (fallbackToAnyParent) {
+			expected = 3;
+		}
+
+		doTestSearchCount(
+			expected, OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
+			allOrganizations, fallbackToAnyParent);
+
+		expected = 0;
+
+		if (fallbackToAnyParent) {
+			expected = 1;
+		}
+
+		doTestSearchCount(
+			expected, OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
+			subOrganizations, fallbackToAnyParent);
+
+		expected = 2;
+
+		if (fallbackToAnyParent) {
+			expected = 3;
+		}
+
+		doTestSearchCount(
+			expected, OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
+			toplevelOrganizations, fallbackToAnyParent);
+
+		// Test with OrganizationConstants.ANY_PARENT_ORGANIZATION_ID
+
+		doTestSearchCount(
+			allOrganizations.size(),
+			OrganizationConstants.ANY_PARENT_ORGANIZATION_ID, allOrganizations,
+			fallbackToAnyParent);
+
+		doTestSearchCount(
+			subOrganizations.size(),
+			OrganizationConstants.ANY_PARENT_ORGANIZATION_ID, subOrganizations,
+			fallbackToAnyParent);
+
+		doTestSearchCount(
+			allOrganizations.size(),
+			OrganizationConstants.ANY_PARENT_ORGANIZATION_ID,
+			toplevelOrganizations, fallbackToAnyParent);
+
+		// Test with organizationA.getOrganizationId()
+
+		doTestSearchCount(
+			1, organizationA.getOrganizationId(), allOrganizations,
+			fallbackToAnyParent);
+
+		doTestSearchCount(
+			1, organizationA.getOrganizationId(), subOrganizations,
+			fallbackToAnyParent);
+
+		doTestSearchCount(
+			1, organizationA.getOrganizationId(), toplevelOrganizations,
+			fallbackToAnyParent);
+
+		// Test with organizationB.getOrganizationId()
+
+		doTestSearchCount(
+			0, organizationB.getOrganizationId(), allOrganizations,
+			fallbackToAnyParent);
+
+		doTestSearchCount(
+			0, organizationB.getOrganizationId(), subOrganizations,
+			fallbackToAnyParent);
+
+		doTestSearchCount(
+			0, organizationB.getOrganizationId(), toplevelOrganizations,
+			fallbackToAnyParent);
+
 	}
 
 }
