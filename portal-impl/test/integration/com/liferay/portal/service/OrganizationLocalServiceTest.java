@@ -17,6 +17,7 @@ package com.liferay.portal.service;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Organization;
@@ -28,6 +29,7 @@ import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.OrganizationTestUtil;
 import com.liferay.portal.util.TestPropsValues;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.junit.Assert;
@@ -260,6 +262,16 @@ public class OrganizationLocalServiceTest {
 			organizationB.getGroupId(), groupAA.getParentGroupId());
 	}
 
+	@Test
+	public void testSearchCountWithFallbackToAnyParent() throws Exception {
+		testSearchCount(true);
+	}
+
+	@Test
+	public void testSearchCountWithoutFallbackToAnyParent() throws Exception {
+		testSearchCount(false);
+	}
+
 	protected Organization[] createOrganizations(
 			boolean[] associateWithMainSite)
 		throws Exception {
@@ -278,6 +290,54 @@ public class OrganizationLocalServiceTest {
 
 		return new Organization[] {
 			organizationA, organizationAA, organizationB};
+	}
+
+	protected void testSearchCount(boolean fallbackToAnyParent)
+		throws Exception {
+
+		Organization[] organizations = createOrganizations(
+			new boolean[] {false, false, false});
+
+		Organization organizationA = organizations[0];
+
+		LinkedHashMap<String, Object> params =
+			new LinkedHashMap<String, Object>();
+
+		params.put("organizationsTree", ListUtil.fromArray(organizations));
+
+		int actual = OrganizationLocalServiceUtil.searchCount(
+			organizationA.getCompanyId(),
+			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID, null, null,
+			null, null, params, fallbackToAnyParent);
+
+		int expected = 2;
+
+		if (fallbackToAnyParent) {
+			expected = 3;
+		}
+
+		Assert.assertEquals(expected, actual);
+
+		actual = OrganizationLocalServiceUtil.searchCount(
+			organizationA.getCompanyId(), organizationA.getOrganizationId(),
+			null, null, null, null, params, fallbackToAnyParent);
+
+		expected = 1;
+
+		if (fallbackToAnyParent) {
+			expected = 3;
+		}
+
+		Assert.assertEquals(expected, actual);
+
+		actual = OrganizationLocalServiceUtil.searchCount(
+			organizationA.getCompanyId(),
+			OrganizationConstants.ANY_PARENT_ORGANIZATION_ID, null, null, null,
+			null, params, fallbackToAnyParent);
+
+		expected = 3;
+
+		Assert.assertEquals(expected, actual);
 	}
 
 }
