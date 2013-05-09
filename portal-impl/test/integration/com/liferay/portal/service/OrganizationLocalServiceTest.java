@@ -17,6 +17,7 @@ package com.liferay.portal.service;
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Organization;
@@ -28,6 +29,7 @@ import com.liferay.portal.test.TransactionalExecutionTestListener;
 import com.liferay.portal.util.OrganizationTestUtil;
 import com.liferay.portal.util.TestPropsValues;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.junit.Assert;
@@ -76,100 +78,91 @@ public class OrganizationLocalServiceTest {
 	public void testAddOrganizationWithoutSiteToParentOrganizationWithoutSite()
 		throws Exception {
 
-		Organization organizationA = OrganizationTestUtil.addOrganization(
-			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
-			"Organization A", false);
+		Organization[] organizations = createOrganizations(
+			new boolean[] {false, false, false});
 
-		Organization organizationB = OrganizationTestUtil.addOrganization(
-			organizationA.getOrganizationId(), "Organization B", false);
+		Organization organizationA = organizations[0];
+		Organization organizationAA = organizations[1];
 
 		Assert.assertEquals(
 			organizationA.getOrganizationId(),
-			organizationB.getParentOrganizationId());
+			organizationAA.getParentOrganizationId());
 
-		Group groupB = organizationB.getGroup();
+		Group groupAA = organizationAA.getGroup();
 
 		Assert.assertEquals(
-			GroupConstants.DEFAULT_PARENT_GROUP_ID, groupB.getParentGroupId());
+			GroupConstants.DEFAULT_PARENT_GROUP_ID, groupAA.getParentGroupId());
 	}
 
 	@Test
 	public void testAddOrganizationWithoutSiteToParentOrganizationWithSite()
 		throws Exception {
 
-		Organization organizationA = OrganizationTestUtil.addOrganization(
-			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
-			"Organization A", true);
+		Organization[] organizations = createOrganizations(
+			new boolean[] {true, false, false});
 
-		Organization organizationB = OrganizationTestUtil.addOrganization(
-				organizationA.getOrganizationId(), "Organization B", false);
+		Organization organizationA = organizations[0];
+		Organization organizationAA = organizations[1];
 
 		Assert.assertEquals(
 			organizationA.getOrganizationId(),
-			organizationB.getParentOrganizationId());
+			organizationAA.getParentOrganizationId());
 
-		Group groupB = organizationB.getGroup();
+		Group groupAA = organizationAA.getGroup();
 
 		Assert.assertEquals(
-			GroupConstants.DEFAULT_PARENT_GROUP_ID, groupB.getParentGroupId());
+			GroupConstants.DEFAULT_PARENT_GROUP_ID, groupAA.getParentGroupId());
 	}
 
 	@Test
 	public void testAddOrganizationWithSiteToParentOrganizationWithoutSite()
 		throws Exception {
 
-		Organization organizationA = OrganizationTestUtil.addOrganization(
-			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
-			"Organization A", false);
+		Organization[] organizations = createOrganizations(
+			new boolean[] {false, true, false});
 
-		Organization organizationB = OrganizationTestUtil.addOrganization(
-				organizationA.getOrganizationId(), "Organization B", true);
+		Organization organizationA = organizations[0];
+		Organization organizationAA = organizations[1];
 
 		Assert.assertEquals(
 			organizationA.getOrganizationId(),
-			organizationB.getParentOrganizationId());
+			organizationAA.getParentOrganizationId());
 
-		Group groupB = organizationB.getGroup();
+		Group groupAA = organizationAA.getGroup();
 
 		Assert.assertEquals(
-			GroupConstants.DEFAULT_PARENT_GROUP_ID, groupB.getParentGroupId());
+			GroupConstants.DEFAULT_PARENT_GROUP_ID, groupAA.getParentGroupId());
 	}
 
 	@Test
 	public void testAddOrganizationWithSiteToParentOrganizationWithSite()
 		throws Exception {
 
-		Organization organizationA = OrganizationTestUtil.addOrganization(
-			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
-			"Organization A", true);
+		Organization[] organizations = createOrganizations(
+			new boolean[] {true, true, false});
 
-		Organization organizationB = OrganizationTestUtil.addOrganization(
-				organizationA.getOrganizationId(), "Organization B", true);
+		Organization organizationA = organizations[0];
+		Organization organizationAA = organizations[1];
 
 		Assert.assertEquals(
 			organizationA.getOrganizationId(),
-			organizationB.getParentOrganizationId());
+			organizationAA.getParentOrganizationId());
 
-		Group groupB = organizationB.getGroup();
+		Group groupAA = organizationAA.getGroup();
 
 		Assert.assertEquals(
-			organizationA.getGroupId(), groupB.getParentGroupId());
+			organizationA.getGroupId(), groupAA.getParentGroupId());
 	}
 
 	@Test
 	public void testMoveOrganizationWithoutSiteToParentOrganizationWithoutSite()
 		throws Exception {
 
-		Organization organizationA = OrganizationTestUtil.addOrganization(
-			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
-			"Organization A", false);
+		Organization[] organizations = createOrganizations(
+			new boolean[] {false, true, false});
 
-		Organization organizationAA = OrganizationTestUtil.addOrganization(
-			organizationA.getOrganizationId(), "Organization AA", true);
-
-		Organization organizationB = OrganizationTestUtil.addOrganization(
-			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
-			"Organization B", false);
+		Organization organizationAA = organizations[1];
+		Organization organizationB = organizations[2];
 
 		organizationAA = OrganizationLocalServiceUtil.updateOrganization(
 			organizationAA.getCompanyId(), organizationAA.getOrganizationId(),
@@ -192,16 +185,11 @@ public class OrganizationLocalServiceTest {
 	public void testMoveOrganizationWithoutSiteToParentOrganizationWithSite()
 		throws Exception {
 
-		Organization organizationA = OrganizationTestUtil.addOrganization(
-			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
-			"Organization A", false);
+		Organization[] organizations = createOrganizations(
+			new boolean[] {false, true, true});
 
-		Organization organizationAA = OrganizationTestUtil.addOrganization(
-				organizationA.getOrganizationId(), "Organization AA", true);
-
-		Organization organizationB = OrganizationTestUtil.addOrganization(
-			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
-			"Organization B", true);
+		Organization organizationAA = organizations[1];
+		Organization organizationB = organizations[2];
 
 		organizationAA = OrganizationLocalServiceUtil.updateOrganization(
 			organizationAA.getCompanyId(), organizationAA.getOrganizationId(),
@@ -224,16 +212,11 @@ public class OrganizationLocalServiceTest {
 	public void testMoveOrganizationWithSiteToParentOrganizationWithoutSite()
 		throws Exception {
 
-		Organization organizationA = OrganizationTestUtil.addOrganization(
-			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
-			"Organization A", true);
+		Organization[] organizations = createOrganizations(
+			new boolean[] {true, true, false});
 
-		Organization organizationAA = OrganizationTestUtil.addOrganization(
-				organizationA.getOrganizationId(), "Organization AA", true);
-
-		Organization organizationB = OrganizationTestUtil.addOrganization(
-			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
-			"Organization B", false);
+		Organization organizationAA = organizations[1];
+		Organization organizationB = organizations[2];
 
 		organizationAA = OrganizationLocalServiceUtil.updateOrganization(
 			organizationAA.getCompanyId(), organizationAA.getOrganizationId(),
@@ -256,16 +239,11 @@ public class OrganizationLocalServiceTest {
 	public void testMoveOrganizationWithSiteToParentOrganizationWithSite()
 		throws Exception {
 
-		Organization organizationA = OrganizationTestUtil.addOrganization(
-			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
-			"Organization A", true);
+		Organization[] organizations = createOrganizations(
+			new boolean[] {true, true, true});
 
-		Organization organizationAA = OrganizationTestUtil.addOrganization(
-			organizationA.getOrganizationId(), "Organization AA", true);
-
-		Organization organizationB = OrganizationTestUtil.addOrganization(
-			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
-			"Organization B", true);
+		Organization organizationAA = organizations[1];
+		Organization organizationB = organizations[2];
 
 		organizationAA = OrganizationLocalServiceUtil.updateOrganization(
 			organizationAA.getCompanyId(), organizationAA.getOrganizationId(),
@@ -282,6 +260,84 @@ public class OrganizationLocalServiceTest {
 
 		Assert.assertEquals(
 			organizationB.getGroupId(), groupAA.getParentGroupId());
+	}
+
+	@Test
+	public void testSearchCountWithFallbackToAnyParent() throws Exception {
+		testSearchCount(true);
+	}
+
+	@Test
+	public void testSearchCountWithoutFallbackToAnyParent() throws Exception {
+		testSearchCount(false);
+	}
+
+	protected Organization[] createOrganizations(
+			boolean[] associateWithMainSite)
+		throws Exception {
+
+		Organization organizationA = OrganizationTestUtil.addOrganization(
+			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
+			"Organization A", associateWithMainSite[0]);
+
+		Organization organizationAA = OrganizationTestUtil.addOrganization(
+			organizationA.getOrganizationId(), "Organization AA",
+			associateWithMainSite[1]);
+
+		Organization organizationB = OrganizationTestUtil.addOrganization(
+			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID,
+			"Organization B", associateWithMainSite[2]);
+
+		return new Organization[] {
+			organizationA, organizationAA, organizationB};
+	}
+
+	protected void testSearchCount(boolean fallbackToAnyParent)
+		throws Exception {
+
+		Organization[] organizations = createOrganizations(
+			new boolean[] {false, false, false});
+
+		Organization organizationA = organizations[0];
+
+		LinkedHashMap<String, Object> params =
+			new LinkedHashMap<String, Object>();
+
+		params.put("organizationsTree", ListUtil.fromArray(organizations));
+
+		int actual = OrganizationLocalServiceUtil.searchCount(
+			organizationA.getCompanyId(),
+			OrganizationConstants.DEFAULT_PARENT_ORGANIZATION_ID, null, null,
+			null, null, params, fallbackToAnyParent);
+
+		int expected = 2;
+
+		if (fallbackToAnyParent) {
+			expected = 3;
+		}
+
+		Assert.assertEquals(expected, actual);
+
+		actual = OrganizationLocalServiceUtil.searchCount(
+			organizationA.getCompanyId(), organizationA.getOrganizationId(),
+			null, null, null, null, params, fallbackToAnyParent);
+
+		expected = 1;
+
+		if (fallbackToAnyParent) {
+			expected = 3;
+		}
+
+		Assert.assertEquals(expected, actual);
+
+		actual = OrganizationLocalServiceUtil.searchCount(
+			organizationA.getCompanyId(),
+			OrganizationConstants.ANY_PARENT_ORGANIZATION_ID, null, null, null,
+			null, params, fallbackToAnyParent);
+
+		expected = 3;
+
+		Assert.assertEquals(expected, actual);
 	}
 
 }
