@@ -16,6 +16,7 @@ package com.liferay.portal.lar;
 
 import com.liferay.portal.LARFileException;
 import com.liferay.portal.LARTypeException;
+import com.liferay.portal.LayoutFriendlyURLException;
 import com.liferay.portal.LayoutImportException;
 import com.liferay.portal.LayoutPrototypeException;
 import com.liferay.portal.LocaleException;
@@ -28,6 +29,7 @@ import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.lar.ExportImportThreadLocal;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataContextFactoryUtil;
+import com.liferay.portal.kernel.lar.PortletDataException;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.lar.UserIdStrategy;
@@ -84,6 +86,7 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journalcontent.util.JournalContentUtil;
 import com.liferay.portlet.sites.util.Sites;
+import com.liferay.portlet.sites.util.SitesUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -500,10 +503,12 @@ public class LayoutImporter {
 
 		// Remove layouts that were deleted from the layout set prototype
 
+		LayoutSetPrototype layoutSetPrototype = null;
+
 		if (Validator.isNotNull(layoutSetPrototypeUuid) &&
 			layoutSetPrototypeLinkEnabled) {
 
-			LayoutSetPrototype layoutSetPrototype =
+			layoutSetPrototype =
 				LayoutSetPrototypeLocalServiceUtil.
 					getLayoutSetPrototypeByUuidAndCompanyId(
 						layoutSetPrototypeUuid, companyId);
@@ -537,8 +542,29 @@ public class LayoutImporter {
 			}
 		}
 
+		int friendlyURLExceptionCounter = 0;
+
 		for (Element layoutElement : _layoutElements) {
-			importLayout(portletDataContext, newLayouts, layoutElement);
+			try {
+				importLayout(portletDataContext, newLayouts, layoutElement);
+			}
+			catch (PortletDataException pde) {
+				if (pde.getCause() instanceof LayoutFriendlyURLException) {
+					friendlyURLExceptionCounter++;
+				}
+				else {
+					throw pde;
+				}
+			}
+		}
+
+		if (friendlyURLExceptionCounter != 0) {
+			int mergeFailCount = SitesUtil.getMergeFailCount(
+				layoutSetPrototype);
+
+			SitesUtil.setMergeFailCount(
+				layoutSetPrototype,
+				mergeFailCount + friendlyURLExceptionCounter);
 		}
 
 		Element portletsElement = _rootElement.element("portlets");
@@ -760,7 +786,8 @@ public class LayoutImporter {
 
 		if (layoutsImportMode.equals(
 				PortletDataHandlerKeys.
-					LAYOUTS_IMPORT_MODE_CREATED_FROM_PROTOTYPE)) {
+					LAYOUTS_IMPORT_MODE_CREATED_FROM_PROTOTYPE) &&
+			(friendlyURLExceptionCounter == 0)) {
 
 			UnicodeProperties settingsProperties =
 				layoutSet.getSettingsProperties();
