@@ -54,7 +54,7 @@ public class PortletConfigurationUtil {
 		return customCSSClassName;
 	}
 
-	public static String getPortletTitle(
+	public static String getPortletCustomTitle(
 		PortletPreferences portletSetup, String languageId) {
 
 		String useCustomTitle = GetterUtil.getString(
@@ -102,6 +102,16 @@ public class PortletConfigurationUtil {
 		}
 
 		return portletTitle;
+	}
+
+	/**
+	 * @deprecated As of 6.2 renamed to {@link
+	 *             #getPortletCustomTitle(PortletPreferences, String)}
+	 */
+	public static String getPortletTitle(
+		PortletPreferences portletSetup, String languageId) {
+
+		return getPortletCustomTitle(portletSetup, languageId);
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(

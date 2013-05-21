@@ -78,6 +78,7 @@ import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.dynamicdatalists.RecordSetDuplicateRecordSetKeyException;
 import com.liferay.portlet.dynamicdatamapping.StructureDuplicateStructureKeyException;
 import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroupInstance;
+import com.liferay.portlet.portletconfiguration.util.PortletConfigurationUtil;
 import com.liferay.portlet.sites.util.Sites;
 import com.liferay.portlet.sites.util.SitesUtil;
 
@@ -2440,13 +2441,21 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			for (Locale locale : nameMapModifiedLocales) {
 				String languageId = LanguageUtil.getLanguageId(locale);
 
-				String portletTitle = PortalUtil.getPortletTitle(
-					PortletConstants.getRootPortletId(
-						portletPreferences.getPortletId()), languageId);
+				String portletTitle =
+					PortletConfigurationUtil.getPortletCustomTitle(
+						jxPreferences, languageId);
 
-				String newPortletTitle = PortalUtil.getNewPortletTitle(
-					portletTitle, curLayout.getName(languageId),
-					nameMap.get(locale));
+				String newPortletTitle = portletTitle;
+
+				if (Validator.isNull(portletTitle)) {
+					portletTitle = PortalUtil.getPortletTitle(
+						PortletConstants.getRootPortletId(
+							portletPreferences.getPortletId()), languageId);
+
+					newPortletTitle = PortalUtil.getNewPortletTitle(
+						portletTitle, curLayout.getName(languageId),
+						nameMap.get(locale));
+				}
 
 				if (newPortletTitle.equals(portletTitle)) {
 					continue;
