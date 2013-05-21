@@ -50,7 +50,7 @@ if (portletDecorateObj != null) {
 
 // Portlet title
 
-String portletTitle = PortletConfigurationUtil.getPortletTitle(portletSetup, themeDisplay.getLanguageId());
+String portletTitle = PortletConfigurationUtil.getPortletCustomTitle(portletSetup, themeDisplay.getLanguageId());
 
 if (portletDisplay.isAccess() && portletDisplay.isActive() && (portletTitle == null)) {
 	portletTitle = HtmlUtil.extractText(renderResponseImpl.getTitle());

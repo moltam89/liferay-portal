@@ -211,7 +211,7 @@ public class EditConfigurationAction extends PortletAction {
 			PortletPreferencesFactoryUtil.getPortletSetup(
 				renderRequest, portlet.getPortletId());
 
-		String title = PortletConfigurationUtil.getPortletTitle(
+		String title = PortletConfigurationUtil.getPortletCustomTitle(
 			portletSetup, themeDisplay.getLanguageId());
 
 		if (Validator.isNull(title)) {

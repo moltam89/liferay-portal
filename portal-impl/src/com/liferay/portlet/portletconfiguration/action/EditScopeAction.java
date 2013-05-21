@@ -241,7 +241,7 @@ public class EditScopeAction extends EditConfigurationAction {
 		ThemeDisplay themeDisplay = (ThemeDisplay)portletRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		String portletTitle = PortletConfigurationUtil.getPortletTitle(
+		String portletTitle = PortletConfigurationUtil.getPortletCustomTitle(
 			preferences, themeDisplay.getLanguageId());
 
 		if (Validator.isNull(portletTitle)) {
