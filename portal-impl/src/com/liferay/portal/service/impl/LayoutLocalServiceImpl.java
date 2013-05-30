@@ -39,7 +39,6 @@ import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -83,6 +82,7 @@ import com.liferay.portlet.backgroundtask.model.BTEntry;
 import com.liferay.portlet.dynamicdatalists.RecordSetDuplicateRecordSetKeyException;
 import com.liferay.portlet.dynamicdatamapping.StructureDuplicateStructureKeyException;
 import com.liferay.portlet.mobiledevicerules.model.MDRRuleGroupInstance;
+import com.liferay.portlet.portletconfiguration.util.PortletConfigurationUtil;
 import com.liferay.portlet.sites.util.Sites;
 import com.liferay.portlet.sites.util.SitesUtil;
 
@@ -1990,9 +1990,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		Layout layout = layoutPersistence.findByG_P_L(
 			groupId, privateLayout, layoutId);
 
-		List<Locale> modifiedLocales = LocalizationUtil.getModifiedLocales(
-			layout.getNameMap(), nameMap);
-
 		if (parentLayoutId != layout.getParentLayoutId()) {
 			int priority = layoutLocalServiceHelper.getNextPriority(
 				groupId, privateLayout, parentLayoutId,
@@ -2061,13 +2058,6 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 				imageLocalService.updateImage(
 					layout.getIconImageId(), iconBytes);
 			}
-		}
-
-		// Portlet preferences
-
-		if (!modifiedLocales.isEmpty()) {
-			updateScopedPortletNames(
-				groupId, privateLayout, layoutId, nameMap, modifiedLocales);
 		}
 
 		// Layout friendly URLs
@@ -2635,13 +2625,21 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			for (Locale locale : nameMapModifiedLocales) {
 				String languageId = LanguageUtil.getLanguageId(locale);
 
-				String portletTitle = PortalUtil.getPortletTitle(
-					PortletConstants.getRootPortletId(
-						portletPreferences.getPortletId()), languageId);
+				String portletTitle =
+					PortletConfigurationUtil.getPortletTitle(
+						jxPreferences, languageId);
 
-				String newPortletTitle = PortalUtil.getNewPortletTitle(
-					portletTitle, curLayout.getName(languageId),
-					nameMap.get(locale));
+				String newPortletTitle = portletTitle;
+
+				if (Validator.isNull(newPortletTitle)) {
+					portletTitle = PortalUtil.getPortletTitle(
+						PortletConstants.getRootPortletId(
+							portletPreferences.getPortletId()), languageId);
+
+					newPortletTitle = PortalUtil.getNewPortletTitle(
+						portletTitle, curLayout.getName(languageId),
+						nameMap.get(locale));
+				}
 
 				if (newPortletTitle.equals(portletTitle)) {
 					continue;
