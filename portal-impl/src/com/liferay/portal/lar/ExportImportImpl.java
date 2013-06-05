@@ -449,6 +449,8 @@ public class ExportImportImpl implements ExportImport {
 					fileEntry.getGroupId(), FileEntry.class.getName(),
 					fileEntry.getFileEntryId());
 
+				deleteTimestampFromUrlParams(sb, beginPos, endPos);
+
 				sb.replace(beginPos, endPos, "[$dl-reference=" + path + "$]");
 			}
 			catch (Exception e) {
@@ -1089,6 +1091,29 @@ public class ExportImportImpl implements ExportImport {
 		}
 
 		return null;
+	}
+
+	private void deleteTimestampFromUrlParams(
+		StringBuilder sb, int beginPos, int endPos) {
+
+		String stopString = "" + sb.charAt(beginPos-1);
+		int beginPosParams = endPos;
+		int endPosParams = sb.indexOf(stopString, beginPosParams);
+
+		String urlParams = sb.substring(beginPosParams, endPosParams);
+
+		if (urlParams.indexOf("t=") == -1) {
+			return;
+		}
+
+		urlParams = urlParams.replaceFirst("[?&](amp;)*t=[0-9]+","");
+
+		if (urlParams.startsWith("&")) {
+			urlParams = urlParams.replaceFirst("&(amp;)*", "?");
+		}
+
+		sb.replace(beginPosParams, endPosParams, urlParams);
+
 	}
 
 	private static final char[] _DL_REFERENCE_LEGACY_STOP_CHARS = {
