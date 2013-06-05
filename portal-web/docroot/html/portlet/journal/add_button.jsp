@@ -29,8 +29,8 @@ List<DDMStructure> ddmStructures = DDMStructureLocalServiceUtil.getStructures(Po
 		<portlet:renderURL var="addFolderURL">
 			<portlet:param name="struts_action" value="/journal/edit_folder" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
-			<portlet:param name="parentFolderId" value="<%= String.valueOf(folderId) %>" />
 			<portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" />
+			<portlet:param name="parentFolderId" value="<%= String.valueOf(folderId) %>" />
 		</portlet:renderURL>
 
 		<aui:nav-item href="<%= addFolderURL %>" iconClass="icon-folder-open" label='<%= (folder != null) ? "subfolder" : "folder" %>' />
@@ -40,8 +40,8 @@ List<DDMStructure> ddmStructures = DDMStructureLocalServiceUtil.getStructures(Po
 		<liferay-portlet:renderURL var="addArticleURL" windowState="<%= LiferayWindowState.MAXIMIZED.toString() %>">
 			<portlet:param name="struts_action" value="/journal/edit_article" />
 			<portlet:param name="redirect" value="<%= currentURL %>" />
-			<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
 			<portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" />
+			<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
 		</liferay-portlet:renderURL>
 
 		<aui:nav-item href="<%= addArticleURL %>" label="basic-web-content" />
@@ -53,9 +53,9 @@ List<DDMStructure> ddmStructures = DDMStructureLocalServiceUtil.getStructures(Po
 			<liferay-portlet:renderURL var="addArticleURL" windowState="<%= LiferayWindowState.MAXIMIZED.toString() %>">
 				<portlet:param name="struts_action" value="/journal/edit_article" />
 				<portlet:param name="redirect" value="<%= currentURL %>" />
+				<portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" />
 				<portlet:param name="folderId" value="<%= String.valueOf(folderId) %>" />
 				<portlet:param name="structureId" value="<%= ddmStructure.getStructureKey() %>" />
-				<portlet:param name="groupId" value="<%= String.valueOf(scopeGroupId) %>" />
 			</liferay-portlet:renderURL>
 
 			<aui:nav-item href="<%= addArticleURL %>" label="<%= HtmlUtil.escape(ddmStructure.getName(themeDisplay.getLocale())) %>" />
