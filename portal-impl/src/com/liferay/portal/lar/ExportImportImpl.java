@@ -459,6 +459,8 @@ public class ExportImportImpl implements ExportImport {
 					fileEntry.getFileEntryId());
 
 				sb.replace(beginPos, endPos, "[$dl-reference=" + path + "$]");
+
+				_deleteTimestampFromUrlParams(sb, beginPos);
 			}
 			catch (Exception e) {
 				if (_log.isDebugEnabled()) {
@@ -1110,6 +1112,50 @@ public class ExportImportImpl implements ExportImport {
 		return null;
 	}
 
+	private void _deleteTimestampFromUrlParams(StringBuilder sb, int beginPos) {
+		int closeBracketPos = sb.indexOf(StringPool.CLOSE_BRACKET, beginPos);
+
+		if ((closeBracketPos == -1) || (closeBracketPos == (sb.length() - 1)) ||
+			(sb.charAt(closeBracketPos + 1) != CharPool.QUESTION)) {
+
+			return;
+		}
+
+		int questionPos = closeBracketPos + 1;
+
+		char startChar = sb.charAt(beginPos-1);
+
+		int startCharIndex = String.valueOf(
+			_DL_REFERENCE_URL_START_CHARS).indexOf(startChar);
+
+		if (startCharIndex == -1) {
+			return;
+		}
+
+		String stopChar = String.valueOf(
+			_DL_REFERENCE_URL_STOP_CHARS[startCharIndex]);
+
+		int endPosParams = sb.indexOf(stopChar, questionPos);
+
+		if (endPosParams == -1) {
+			return;
+		}
+
+		if (startChar == CharPool.OPEN_BRACKET) {
+			int pipePos = sb.indexOf(StringPool.PIPE, questionPos);
+
+			if ((pipePos != -1) && (pipePos < endPosParams)) {
+				endPosParams = pipePos;
+			}
+		}
+
+		String urlParams = sb.substring(questionPos, endPosParams);
+
+		urlParams = HttpUtil.removeParameter(urlParams, "t");
+
+		sb.replace(questionPos, endPosParams, urlParams);
+	}
+
 	private static final char[] _DL_REFERENCE_LEGACY_STOP_CHARS = {
 		CharPool.APOSTROPHE, CharPool.CLOSE_BRACKET, CharPool.CLOSE_CURLY_BRACE,
 		CharPool.CLOSE_PARENTHESIS, CharPool.GREATER_THAN, CharPool.LESS_THAN,
@@ -1120,6 +1166,16 @@ public class ExportImportImpl implements ExportImport {
 		CharPool.APOSTROPHE, CharPool.CLOSE_BRACKET, CharPool.CLOSE_CURLY_BRACE,
 		CharPool.CLOSE_PARENTHESIS, CharPool.GREATER_THAN, CharPool.LESS_THAN,
 		CharPool.PIPE, CharPool.QUESTION, CharPool.QUOTE, CharPool.SPACE
+	};
+
+	private static final char[] _DL_REFERENCE_URL_START_CHARS = {
+		CharPool.APOSTROPHE, CharPool.OPEN_BRACKET, CharPool.OPEN_CURLY_BRACE,
+		CharPool.OPEN_PARENTHESIS, CharPool.EQUAL, CharPool.QUOTE
+	};
+
+	private static final char[] _DL_REFERENCE_URL_STOP_CHARS = {
+		CharPool.APOSTROPHE, CharPool.CLOSE_BRACKET, CharPool.CLOSE_CURLY_BRACE,
+		CharPool.CLOSE_PARENTHESIS, CharPool.GREATER_THAN, CharPool.QUOTE
 	};
 
 	private static final char[] _LAYOUT_REFERENCE_STOP_CHARS = {
