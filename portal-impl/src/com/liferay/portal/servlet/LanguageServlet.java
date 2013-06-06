@@ -25,7 +25,6 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.util.PropsValues;
 
 import java.io.IOException;
 
@@ -63,64 +62,19 @@ public class LanguageServlet extends HttpServlet {
 			return;
 		}
 
-		Locale locale = null;
-
-		try {
-			locale = LocaleUtil.fromLanguageId(pathArray[0]);
-
-			if (pathArray[0].indexOf(CharPool.UNDERLINE) > 0) {
-				String[] languageIdParts = StringUtil.split(
-					pathArray[0], CharPool.UNDERLINE);
-
-				String languageCode = languageIdParts[0];
-				String countryCode = languageIdParts[1];
-
-				if (!locale.getLanguage().equals(languageCode) ||
-					!locale.getCountry().equals(countryCode)) {
-
-					_log.error("Invalid language id specified");
-
-					return;
-				}
-			}
-			else {
-				if (!locale.getLanguage().equals(pathArray[0])) {
-					_log.error("Invalid language id specified");
-
-					return;
-				}
-			}
-		}
-		catch (Exception e) {
-			_log.error("Invalid language id specified");
-
-			return;
-		}
-
 		if (pathArray.length == 1) {
 			_log.error("Language key is not specified");
 
 			return;
 		}
 
+		Locale locale = LocaleUtil.fromLanguageId(pathArray[0]);
 		String key = pathArray[1];
-		String localizedKey = key;
 
-		try {
-			localizedKey = LanguageUtil.get(locale, key);
+		if (Validator.isNull(LanguageUtil.get(locale, key, StringPool.BLANK))) {
+			_log.error("Invalid language key is specified");
 
-			if (!PropsValues.TRANSLATIONS_DISABLED) {
-				if (localizedKey.equals(key)) {
-					_log.error("Invalid language key specified");
-
-					return;
-				}
-			}
-		}
-		catch (Exception e) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(e, e);
-			}
+			return;
 		}
 
 		Object[] arguments = null;
@@ -135,7 +89,7 @@ public class LanguageServlet extends HttpServlet {
 
 		try {
 			if ((arguments == null) || (arguments.length == 0)) {
-				value = localizedKey;
+				value = LanguageUtil.get(locale, key);
 			}
 			else {
 				value = LanguageUtil.format(locale, key, arguments);
