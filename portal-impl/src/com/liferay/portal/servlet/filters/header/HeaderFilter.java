@@ -19,8 +19,11 @@ import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.TimeZoneUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.security.auth.AuthTokenUtil;
+import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.servlet.filters.BasePortalFilter;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
@@ -33,6 +36,8 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -69,6 +74,28 @@ public class HeaderFilter extends BasePortalFilter {
 		}
 
 		return lasModified;
+	}
+
+	protected boolean isMatchURLRegexForceAuthTokenCheckPattern(
+		HttpServletRequest request, String uri) {
+
+		String url = uri;
+
+		String queryString = request.getQueryString();
+
+		if (Validator.isNotNull(queryString)) {
+			url = url.concat(StringPool.QUESTION).concat(queryString);
+		}
+
+		boolean matchURLRegexAuthTokenCheckPattern = true;
+
+		if (_urlRegexForceAuthTokenCheckPattern != null) {
+			Matcher matcher = _urlRegexForceAuthTokenCheckPattern.matcher(url);
+
+			matchURLRegexAuthTokenCheckPattern = matcher.find();
+		}
+
+		return matchURLRegexAuthTokenCheckPattern;
 	}
 
 	@Override
@@ -126,6 +153,19 @@ public class HeaderFilter extends BasePortalFilter {
 				}
 			}
 
+			if (isMatchURLRegexForceAuthTokenCheckPattern(
+					request, request.getRequestURI())) {
+
+				try {
+					if (PropsValues.AUTH_TOKEN_CHECK_ENABLED) {
+						AuthTokenUtil.check(request);
+					}
+				}
+				catch (PrincipalException pe) {
+					addHeader = false;
+				}
+			}
+
 			if (addHeader) {
 				response.addHeader(name, value);
 			}
@@ -161,5 +201,6 @@ public class HeaderFilter extends BasePortalFilter {
 
 	private Format _dateFormat;
 	private FilterConfig _filterConfig;
+	private Pattern _urlRegexForceAuthTokenCheckPattern;
 
 }

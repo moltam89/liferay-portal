@@ -39,6 +39,8 @@ import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.LayoutTypePortletConstants;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.PortletConstants;
+import com.liferay.portal.security.auth.AuthTokenUtil;
+import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
@@ -49,6 +51,9 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.util.servlet.filters.CacheResponseData;
 import com.liferay.util.servlet.filters.CacheResponseUtil;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -77,6 +82,15 @@ public class CacheFilter extends BasePortalFilter {
 			(_pattern != _PATTERN_RESOURCE)) {
 
 			_log.error("Cache pattern is invalid");
+		}
+
+		String urlRegexForceAuthTokenCheckPattern = GetterUtil.getString(
+			filterConfig.getInitParameter(
+				"url-regex-force-auth-token-check-pattern"));
+
+		if (Validator.isNotNull(urlRegexForceAuthTokenCheckPattern)) {
+			_urlRegexForceAuthTokenCheckPattern = Pattern.compile(
+				urlRegexForceAuthTokenCheckPattern);
 		}
 	}
 
@@ -301,6 +315,19 @@ public class CacheFilter extends BasePortalFilter {
 		long companyId, HttpServletRequest request) {
 
 		try {
+			if (isMatchURLRegexForceAuthTokenCheckPattern(
+					request, request.getRequestURI())) {
+
+				try {
+					if (PropsValues.AUTH_TOKEN_CHECK_ENABLED) {
+						AuthTokenUtil.check(request);
+					}
+				}
+				catch (PrincipalException pe) {
+					return false;
+				}
+			}
+
 			if (_pattern == _PATTERN_RESOURCE) {
 				return true;
 			}
@@ -409,6 +436,38 @@ public class CacheFilter extends BasePortalFilter {
 		}
 	}
 
+	protected boolean isMatchURLRegexForceAuthTokenCheckPattern(
+		HttpServletRequest request, String uri) {
+
+		String url = uri;
+
+		String queryString = request.getQueryString();
+
+		if (Validator.isNotNull(queryString)) {
+			url = url.concat(StringPool.QUESTION).concat(queryString);
+		}
+
+		boolean matchURLRegexAuthTokenCheckPattern = true;
+
+		if (_urlRegexForceAuthTokenCheckPattern != null) {
+			Matcher matcher = _urlRegexForceAuthTokenCheckPattern.matcher(url);
+
+			matchURLRegexAuthTokenCheckPattern = matcher.find();
+		}
+
+		if (_log.isDebugEnabled()) {
+			if (matchURLRegexAuthTokenCheckPattern) {
+				_log.debug(getClass() + " has a regex match with " + url);
+			}
+			else {
+				_log.debug(
+					getClass() + " does not have a regex match with " + url);
+			}
+		}
+
+		return matchURLRegexAuthTokenCheckPattern;
+	}
+
 	@Override
 	protected void processFilter(
 			HttpServletRequest request, HttpServletResponse response,
@@ -499,5 +558,6 @@ public class CacheFilter extends BasePortalFilter {
 	private static Log _log = LogFactoryUtil.getLog(CacheFilter.class);
 
 	private int _pattern;
+	private Pattern _urlRegexForceAuthTokenCheckPattern;
 
 }
