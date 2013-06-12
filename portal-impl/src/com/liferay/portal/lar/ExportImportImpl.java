@@ -282,7 +282,7 @@ public class ExportImportImpl implements ExportImport {
 						String className = element.attributeValue("class-name");
 						long count = GetterUtil.getLong(element.getText());
 
-						manifestSummary.addModelCount(className, count);
+						manifestSummary.addModelAdditionCount(className, count);
 					}
 				}
 
@@ -914,16 +914,26 @@ public class ExportImportImpl implements ExportImport {
 
 		Element summaryElement = rootElement.addElement("summary");
 
-		Map<String, Long> modelCounters = manifestSummary.getModelCounters();
-
-		for (String modelClassName : modelCounters.keySet()) {
+		for (String modelClassName : manifestSummary.getModelNames()) {
 			Element element = summaryElement.addElement("staged-model");
 
 			element.addAttribute("class-name", modelClassName);
 
-			String count = String.valueOf(modelCounters.get(modelClassName));
+			long modelAdditionCount = manifestSummary.getModelAdditionCount(
+				modelClassName);
 
-			element.addText(count);
+			if (modelAdditionCount > 0) {
+				element.addAttribute(
+					"addition-count", String.valueOf(modelAdditionCount));
+			}
+
+			long modelDeletionCount = manifestSummary.getModelDeletionCount(
+				modelClassName);
+
+			if (modelDeletionCount > 0) {
+				element.addAttribute(
+					"deletion-count", String.valueOf(modelDeletionCount));
+			}
 		}
 	}
 

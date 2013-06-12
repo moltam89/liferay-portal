@@ -1080,7 +1080,7 @@ create table LayoutSetBranch (
 	wapThemeId VARCHAR(75) null,
 	wapColorSchemeId VARCHAR(75) null,
 	css TEXT null,
-	settings_ STRING null,
+	settings_ TEXT null,
 	layoutSetPrototypeUuid VARCHAR(75) null,
 	layoutSetPrototypeLinkEnabled BOOLEAN
 );
@@ -2009,6 +2009,7 @@ create table SocialActivitySet (
 	classNameId LONG,
 	classPK LONG,
 	type_ INTEGER,
+	extraData STRING null,
 	activityCount INTEGER
 );
 
