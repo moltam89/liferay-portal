@@ -32,3 +32,15 @@ HTML reference with single quotes:
 <a href='[$PATH_FRIENDLY_URL_PRIVATE_USER$][$GROUP_FRIENDLY_URL$]/layout'>Link</a>
 <a href='[$PATH_FRIENDLY_URL_PUBLIC$][$GROUP_FRIENDLY_URL$]/layout'>Link</a>
 <a href='[$PATH_FRIENDLY_URL_PUBLIC$][$GROUP_FRIENDLY_URL$]'>Link</a>
+
+HTML localized relative URLs:
+
+<a href="/en/[$PATH_FRIENDLY_URL_PRIVATE_GROUP$][$GROUP_FRIENDLY_URL$]/layout">Link</a>
+<a href="/en/[$PATH_FRIENDLY_URL_PRIVATE_USER$][$GROUP_FRIENDLY_URL$]/layout">Link</a>
+<a href="/en/[$PATH_FRIENDLY_URL_PUBLIC$][$GROUP_FRIENDLY_URL$]/layout">Link</a>
+<a href="/en/[$PATH_FRIENDLY_URL_PUBLIC$][$GROUP_FRIENDLY_URL$]">Link</a>
+
+<a href="/en_US/[$PATH_FRIENDLY_URL_PRIVATE_GROUP$][$GROUP_FRIENDLY_URL$]/layout">Link</a>
+<a href="/en_US/[$PATH_FRIENDLY_URL_PRIVATE_USER$][$GROUP_FRIENDLY_URL$]/layout">Link</a>
+<a href="/en_US/[$PATH_FRIENDLY_URL_PUBLIC$][$GROUP_FRIENDLY_URL$]/layout">Link</a>
+<a href="/en_US/[$PATH_FRIENDLY_URL_PUBLIC$][$GROUP_FRIENDLY_URL$]">Link</a>
