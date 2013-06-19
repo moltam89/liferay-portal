@@ -15,6 +15,7 @@
 package com.liferay.portal.kernel.util;
 
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.xml.Document;
 
 import java.util.Locale;
 import java.util.Map;
@@ -56,6 +57,14 @@ public interface Localization {
 	public Object deserialize(JSONObject jsonObject);
 
 	/**
+	 * Returns the available locales from the Document.
+	 *
+	 * @param  document the Document with localizations
+	 * @return the language IDs of the available locales
+	 */
+	public String[] getAvailableLocales(Document document);
+
+	/**
 	 * Returns the available locales from the localizations XML.
 	 *
 	 * @param  xml the localizations XML
@@ -75,6 +84,16 @@ public interface Localization {
 	public Locale getDefaultImportLocale(
 		String className, long classPK, Locale contentDefaultLocale,
 		Locale[] contentAvailableLocales);
+
+	/**
+	 * Returns the default locale from the Document.
+	 *
+	 * @param  document the Document with localizations
+	 * @return the language ID of the default locale, or the system default
+	 *         locale if the default locale cannot be retrieved from the
+	 *         Document
+	 */
+	public String getDefaultLocale(Document document);
 
 	/**
 	 * Returns the default locale from the localizations XML.
