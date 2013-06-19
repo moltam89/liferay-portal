@@ -572,24 +572,34 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 			String url = content.substring(beginPos + offset, endPos);
 
+			if (!url.startsWith(StringPool.SLASH)) {
+				endPos = beginPos - 1;
+
+				continue;
+			}
+
 			String servletMapping = null;
 			String servletMappingParam = null;
+			int servletMappingPos = -1;
 
-			if (url.startsWith(PortalUtil.getPathFriendlyURLPrivateGroup())) {
+			if (url.indexOf(PortalUtil.getPathFriendlyURLPrivateGroup()) > -1) {
 				servletMapping = PortalUtil.getPathFriendlyURLPrivateGroup();
 				servletMappingParam =
 					"@data_handler_private_group_servlet_mapping@";
+				servletMappingPos = url.indexOf(servletMapping);
 			}
-			else if (url.startsWith(
-						PortalUtil.getPathFriendlyURLPrivateUser())) {
+			else if (url.indexOf(
+						PortalUtil.getPathFriendlyURLPrivateUser()) > -1) {
 
 				servletMapping = PortalUtil.getPathFriendlyURLPrivateUser();
 				servletMappingParam =
 					"@data_handler_private_user_servlet_mapping@";
+				servletMappingPos = url.indexOf(servletMapping);
 			}
-			else if (url.startsWith(PortalUtil.getPathFriendlyURLPublic())) {
+			else if (url.indexOf(PortalUtil.getPathFriendlyURLPublic()) > -1) {
 				servletMapping = PortalUtil.getPathFriendlyURLPublic();
 				servletMappingParam = "@data_handler_public_servlet_mapping@";
+				servletMappingPos = url.indexOf(servletMapping);
 			}
 			else {
 				endPos = beginPos - 1;
@@ -597,11 +607,13 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				continue;
 			}
 
-			int beginGroupPos = beginPos + offset + servletMapping.length();
+			int beginGroupPos =
+				beginPos + offset + servletMappingPos + servletMapping.length();
 
 			if (content.charAt(beginGroupPos) == CharPool.SLASH) {
 				int endGroupPos = url.indexOf(
-					CharPool.SLASH, servletMapping.length() + 1);
+					CharPool.SLASH,
+					servletMappingPos + servletMapping.length() + 1);
 
 				if (endGroupPos == -1) {
 					endGroupPos = endPos;
@@ -618,9 +630,16 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 						beginGroupPos, endGroupPos,
 						"@data_handler_group_friendly_url@");
 				}
+				else {
+					endPos = beginPos - 1;
+
+					continue;
+				}
 			}
 
-			sb.replace(beginPos + offset, beginGroupPos, servletMappingParam);
+			sb.replace(
+				beginPos + offset + servletMappingPos, beginGroupPos,
+				servletMappingParam);
 
 			endPos = beginPos - 1;
 		}
