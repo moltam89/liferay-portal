@@ -140,6 +140,54 @@ public class ExportImportHelperUtilTest {
 	}
 
 	@Test
+	public void testDeleteTimestampFromDLReferenceUrls() throws Exception {
+		Element rootElement =
+			_portletDataContextExport.getExportDataRootElement();
+
+		String content = replaceParameters(
+			getContent("dl_references_timestamp.txt"), _fileEntry);
+
+		String[] urls = content.split("\n");
+
+		List<String> urlsWithTimestamp = replaceTimestampParameters(urls);
+
+		Assert.assertEquals(urlsWithTimestamp.size(), urlsWithTimestamp.size());
+
+		content = StringUtil.merge(urlsWithTimestamp,"\n");
+
+		content = ExportImportHelperUtil.replaceExportContentReferences(
+			_portletDataContextExport, _referrerStagedModel,
+			rootElement.element("entry"), content, true);
+
+		String[] urlsExported = content.split("\n");
+
+		Assert.assertEquals(urlsExported.length, urlsWithTimestamp.size());
+
+		Pattern p = Pattern.compile("[?&]t=");
+		Matcher m = p.matcher("");
+
+		for (int i = 0; i < urlsWithTimestamp.size(); i++) {
+			String url1 = urlsExported[i];
+			String url2 = urlsWithTimestamp.get(i);
+
+			Assert.assertFalse(
+				"timestamp not deleted:" + url1, m.reset(url1).find());
+
+			if (url2.contains("/documents/") && url2.contains("?")) {
+				Assert.assertTrue(
+					"other parameters deleted:" + url1 + ", " + url2,
+					url1.contains("width=100&height=100"));
+			}
+
+			if (url2.contains("/documents/") && url2.contains("mustkeep")) {
+				Assert.assertTrue(
+					"other parameters deleted:" + url1 + ", " + url2,
+					url1.contains("mustkeep"));
+			}
+		}
+	}
+
+	@Test
 	public void testExportDLReferences() throws Exception {
 		Element rootElement =
 			_portletDataContextExport.getExportDataRootElement();
@@ -379,6 +427,37 @@ public class ExportImportHelperUtilTest {
 				PortalUtil.getPathFriendlyURLPublic(), fileEntry.getTitle(),
 				fileEntry.getUuid()
 			});
+	}
+
+	protected List<String> replaceTimestampParameters(String[] urls)
+			throws Exception {
+
+		String time = "t=" + ServiceTestUtil.randomLong();
+		String width = "width=100";
+		String height = "height=100";
+
+		String[] params = {
+			time + "&" + width + "&" + height,
+			width + "&" + time + "&" + height, width + "&" + height + "&" + time
+		};
+
+		List<String> outUrls = new ArrayList<String>();
+
+		for (String url : urls) {
+			for (String param : params) {
+				String s1 = url.replace("[$TIMESTAMP$]", "&" + param);
+				String s2 = url.replace("[$ONLYTIMESTAMP$]", "?" + param);
+
+				if (!s1.equals(url)) {
+					outUrls.add(s1);
+				}
+				else {
+					outUrls.add(s2);
+				}
+			}
+		}
+
+		return outUrls;
 	}
 
 	private FileEntry _fileEntry;
