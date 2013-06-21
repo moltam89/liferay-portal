@@ -433,6 +433,29 @@ public class JournalArticleLocalServiceImpl
 				WorkflowConstants.ACTION_PUBLISH);
 		}
 
+		// Update serviceContext
+
+		Map<String, String[]> URLParams = new HashMap<String, String[]>();
+
+		String namespace = PortalUtil.getPortletNamespace(PortletKeys.JOURNAL);
+
+		URLParams.put(namespace.concat("articleId"), new String[] {articleId});
+		URLParams.put(
+			namespace.concat("groupId"),
+			new String[] {String.valueOf(groupId)});
+		URLParams.put(
+			namespace.concat("struts_action"),
+			new String[] {"/journal/edit_article"});
+		URLParams.put(
+			namespace.concat("version"),
+			new String[] {String.valueOf(version)});
+
+		articleURL = PortalUtil.getControlPanelFullURL(
+			groupId, PortletKeys.JOURNAL, URLParams);
+
+		serviceContext.setAttribute("articleId", articleId);
+		serviceContext.setAttribute("articleURL", articleURL);
+
 		// Email
 
 		PortletPreferences preferences =
