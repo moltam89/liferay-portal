@@ -53,6 +53,10 @@
 		<filter-name>Cache Filter - Friendly</filter-name>
 		<filter-class>com.liferay.portal.servlet.filters.cache.CacheFilter</filter-class>
 		<init-param>
+			<param-name>url-regex-force-auth-token-check-pattern</param-name>
+			<param-value>^/language/.+</param-value>
+		</init-param>
+		<init-param>
 			<param-name>pattern</param-name>
 			<param-value>0</param-value>
 		</init-param>
@@ -61,6 +65,10 @@
 		<filter-name>Cache Filter - Layout</filter-name>
 		<filter-class>com.liferay.portal.servlet.filters.cache.CacheFilter</filter-class>
 		<init-param>
+			<param-name>url-regex-force-auth-token-check-pattern</param-name>
+			<param-value>^/language/.+</param-value>
+		</init-param>
+		<init-param>
 			<param-name>pattern</param-name>
 			<param-value>1</param-value>
 		</init-param>
@@ -68,6 +76,10 @@
 	<filter>
 		<filter-name>Cache Filter - Resource</filter-name>
 		<filter-class>com.liferay.portal.servlet.filters.cache.CacheFilter</filter-class>
+		<init-param>
+			<param-name>url-regex-force-auth-token-check-pattern</param-name>
+			<param-value>^/language/.+</param-value>
+		</init-param>
 		<init-param>
 			<param-name>url-regex-ignore-pattern</param-name>
 			<param-value>.+/-/.+</param-value>
@@ -80,6 +92,10 @@
 	<filter>
 		<filter-name>Cache Filter - Resource JSP</filter-name>
 		<filter-class>com.liferay.portal.servlet.filters.cache.CacheFilter</filter-class>
+		<init-param>
+			<param-name>url-regex-force-auth-token-check-pattern</param-name>
+			<param-value>^/language/.+</param-value>
+		</init-param>
 		<init-param>
 			<param-name>url-regex-pattern</param-name>
 			<param-value>.+/(barebone|css|everything|main)\.jsp</param-value>
@@ -148,6 +164,10 @@
 	<filter>
 		<filter-name>Header Filter</filter-name>
 		<filter-class>com.liferay.portal.servlet.filters.header.HeaderFilter</filter-class>
+		<init-param>
+			<param-name>url-regex-force-auth-token-check-pattern</param-name>
+			<param-value>^/language/.+</param-value>
+		</init-param>
 		<init-param>
 			<param-name>url-regex-ignore-pattern</param-name>
 			<param-value>.+/-/.+</param-value>

@@ -14,6 +14,7 @@
 
 package com.liferay.portal.servlet;
 
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -25,6 +26,8 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.security.auth.AuthTokenUtil;
+import com.liferay.portal.util.PropsValues;
 
 import java.io.IOException;
 
@@ -56,6 +59,51 @@ public class LanguageServlet extends HttpServlet {
 
 		String[] pathArray = StringUtil.split(path, CharPool.SLASH);
 
+		try {
+			if (PropsValues.AUTH_TOKEN_CHECK_ENABLED) {
+				AuthTokenUtil.check(request);
+			}
+		}
+		catch (PortalException pe) {
+			_log.error("Invalid authentication token received");
+
+			return;
+		}
+
+		Locale locale = null;
+
+		try {
+			locale = LocaleUtil.fromLanguageId(pathArray[0]);
+
+			if (pathArray[0].indexOf(CharPool.UNDERLINE) > 0) {
+				String[] languageIdParts = StringUtil.split(
+					pathArray[0], CharPool.UNDERLINE);
+
+				String languageCode = languageIdParts[0];
+				String countryCode = languageIdParts[1];
+
+				if (!locale.getLanguage().equals(languageCode) ||
+					!locale.getCountry().equals(countryCode)) {
+
+					_log.error("Invalid language id specified");
+
+					return;
+				}
+			}
+			else {
+				if (!locale.getLanguage().equals(pathArray[0])) {
+					_log.error("Invalid language id specified");
+
+					return;
+				}
+			}
+		}
+		catch (Exception e) {
+			_log.error("Invalid language id specified");
+
+			return;
+		}
+
 		if (pathArray.length == 0) {
 			_log.error("Language id is not specified");
 
@@ -68,8 +116,13 @@ public class LanguageServlet extends HttpServlet {
 			return;
 		}
 
-		Locale locale = LocaleUtil.fromLanguageId(pathArray[0]);
 		String key = pathArray[1];
+
+		if (!LanguageUtil.isValidLanguageKey(locale, key)) {
+			_log.error("Invalid language key specified");
+
+			return;
+		}
 
 		Object[] arguments = null;
 
