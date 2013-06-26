@@ -41,7 +41,9 @@ AUI.add(
 
 						instance.toolbar.add(
 							{
-								handler: A.bind('_handleChooseEvent', instance),
+								on: {
+									click: A.bind('_handleChooseEvent', instance)
+								},
 								label: Liferay.Language.get('choose')
 							},
 							1
