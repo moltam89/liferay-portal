@@ -17,6 +17,9 @@ package com.liferay.portal.kernel.log;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Html;
 import com.liferay.portal.kernel.util.HtmlUtil;
+import com.liferay.portal.kernel.util.Props;
+import com.liferay.portal.kernel.util.PropsKeys;
+import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.StackTraceUtil;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
@@ -191,7 +194,7 @@ public abstract class AbstractSecureLog<L> implements Log {
 		sb.append(StringPool.OS_EOL);
 
 		String stackTrace = _sanitize(
-			StackTraceUtil.getStackTrace(t), false, true);
+			StackTraceUtil.getStackTrace(t), false, _isSanitizeHtmlEnabled());
 
 		sb.append(stackTrace);
 
@@ -202,8 +205,33 @@ public abstract class AbstractSecureLog<L> implements Log {
 		log(level, null, t);
 	}
 
+	private boolean _isSanitizeCrlfEnabled() {
+		Props props = PropsUtil.getProps();
+
+		if (props != null) {
+			return GetterUtil.getBoolean(
+				props.get(PropsKeys.SECURE_LOGGING_SANITIZE_CRLF_ENABLED));
+		}
+
+		return _DEFAULT_SANITIZE_CRLF_ENABLED;
+	}
+
+	private boolean _isSanitizeHtmlEnabled() {
+		Props props = PropsUtil.getProps();
+
+		if (props != null) {
+			return GetterUtil.getBoolean(
+				props.get(PropsKeys.SECURE_LOGGING_SANITIZE_HTML_ENABLED));
+		}
+
+		return _DEFAULT_SANITIZE_HTML_ENABLED;
+	}
+
 	private String _sanitize(Object msg) {
-		return _sanitize(msg, true, true);
+		boolean sanitizeCrlf = _isSanitizeCrlfEnabled();
+		boolean sanitizeHtml = _isSanitizeHtmlEnabled();
+
+		return _sanitize(msg, sanitizeCrlf, sanitizeHtml);
 	}
 
 	private String _sanitize(
@@ -244,5 +272,9 @@ public abstract class AbstractSecureLog<L> implements Log {
 	private static final String[] _UNDERLINES = new String[] {
 		StringPool.UNDERLINE, StringPool.UNDERLINE
 	};
+
+	private static boolean _DEFAULT_SANITIZE_CRLF_ENABLED = true;
+
+	private static boolean _DEFAULT_SANITIZE_HTML_ENABLED = false;
 
 }
