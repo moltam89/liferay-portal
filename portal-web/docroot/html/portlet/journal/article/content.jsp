@@ -197,7 +197,7 @@ if (Validator.isNotNull(content)) {
 			<td>
 				<c:if test="<%= (article == null) || article.isNew() %>">
 					<c:choose>
-						<c:when test="<%= PropsValues.JOURNAL_ARTICLE_FORCE_AUTOGENERATE_ID %>">
+						<c:when test="<%= !classPK.isEmpty() || PropsValues.JOURNAL_ARTICLE_FORCE_AUTOGENERATE_ID %>">
 							<aui:input name="newArticleId" type="hidden" />
 							<aui:input name="autoArticleId" type="hidden" value="<%= true %>" />
 						</c:when>
