@@ -235,7 +235,7 @@ public abstract class AbstractSecureLog<L> implements Log {
 	}
 
 	private String _sanitize(
-			Object msg, boolean sanitizeCrlf, boolean sanitizeHtml) {
+		Object msg, boolean sanitizeCrlf, boolean sanitizeHtml) {
 
 		String originalMessage = GetterUtil.getString(msg, StringPool.BLANK);
 
