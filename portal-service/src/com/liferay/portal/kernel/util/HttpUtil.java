@@ -172,6 +172,18 @@ public class HttpUtil {
 		return getHttp().hasProxyConfig();
 	}
 
+	public static boolean isEncodedPath(String path) {
+		return getHttp().isEncodedPath(path);
+	}
+
+	public static boolean isEncodedURL(String url) {
+		return getHttp().isEncodedURL(url, false);
+	}
+
+	public static boolean isEncodedURL(String url, boolean useExtended) {
+		return getHttp().isEncodedURL(url, useExtended);
+	}
+
 	public static boolean isNonProxyHost(String host) {
 		return getHttp().isNonProxyHost(host);
 	}
@@ -224,6 +236,10 @@ public class HttpUtil {
 
 	public static String removeProtocol(String url) {
 		return getHttp().removeProtocol(url);
+	}
+
+	public static String sanitize(String location) {
+		return getHttp().sanitize(location);
 	}
 
 	public static String setParameter(String url, String name, boolean value) {

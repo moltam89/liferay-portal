@@ -55,6 +55,27 @@ public class URLCodecTest {
 		}
 	}
 
+	@Test
+	public void testIsEncodedURL() throws Exception {
+		for (int i = 0; i < _RAW_URLS.length; i++) {
+			Assert.assertTrue(URLCodec.isEncodedURL(_ENCODED_URLS[i]));
+		}
+
+		Assert.assertTrue(URLCodec.isEncodedURL(_RAW_URLS[0]));
+		Assert.assertTrue(URLCodec.isEncodedURL(_RAW_URLS[1]));
+		Assert.assertTrue(URLCodec.isEncodedURL(_RAW_URLS[2]));
+		Assert.assertTrue(URLCodec.isEncodedURL(_RAW_URLS[3]));
+		Assert.assertFalse(URLCodec.isEncodedURL(_RAW_URLS[4]));
+		Assert.assertFalse(URLCodec.isEncodedURL(_RAW_URLS[5]));
+		Assert.assertFalse(URLCodec.isEncodedURL(_RAW_URLS[6]));
+
+		Assert.assertFalse(URLCodec.isEncodedURL(_RAW_URLS[7]));
+		Assert.assertTrue(
+			URLCodec.isEncodedURL(_RAW_URLS[7], StringPool.UTF8, true));
+
+		Assert.assertFalse(URLCodec.isEncodedURL(_RAW_URLS[8]));
+	}
+
 	private static final String[] _ENCODED_URLS = new String[9];
 
 	private static final String[] _ESCAPE_SPACES_ENCODED_URLS = new String[9];
