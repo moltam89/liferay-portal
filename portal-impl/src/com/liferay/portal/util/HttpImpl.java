@@ -236,7 +236,7 @@ public class HttpImpl implements Http {
 	@Override
 	public String decodePath(String path) {
 		path = StringUtil.replace(path, StringPool.SLASH, _TEMP_SLASH);
-		path = decodeURL(path, true);
+		path = decodeURL(path);
 		path = StringUtil.replace(path, _TEMP_SLASH, StringPool.SLASH);
 
 		return path;
@@ -244,12 +244,7 @@ public class HttpImpl implements Http {
 
 	@Override
 	public String decodeURL(String url) {
-		return decodeURL(url, false);
-	}
-
-	@Override
-	public String decodeURL(String url, boolean unescapeSpaces) {
-		return URLCodec.decodeURL(url, StringPool.UTF8, unescapeSpaces);
+		return URLCodec.decodeURL(url, StringPool.UTF8);
 	}
 
 	public void destroy() {

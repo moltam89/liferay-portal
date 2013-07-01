@@ -66,10 +66,6 @@ public class HttpUtil {
 		return getHttp().decodeURL(url);
 	}
 
-	public static String decodeURL(String url, boolean unescapeSpaces) {
-		return getHttp().decodeURL(url, unescapeSpaces);
-	}
-
 	public static String encodeParameters(String url) {
 		return getHttp().encodeParameters(url);
 	}

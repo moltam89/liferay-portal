@@ -34,17 +34,11 @@ import java.util.BitSet;
 public class URLCodec {
 
 	public static String decodeURL(String encodedURLString) {
-		return decodeURL(encodedURLString, StringPool.UTF8, false);
+		return decodeURL(encodedURLString, StringPool.UTF8);
 	}
 
 	public static String decodeURL(
-		String encodedURLString, boolean unescapeSpaces) {
-
-		return decodeURL(encodedURLString, StringPool.UTF8, unescapeSpaces);
-	}
-
-	public static String decodeURL(
-		String encodedURLString, String charsetName, boolean unescapeSpaces) {
+		String encodedURLString, String charsetName) {
 
 		if (encodedURLString == null) {
 			return null;
@@ -53,11 +47,6 @@ public class URLCodec {
 		if (encodedURLString.length() == 0) {
 			return StringPool.BLANK;
 		}
-
-		/*if (unescapeSpaces) {
-			encodedURLString = StringUtil.replace(
-				encodedURLString, "%20", StringPool.PLUS);
-		}*/
 
 		StringBuilder sb = null;
 
