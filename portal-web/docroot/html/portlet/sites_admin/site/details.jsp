@@ -45,6 +45,17 @@ if (showPrototypes && (group != null)) {
 		if (Validator.isNotNull(layoutSetPrototypeUuid)) {
 			privateLayoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypeByUuidAndCompanyId(layoutSetPrototypeUuid, company.getCompanyId());
 		}
+		else if (liveGroup.isStaged()) {
+			privateLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(liveGroup.getStagingGroup().getGroupId(), true);
+
+			privateLayoutSetPrototypeLinkEnabled = privateLayoutSet.isLayoutSetPrototypeLinkEnabled();
+
+			layoutSetPrototypeUuid = privateLayoutSet.getLayoutSetPrototypeUuid();
+
+			if (Validator.isNotNull(layoutSetPrototypeUuid)) {
+				privateLayoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypeByUuid(layoutSetPrototypeUuid);
+			}
+		}
 	}
 	catch (Exception e) {
 	}
@@ -60,6 +71,17 @@ if (showPrototypes && (group != null)) {
 
 		if (Validator.isNotNull(layoutSetPrototypeUuid)) {
 			publicLayoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypeByUuidAndCompanyId(layoutSetPrototypeUuid, company.getCompanyId());
+		}
+		else if (liveGroup.isStaged()) {
+			publicLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(liveGroup.getStagingGroup().getGroupId(), false);
+
+			publicLayoutSetPrototypeLinkEnabled = publicLayoutSet.isLayoutSetPrototypeLinkEnabled();
+
+			layoutSetPrototypeUuid = publicLayoutSet.getLayoutSetPrototypeUuid();
+
+			if (Validator.isNotNull(layoutSetPrototypeUuid)) {
+				publicLayoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypeByUuid(layoutSetPrototypeUuid);
+			}
 		}
 	}
 	catch (Exception e) {
