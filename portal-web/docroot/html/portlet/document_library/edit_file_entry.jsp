@@ -158,24 +158,27 @@ portletURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
 	</c:choose>
 </c:if>
 
-<%
-boolean localizeTitle = true;
-String headerTitle = LanguageUtil.get(pageContext, "new-document");
+<c:if test="<%= showHeader %>">
 
-if (fileVersion != null) {
-	headerTitle = fileVersion.getTitle();
-	localizeTitle= false;
-}
-else if (dlFileEntryType != null) {
-	headerTitle = LanguageUtil.format(pageContext, "new-x", new Object[] {dlFileEntryType.getName(locale)});
-}
-%>
+	<%
+	boolean localizeTitle = true;
+	String headerTitle = LanguageUtil.get(pageContext, "new-document");
 
-<liferay-ui:header
-	backURL="<%= backURL %>"
-	localizeTitle="<%= localizeTitle %>"
-	title="<%= headerTitle %>"
-/>
+	if (fileVersion != null) {
+		headerTitle = fileVersion.getTitle();
+		localizeTitle= false;
+	}
+	else if (dlFileEntryType != null) {
+		headerTitle = LanguageUtil.format(pageContext, "new-x", new Object[] {dlFileEntryType.getName(locale)});
+	}
+	%>
+
+	<liferay-ui:header
+		backURL="<%= backURL %>"
+		localizeTitle="<%= localizeTitle %>"
+		title="<%= headerTitle %>"
+	/>
+</c:if>
 
 <portlet:actionURL var="editFileEntryURL">
 	<portlet:param name="struts_action" value="/document_library/edit_file_entry" />
@@ -289,7 +292,6 @@ else if (dlFileEntryType != null) {
 									dialog: {
 										constrain: true,
 										modal: true,
-										zIndex: Liferay.zIndex.WINDOW + 2,
 										width: 680
 									},
 									id: '<portlet:namespace />selectFolder',
@@ -505,6 +507,7 @@ else if (dlFileEntryType != null) {
 <aui:script>
 	function <portlet:namespace />changeFileEntryType() {
 		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= Constants.PREVIEW %>";
+
 		submitForm(document.<portlet:namespace />fm);
 	}
 
@@ -513,7 +516,8 @@ else if (dlFileEntryType != null) {
 	}
 
 	function <portlet:namespace />checkIn() {
-		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= Constants.UPDATE_AND_CHECKIN %>"
+		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= Constants.UPDATE_AND_CHECKIN %>";
+
 		submitForm(document.<portlet:namespace />fm);
 	}
 
@@ -529,6 +533,7 @@ else if (dlFileEntryType != null) {
 		}
 
 		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= (fileEntry == null) ? Constants.ADD : Constants.UPDATE %>";
+
 		submitForm(document.<portlet:namespace />fm);
 	}
 

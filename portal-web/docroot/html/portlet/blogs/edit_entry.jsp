@@ -32,13 +32,16 @@ boolean allowTrackbacks = PropsValues.BLOGS_TRACKBACK_ENABLED && BeanParamUtil.g
 boolean smallImage = BeanParamUtil.getBoolean(entry, request, "smallImage");
 
 boolean preview = ParamUtil.getBoolean(request, "preview");
+boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 %>
 
-<liferay-ui:header
-	backURL="<%= backURL %>"
-	localizeTitle="<%= (entry == null) %>"
-	title='<%= (entry == null) ? "new-blog-entry" : entry.getTitle() %>'
-/>
+<c:if test="<%= showHeader %>">
+	<liferay-ui:header
+		backURL="<%= backURL %>"
+		localizeTitle="<%= (entry == null) %>"
+		title='<%= (entry == null) ? "new-blog-entry" : entry.getTitle() %>'
+	/>
+</c:if>
 
 <portlet:actionURL var="editEntryURL">
 	<portlet:param name="struts_action" value="/blogs/edit_entry" />
