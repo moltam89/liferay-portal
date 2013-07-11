@@ -24,8 +24,7 @@ import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
 import com.liferay.portlet.PortletPreferencesImpl;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -150,7 +149,6 @@ public class LocalizationImplTest {
 		String localeFromXml = LocalizationUtil.getDefaultLocale(xml);
 
 		Assert.assertEquals("Locales not match", localeFromDoc, localeFromXml);
-
 	}
 
 	@Test
