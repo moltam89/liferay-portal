@@ -170,6 +170,12 @@ public class PortletPreferencesLocalServiceStagingAdvice
 		LayoutRevision layoutRevision = LayoutRevisionUtil.fetchByPrimaryKey(
 			plid);
 
+		if (layoutRevision != null) {
+			layoutRevision =
+				LayoutRevisionLocalServiceUtil.fetchLastLayoutRevision(
+					layoutRevision.getPlid(), layoutRevision.isHead());
+		}
+
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
