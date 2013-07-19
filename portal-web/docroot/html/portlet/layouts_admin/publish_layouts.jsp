@@ -234,6 +234,7 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 			<aui:input name="layoutSetBranchName" type="hidden" value="<%= layoutSetBranchName %>" />
 			<aui:input name="lastImportUserName" type="hidden" value="<%= user.getFullName() %>" />
 			<aui:input name="lastImportUserUuid" type="hidden" value="<%= String.valueOf(user.getUserUuid()) %>" />
+			<aui:input name="treeId" type="hidden" value="<%= treeId %>" />
 
 			<liferay-ui:error exception="<%= DuplicateLockException.class %>" message="another-publishing-process-is-in-progress,-please-try-again-later" />
 
@@ -334,6 +335,7 @@ response.setHeader("Ajax-ID", request.getHeader("Ajax-ID"));
 							<liferay-util:param name="treeId" value="<%= treeId %>" />
 							<liferay-util:param name="incomplete" value="<%= String.valueOf(false) %>" />
 							<liferay-util:param name="tabs1" value='<%= (privateLayout) ? "private-pages" : "public-pages" %>' />
+							<liferay-util:param name="groupId" value="<%= String.valueOf(selGroupId) %>" />
 						</liferay-util:include>
 					</div>
 

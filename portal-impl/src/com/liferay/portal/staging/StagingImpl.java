@@ -114,6 +114,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.SessionClicks;
+import com.liferay.portal.util.SessionTreeJSClicks;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.PortalPreferences;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
@@ -2365,6 +2366,8 @@ public class StagingImpl implements Staging {
 				parameterMap, scope, dateRange.getStartDate(),
 				dateRange.getEndDate(), groupName, cronText,
 				startCalendar.getTime(), schedulerEndDate, description);
+
+			SessionTreeJSClicks.resetTree(portletRequest);
 		}
 		else {
 			MessageStatus messageStatus = new MessageStatus();
@@ -2389,6 +2392,8 @@ public class StagingImpl implements Staging {
 						privateLayout, layoutIdMap, parameterMap,
 						dateRange.getStartDate(), dateRange.getEndDate());
 				}
+
+				SessionTreeJSClicks.resetTree(portletRequest);
 			}
 			catch (Exception e) {
 				messageStatus.setException(e);
@@ -2540,6 +2545,8 @@ public class StagingImpl implements Staging {
 				remoteGroupId, remotePrivateLayout, dateRange.getStartDate(),
 				dateRange.getEndDate(), groupName, cronText,
 				startCalendar.getTime(), schedulerEndDate, description);
+
+			SessionTreeJSClicks.resetTree(portletRequest);
 		}
 		else {
 			MessageStatus messageStatus = new MessageStatus();
@@ -2552,6 +2559,8 @@ public class StagingImpl implements Staging {
 					remoteAddress, remotePort, remotePathContext,
 					secureConnection, remoteGroupId, remotePrivateLayout,
 					dateRange.getStartDate(), dateRange.getEndDate());
+
+				SessionTreeJSClicks.resetTree(portletRequest);
 			}
 			catch (Exception e) {
 				messageStatus.setException(e);

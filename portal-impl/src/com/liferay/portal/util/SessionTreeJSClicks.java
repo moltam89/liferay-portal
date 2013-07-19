@@ -16,7 +16,9 @@ package com.liferay.portal.util;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.ParamUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.model.Layout;
@@ -26,6 +28,8 @@ import com.liferay.portlet.PortletPreferencesFactoryUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.portlet.PortletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -161,6 +165,29 @@ public class SessionTreeJSClicks {
 			}
 
 			put(request, treeId, openNodesString);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
+	}
+
+	public static void resetTree(PortletRequest portletRequest) {
+
+		try {
+			String treeId = ParamUtil.getString(portletRequest,"treeId");
+
+			PortalPreferences preferences =
+				PortletPreferencesFactoryUtil.getPortalPreferences(
+					portletRequest);
+
+			StringBundler sb = new StringBundler(4);
+
+			sb.append(SessionTreeJSClicks.class.getName());
+			sb.append(CharPool.POUND);
+			sb.append(treeId);
+			sb.append("SelectedNode");
+
+			preferences.resetValues(sb.toString());
 		}
 		catch (Exception e) {
 			_log.error(e, e);
