@@ -104,6 +104,8 @@ AUI.add(
 							var instance = this;
 
 							if (Lang.isString(value)) {
+								value = Liferay.Util.escapeHTML(value);
+
 								value = value.split(',');
 							}
 
@@ -181,7 +183,25 @@ AUI.add(
 					addEntries: function() {
 						var instance = this;
 
-						instance._onAddEntryClick();
+						var text = Liferay.Util.escapeHTML(instance.inputNode.val());
+
+						if (text) {
+							if (text.indexOf(',') > -1) {
+								var items = text.split(',');
+
+								A.each(
+									items,
+									function(item, index, collection) {
+										instance.entries.add(item, {});
+									}
+								);
+							}
+							else {
+								instance.entries.add(text, {});
+							}
+						}
+
+						Liferay.Util.focusFormField(instance.inputNode);
 					},
 
 					syncUI: function() {
@@ -197,7 +217,7 @@ AUI.add(
 					_bindTagsSelector: function() {
 						var instance = this;
 
-						instance._submitFormListener = A.Do.before(instance._onAddEntryClick, window, 'submitForm', instance);
+						instance._submitFormListener = A.Do.before(instance.addEntries, window, 'submitForm', instance);
 
 						instance.get('boundingBox').on('keypress', instance._onKeyPress, instance);
 					},
@@ -378,25 +398,7 @@ AUI.add(
 							}
 						}
 
-						var text = Liferay.Util.escapeHTML(instance.inputNode.val());
-
-						if (text) {
-							if (text.indexOf(',') > -1) {
-								var items = text.split(',');
-
-								A.each(
-									items,
-									function(item, index, collection) {
-										instance.entries.add(item, {});
-									}
-								);
-							}
-							else {
-								instance.entries.add(text, {});
-							}
-						}
-
-						Liferay.Util.focusFormField(instance.inputNode);
+						instance.addEntries();
 					},
 
 					_onCheckboxClick: function(event) {
@@ -421,7 +423,7 @@ AUI.add(
 						var charCode = event.charCode;
 
 						if (charCode == '44') {
-							instance._onAddEntryClick();
+							instance._onAddEntryClick(event);
 
 							event.preventDefault();
 						}
