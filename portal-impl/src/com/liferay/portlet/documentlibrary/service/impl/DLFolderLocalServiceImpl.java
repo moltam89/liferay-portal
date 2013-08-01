@@ -224,6 +224,13 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 			}
 		}
 
+		// Workflow
+
+		workflowDefinitionLinkLocalService.deleteWorkflowDefinitionLink(
+			dlFolder.getCompanyId(), dlFolder.getGroupId(),
+			DLFolder.class.getName(), dlFolder.getFolderId(),
+			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_ALL);
+
 		// Resources
 
 		resourceLocalService.deleteResource(
