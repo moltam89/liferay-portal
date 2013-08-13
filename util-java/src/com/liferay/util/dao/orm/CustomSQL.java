@@ -14,6 +14,8 @@
 
 package com.liferay.util.dao.orm;
 
+import com.liferay.portal.kernel.dao.db.DB;
+import com.liferay.portal.kernel.dao.db.DBFactoryUtil;
 import com.liferay.portal.kernel.dao.jdbc.DataAccess;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.io.unsync.UnsyncBufferedReader;
@@ -226,6 +228,12 @@ public class CustomSQL {
 	}
 
 	public String[] keywords(String keywords) {
+		DB db = DBFactoryUtil.getDB();
+
+		if (db.isSupportsStringCaseSensitiveQuery()) {
+			return keywords(keywords, false);
+		}
+
 		return keywords(keywords, true);
 	}
 
@@ -294,6 +302,12 @@ public class CustomSQL {
 	}
 
 	public String[] keywords(String[] keywordsArray) {
+		DB db = DBFactoryUtil.getDB();
+
+		if (db.isSupportsStringCaseSensitiveQuery()) {
+			return keywords(keywordsArray, false);
+		}
+
 		return keywords(keywordsArray, true);
 	}
 
