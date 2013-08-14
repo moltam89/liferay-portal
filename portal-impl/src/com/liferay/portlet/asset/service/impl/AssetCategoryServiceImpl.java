@@ -238,7 +238,7 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 		int total = 0;
 
 		if (Validator.isNotNull(name)) {
-			name = (CustomSQLUtil.keywords(name))[0];
+			name = (CustomSQLUtil.keywords(name, false))[0];
 
 			categories = getVocabularyCategories(
 				groupId, name, vocabularyId, start, end, obc);
@@ -337,7 +337,7 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 		int total = 0;
 
 		if (Validator.isNotNull(name)) {
-			name = (CustomSQLUtil.keywords(name))[0];
+			name = (CustomSQLUtil.keywords(name, false))[0];
 
 			categories = getVocabularyCategories(
 				groupId, name, vocabularyId, start, end, obc);
@@ -407,7 +407,7 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 			int end, OrderByComparator obc)
 		throws SystemException {
 
-		String name = CustomSQLUtil.keywords(keywords)[0];
+		String name = CustomSQLUtil.keywords(keywords, false)[0];
 
 		if (Validator.isNull(name)) {
 			return assetCategoryPersistence.filterFindByG_V(
