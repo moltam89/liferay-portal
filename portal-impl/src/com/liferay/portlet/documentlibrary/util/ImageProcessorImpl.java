@@ -14,8 +14,6 @@
 
 package com.liferay.portlet.documentlibrary.util;
 
-import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.image.ImageBag;
 import com.liferay.portal.kernel.image.ImageToolUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
@@ -33,7 +31,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
-import com.liferay.portlet.documentlibrary.store.DLStoreUtil;
 
 import java.awt.image.ColorModel;
 import java.awt.image.RenderedImage;
@@ -140,22 +137,21 @@ public class ImageProcessorImpl
 			return false;
 		}
 
-		boolean hasImages = false;
+		boolean isPreview = _hasPreview(fileVersion);
 
-		try {
-			if (_hasPreview(fileVersion) && hasThumbnails(fileVersion)) {
-				hasImages = true;
-			}
+		boolean isThumbnails = hasThumbnails(fileVersion);
 
-			if (!hasImages && isSupported(fileVersion)) {
-				_queueGeneration(null, fileVersion);
-			}
-		}
-		catch (Exception e) {
-			_log.error(e, e);
+		if ((PropsValues.DL_FILE_ENTRY_PREVIEW_ENABLED && !isPreview) ||
+			(PropsValues.DL_FILE_ENTRY_THUMBNAIL_ENABLED && !isThumbnails) &&
+			isSupported(fileVersion)) {
+
+			_queueGeneration(null, fileVersion);
+
 		}
 
-		return hasImages;
+		return ((isPreview || !PropsValues.DL_FILE_ENTRY_PREVIEW_ENABLED ||
+			!_previewGenerationRequired(fileVersion)) && isThumbnails);
+
 	}
 
 	@Override
@@ -308,11 +304,15 @@ public class ImageProcessorImpl
 				}
 			}
 
-			if (!_hasPreview(destinationFileVersion)) {
+			if (PropsValues.DL_FILE_ENTRY_PREVIEW_ENABLED &&
+				!_hasPreview(destinationFileVersion)) {
+
 				_storePreviewImage(destinationFileVersion, renderedImage);
 			}
 
-			if (!hasThumbnails(destinationFileVersion)) {
+			if (PropsValues.DL_FILE_ENTRY_THUMBNAIL_ENABLED &&
+				!hasThumbnails(destinationFileVersion)) {
+
 				storeThumbnailImages(destinationFileVersion, renderedImage);
 			}
 		}
@@ -344,25 +344,17 @@ public class ImageProcessorImpl
 		return type;
 	}
 
-	private boolean _hasPreview(FileVersion fileVersion)
-		throws PortalException, SystemException {
+	private boolean _hasPreview(FileVersion fileVersion) {
+		String type = getPreviewType(fileVersion);
 
-		if (PropsValues.DL_FILE_ENTRY_PREVIEW_ENABLED &&
-			_previewGenerationRequired(fileVersion)) {
-
-			String type = getPreviewType(fileVersion);
-
-			String previewFilePath = getPreviewFilePath(fileVersion, type);
-
-			if (!DLStoreUtil.hasFile(
-					fileVersion.getCompanyId(), REPOSITORY_ID,
-					previewFilePath)) {
-
-				return false;
-			}
+		try {
+			return hasPreview(fileVersion, type);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
 		}
 
-		return true;
+		return false;
 	}
 
 	private boolean _previewGenerationRequired(FileVersion fileVersion) {
