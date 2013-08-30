@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.ThemeFactoryUtil;
 import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
@@ -497,7 +498,8 @@ public class LayoutExporter {
 
 		for (Layout layout : layouts) {
 			exportLayout(
-				portletDataContext, portlets, layoutIds, portletIds, layout);
+				portletDataContext, portlets, layoutIds, portletIds, layout,
+				exportTheme, zipWriter);
 		}
 
 		long previousScopeGroupId = portletDataContext.getScopeGroupId();
@@ -587,8 +589,17 @@ public class LayoutExporter {
 
 		_portletExporter.exportRatingsEntries(portletDataContext, rootElement);
 
-		if (exportTheme && !portletDataContext.isPerformDirectBinaryImport()) {
-			exportTheme(layoutSet, zipWriter);
+		if (exportTheme && !portletDataContext.isPerformDirectBinaryImport() &&
+			!Validator.equals(
+				layoutSet.getThemeId(),
+				ThemeFactoryUtil.getDefaultRegularThemeId(
+					layoutSet.getCompanyId()))) {
+
+			Theme theme = layoutSet.getTheme();
+
+			File themeZip = new File(zipWriter.getPath() + "/theme.zip");
+
+			exportTheme(theme, themeZip);
 		}
 
 		ExportImportHelperUtil.writeManifestSummary(
@@ -667,7 +678,8 @@ public class LayoutExporter {
 
 	protected void exportLayout(
 			PortletDataContext portletDataContext, List<Portlet> portlets,
-			long[] layoutIds, Map<String, Object[]> portletIds, Layout layout)
+			long[] layoutIds, Map<String, Object[]> portletIds, Layout layout,
+			boolean exportTheme, ZipWriter zipWriter)
 		throws Exception {
 
 		if (!ArrayUtil.contains(layoutIds, layout.getLayoutId()) &&
@@ -689,6 +701,18 @@ public class LayoutExporter {
 			// Only portlet type layouts support page scoping
 
 			return;
+		}
+
+		if (exportTheme && !portletDataContext.isPerformDirectBinaryImport() &&
+			!layout.isInheritLookAndFeel()) {
+
+			Theme theme = layout.getTheme();
+
+			File themeZip = new File(
+				zipWriter.getPath() + "/theme" + StringPool.DASH +
+					String.valueOf(layout.getLayoutId()) + ".zip");
+
+			exportTheme(theme, themeZip);
 		}
 
 		if (layout.isTypePortlet()) {
@@ -775,11 +799,7 @@ public class LayoutExporter {
 		}
 	}
 
-	protected void exportTheme(LayoutSet layoutSet, ZipWriter zipWriter)
-		throws Exception {
-
-		Theme theme = layoutSet.getTheme();
-
+	protected void exportTheme(Theme theme, File themeZip) throws Exception {
 		String lookAndFeelXML = ContentUtil.get(
 			"com/liferay/portal/dependencies/liferay-look-and-feel.xml.tmpl");
 
@@ -807,8 +827,6 @@ public class LayoutExporter {
 
 			return;
 		}
-
-		File themeZip = new File(zipWriter.getPath() + "/theme.zip");
 
 		ZipWriter themeZipWriter = ZipWriterFactoryUtil.getZipWriter(themeZip);
 
