@@ -790,7 +790,7 @@ public class EditGroupAction extends PortletAction {
 			}
 		}
 
-		if (!liveGroup.isStaged()) {
+		if (!liveGroup.isStaged() || liveGroup.isStagedRemotely()) {
 			SitesUtil.updateLayoutSetPrototypesLinks(
 				liveGroup, publicLayoutSetPrototypeId,
 				privateLayoutSetPrototypeId,
