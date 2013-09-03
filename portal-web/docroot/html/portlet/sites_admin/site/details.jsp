@@ -45,7 +45,7 @@ if (showPrototypes && (group != null)) {
 		if (Validator.isNotNull(layoutSetPrototypeUuid)) {
 			privateLayoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypeByUuidAndCompanyId(layoutSetPrototypeUuid, company.getCompanyId());
 		}
-		else if (liveGroup.isStaged()) {
+		else if (liveGroup.isStaged() && !liveGroup.isStagedRemotely()) {
 			privateLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(liveGroup.getStagingGroup().getGroupId(), true);
 
 			privateLayoutSetPrototypeLinkEnabled = privateLayoutSet.isLayoutSetPrototypeLinkEnabled();
@@ -72,7 +72,7 @@ if (showPrototypes && (group != null)) {
 		if (Validator.isNotNull(layoutSetPrototypeUuid)) {
 			publicLayoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypeByUuidAndCompanyId(layoutSetPrototypeUuid, company.getCompanyId());
 		}
-		else if (liveGroup.isStaged()) {
+		else if (liveGroup.isStaged() && !liveGroup.isStagedRemotely()) {
 			publicLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(liveGroup.getStagingGroup().getGroupId(), false);
 
 			publicLayoutSetPrototypeLinkEnabled = publicLayoutSet.isLayoutSetPrototypeLinkEnabled();
