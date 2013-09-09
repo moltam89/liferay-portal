@@ -993,14 +993,31 @@ public class PortalUtil {
 			long groupId, boolean privateLayout, String portletId)
 		throws PortalException, SystemException {
 
+		return getPlidFromPortletId(groupId, privateLayout, portletId, null);
+	}
+
+	public static long getPlidFromPortletId(
+			long groupId, boolean privateLayout, String portletId,
+			PlidPortletMatcher plidPortletMatcher)
+		throws PortalException, SystemException {
+
 		return getPortal().getPlidFromPortletId(
-			groupId, privateLayout, portletId);
+			groupId, privateLayout, portletId, plidPortletMatcher);
 	}
 
 	public static long getPlidFromPortletId(long groupId, String portletId)
 		throws PortalException, SystemException {
 
-		return getPortal().getPlidFromPortletId(groupId, portletId);
+		return getPlidFromPortletId(groupId, portletId, null);
+	}
+
+	public static long getPlidFromPortletId(
+			long groupId, String portletId,
+			PlidPortletMatcher plidPortletMatcher)
+		throws PortalException, SystemException {
+
+		return getPortal().getPlidFromPortletId(
+			groupId, portletId, plidPortletMatcher);
 	}
 
 	public static Portal getPortal() {

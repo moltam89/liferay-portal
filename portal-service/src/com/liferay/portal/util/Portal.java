@@ -872,7 +872,17 @@ public interface Portal {
 			long groupId, boolean privateLayout, String portletId)
 		throws PortalException, SystemException;
 
+	public long getPlidFromPortletId(
+			long groupId, boolean privateLayout, String portletId,
+			PlidPortletMatcher plidPortletMatcher)
+		throws PortalException, SystemException;
+
 	public long getPlidFromPortletId(long groupId, String portletId)
+		throws PortalException, SystemException;
+
+	public long getPlidFromPortletId(
+			long groupId, String portletId,
+			PlidPortletMatcher plidPortletMatcher)
 		throws PortalException, SystemException;
 
 	public String getPortalLibDir();

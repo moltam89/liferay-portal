@@ -3672,9 +3672,18 @@ public class PortalImpl implements Portal {
 			long groupId, boolean privateLayout, String portletId)
 		throws PortalException, SystemException {
 
+		return getPlidFromPortletId(groupId, privateLayout, portletId, null);
+	}
+
+	@Override
+	public long getPlidFromPortletId(
+			long groupId, boolean privateLayout, String portletId,
+			PlidPortletMatcher plidPortletMatcher)
+		throws PortalException, SystemException {
+
 		long plid = LayoutConstants.DEFAULT_PLID;
 
-		StringBundler sb = new StringBundler(5);
+		StringBundler sb = new StringBundler(7);
 
 		sb.append(groupId);
 		sb.append(StringPool.SPACE);
@@ -3682,12 +3691,18 @@ public class PortalImpl implements Portal {
 		sb.append(StringPool.SPACE);
 		sb.append(portletId);
 
+		if (plidPortletMatcher != null) {
+			sb.append(StringPool.SPACE);
+			sb.append(plidPortletMatcher.getCacheKey());
+		}
+
 		String key = sb.toString();
 
 		Long plidObj = _plidToPortletIdMap.get(key);
 
 		if (plidObj == null) {
-			plid = doGetPlidFromPortletId(groupId, privateLayout, portletId);
+			plid = doGetPlidFromPortletId(
+				groupId, privateLayout, portletId, plidPortletMatcher);
 
 			if (plid != LayoutConstants.DEFAULT_PLID) {
 				_plidToPortletIdMap.put(key, plid);
@@ -3717,7 +3732,7 @@ public class PortalImpl implements Portal {
 				_plidToPortletIdMap.remove(key);
 
 				plid = doGetPlidFromPortletId(
-					groupId, privateLayout, portletId);
+					groupId, privateLayout, portletId, plidPortletMatcher);
 
 				if (plid != LayoutConstants.DEFAULT_PLID) {
 					_plidToPortletIdMap.put(key, plid);
@@ -3732,10 +3747,21 @@ public class PortalImpl implements Portal {
 	public long getPlidFromPortletId(long groupId, String portletId)
 		throws PortalException, SystemException {
 
-		long plid = getPlidFromPortletId(groupId, false, portletId);
+		return getPlidFromPortletId(groupId, portletId, null);
+	}
+
+	@Override
+	public long getPlidFromPortletId(
+			long groupId, String portletId,
+			PlidPortletMatcher plidPortletMatcher)
+		throws PortalException, SystemException {
+
+		long plid = getPlidFromPortletId(
+			groupId, false, portletId, plidPortletMatcher);
 
 		if (plid == LayoutConstants.DEFAULT_PLID) {
-			plid = getPlidFromPortletId(groupId, true, portletId);
+			plid = getPlidFromPortletId(
+				groupId, true, portletId, plidPortletMatcher);
 		}
 
 		if (plid == LayoutConstants.DEFAULT_PLID) {
@@ -6919,7 +6945,8 @@ public class PortalImpl implements Portal {
 	}
 
 	protected long doGetPlidFromPortletId(
-			long groupId, boolean privateLayout, String portletId)
+			long groupId, boolean privateLayout, String portletId,
+			PlidPortletMatcher plidPortletMatcher)
 		throws PortalException, SystemException {
 
 		long scopeGroupId = groupId;
@@ -6946,7 +6973,10 @@ public class PortalImpl implements Portal {
 			LayoutTypePortlet layoutTypePortlet =
 				(LayoutTypePortlet)layout.getLayoutType();
 
-			if (layoutTypePortlet.hasPortletId(portletId)) {
+			if (layoutTypePortlet.hasPortletId(portletId) &&
+				((plidPortletMatcher == null) ||
+				 plidPortletMatcher.valid(layout, portletId))) {
+
 				if (getScopeGroupId(layout, portletId) == scopeGroupId) {
 					plid = layout.getPlid();
 
