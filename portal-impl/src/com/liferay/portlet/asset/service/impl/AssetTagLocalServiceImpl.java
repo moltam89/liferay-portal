@@ -25,8 +25,10 @@ import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.model.Group;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.User;
+import com.liferay.portal.security.auth.CompanyThreadLocal;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
@@ -167,22 +169,68 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 	public void checkTags(long userId, long groupId, String[] names)
 		throws PortalException, SystemException {
 
+		checkTags(userId, groupId, names, false);
+	}
+
+	@Override
+	public List<AssetTag> checkTags(
+			long userId, long groupId, String[] names, boolean checkGlobal)
+		throws PortalException, SystemException {
+
+		List<AssetTag> tags = new ArrayList<AssetTag>();
+
 		for (String name : names) {
+			AssetTag tag = null;
+
 			try {
-				getTag(groupId, name);
+				tag = getTag(groupId, name);
 			}
 			catch (NoSuchTagException nste) {
+				List<AssetTagProperty> tagProperties = null;
+
+				if (checkGlobal) {
+					try {
+						Group companyGroup =
+							groupLocalService.getCompanyGroup(
+								CompanyThreadLocal.getCompanyId());
+
+						tag = getTag(companyGroup.getGroupId(), name);
+
+						tagProperties =
+							assetTagPropertyLocalService.getTagProperties(
+								tag.getTagId());
+					}
+					catch (Exception e) {
+					}
+				}
+
 				ServiceContext serviceContext = new ServiceContext();
 
 				serviceContext.setAddGroupPermissions(true);
 				serviceContext.setAddGuestPermissions(true);
 				serviceContext.setScopeGroupId(groupId);
 
-				addTag(
+				tag = addTag(
 					userId, name, PropsValues.ASSET_TAG_PROPERTIES_DEFAULT,
 					serviceContext);
+
+				// Properties
+
+				if (tagProperties != null) {
+					for (AssetTagProperty tagProperty : tagProperties) {
+						assetTagPropertyLocalService.addTagProperty(
+							userId, tag.getTagId(), tagProperty.getKey(),
+							tagProperty.getValue());
+					}
+				}
+			}
+
+			if (tag != null) {
+				tags.add(tag);
 			}
 		}
+
+		return tags;
 	}
 
 	@Override
