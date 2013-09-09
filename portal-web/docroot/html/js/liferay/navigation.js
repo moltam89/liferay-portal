@@ -685,9 +685,11 @@ AUI.add(
 								newPriority = previousPriority;
 							}
 
-							dragNode.setData(STR_LAYOUT_PRIORITY, newPriority);
+							if (oldPriority != newPriority) {
+								dragNode.setData(STR_LAYOUT_PRIORITY, newPriority);
 
-							instance._saveSortables(dragNode);
+								instance._saveSortables(dragNode);
+							}
 						}
 					);
 
