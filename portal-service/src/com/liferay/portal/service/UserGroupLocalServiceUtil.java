@@ -830,6 +830,13 @@ public class UserGroupLocalServiceUtil {
 		return getService().fetchUserGroup(companyId, name);
 	}
 
+	public static java.util.List<com.liferay.portal.model.UserGroup> getRoleUserGroups(
+		long roleId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().getRoleUserGroups(roleId);
+	}
+
 	/**
 	* Returns the user group with the name.
 	*

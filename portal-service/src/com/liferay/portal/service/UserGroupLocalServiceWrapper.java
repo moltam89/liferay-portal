@@ -893,6 +893,14 @@ public class UserGroupLocalServiceWrapper implements UserGroupLocalService,
 		return _userGroupLocalService.fetchUserGroup(companyId, name);
 	}
 
+	@Override
+	public java.util.List<com.liferay.portal.model.UserGroup> getRoleUserGroups(
+		long roleId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _userGroupLocalService.getRoleUserGroups(roleId);
+	}
+
 	/**
 	* Returns the user group with the name.
 	*
