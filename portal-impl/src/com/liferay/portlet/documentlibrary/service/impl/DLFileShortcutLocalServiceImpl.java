@@ -390,7 +390,7 @@ public class DLFileShortcutLocalServiceImpl
 
 		assetTagLocalService.checkTags(
 			serviceContext.getUserId(), serviceContext.getScopeGroupId(),
-			assetTagNames);
+			assetTagNames, true);
 
 		serviceContext.setAssetTagNames(assetTagNames);
 	}
