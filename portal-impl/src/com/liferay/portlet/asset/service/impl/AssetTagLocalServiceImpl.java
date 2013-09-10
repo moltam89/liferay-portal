@@ -221,24 +221,6 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 				tag = getTag(groupId, name);
 			}
 			catch (NoSuchTagException nste) {
-				List<AssetTagProperty> tagProperties = null;
-
-				if (checkGlobal) {
-					try {
-						Group companyGroup =
-							groupLocalService.getCompanyGroup(
-								CompanyThreadLocal.getCompanyId());
-
-						tag = getTag(companyGroup.getGroupId(), name);
-
-						tagProperties =
-							assetTagPropertyLocalService.getTagProperties(
-								tag.getTagId());
-					}
-					catch (Exception e) {
-					}
-				}
-
 				ServiceContext serviceContext = new ServiceContext();
 
 				serviceContext.setAddGroupPermissions(true);
@@ -251,11 +233,26 @@ public class AssetTagLocalServiceImpl extends AssetTagLocalServiceBaseImpl {
 
 				// Properties
 
-				if (tagProperties != null) {
-					for (AssetTagProperty tagProperty : tagProperties) {
-						assetTagPropertyLocalService.addTagProperty(
-							userId, tag.getTagId(), tagProperty.getKey(),
-							tagProperty.getValue());
+				if (checkGlobal) {
+					Group companyGroup =
+						groupLocalService.getCompanyGroup(
+							CompanyThreadLocal.getCompanyId());
+
+					try {
+						AssetTag globalTag = getTag(
+							companyGroup.getGroupId(), name);
+
+						List<AssetTagProperty> tagProperties =
+							assetTagPropertyLocalService.getTagProperties(
+								globalTag.getTagId());
+
+						for (AssetTagProperty tagProperty : tagProperties) {
+							assetTagPropertyLocalService.addTagProperty(
+								userId, tag.getTagId(), tagProperty.getKey(),
+								tagProperty.getValue());
+						}
+					}
+					catch (NoSuchTagException nste2) {
 					}
 				}
 			}

@@ -655,9 +655,7 @@ public class AssetEntryLocalServiceImpl extends AssetEntryLocalServiceBaseImpl {
 		if (tagNames != null) {
 			long siteGroupId = PortalUtil.getSiteGroupId(groupId);
 
-			List<AssetTag> tags = new ArrayList<AssetTag>(tagNames.length);
-
-			tags = assetTagLocalService.checkTags(
+			List<AssetTag> tags = assetTagLocalService.checkTags(
 				userId, siteGroupId, tagNames, true);
 
 			List<AssetTag> oldTags = assetEntryPersistence.getAssetTags(
