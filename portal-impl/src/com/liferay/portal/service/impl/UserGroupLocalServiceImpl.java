@@ -421,6 +421,21 @@ public class UserGroupLocalServiceImpl extends UserGroupLocalServiceBaseImpl {
 		return userGroupPersistence.fetchByC_N(companyId, name);
 	}
 
+	@Override
+	public List<UserGroup> getRoleUserGroups(long roleId)
+		throws PortalException, SystemException {
+
+		List<UserGroup> userGroups = new ArrayList<UserGroup>();
+
+		for (Group group : groupLocalService.getRoleGroups(roleId)) {
+			if (group.getClassName().equals(UserGroup.class.getName())) {
+				userGroups.add(getUserGroup(group.getClassPK()));
+			}
+		}
+
+		return userGroups;
+	}
+
 	/**
 	 * Returns the user group with the name.
 	 *
