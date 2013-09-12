@@ -8,9 +8,11 @@ AUI.add(
 
 		var STATUS_CODE = Liferay.STATUS_CODE;
 
+		var STR_EMPTY = '';
+
 		var STR_LAYOUT_ID = 'layoutId';
 
-		var STR_EMPTY = '';
+		var STR_LAYOUT_PRIORITY = 'priority';
 
 		var TPL_EDITOR = '<div class="add-page-editor"><div class="input-append"></div></div>';
 
@@ -123,6 +125,7 @@ AUI.add(
 
 									if (layoutConfig) {
 										item.setData(STR_LAYOUT_ID, layoutConfig.id);
+										item.setData(STR_LAYOUT_PRIORITY, layoutConfig.priority);
 
 										if (layoutConfig.deletable) {
 											cssClassBuffer.push('lfr-nav-deletable');
@@ -838,19 +841,32 @@ AUI.add(
 			function(node) {
 				var instance = this;
 
-				var navItems = instance.get('navBlock').all('li');
+				var oldPriority = node.getData(STR_LAYOUT_PRIORITY);
 
-				var priority = -1;
+				var newPriority = oldPriority;
 
-				navItems.some(
-					function(item, index, collection) {
-						if (!item.ancestor().hasClass('child-menu')) {
-							priority++;
-						}
+				var nextPriority;
 
-						return item == node;
-					}
-				);
+				var nextNode = node.next();
+
+				if (nextNode) {
+					nextPriority = nextNode.getData(STR_LAYOUT_PRIORITY);
+				}
+
+				var previousPriority;
+
+				var previousNode = node.previous();
+
+				if (previousNode) {
+					previousPriority = previousNode.getData(STR_LAYOUT_PRIORITY);
+				}
+
+				if (nextNode && (oldPriority > nextPriority)) {
+					newPriority = nextPriority;
+				}
+				else if (previousNode && (oldPriority < previousPriority)) {
+					newPriority = previousPriority;
+				}
 
 				var data = {
 					cmd: 'priority',
@@ -858,7 +874,7 @@ AUI.add(
 					groupId: themeDisplay.getSiteGroupId(),
 					layoutId: node.getData(STR_LAYOUT_ID),
 					p_auth: Liferay.authToken,
-					priority: priority,
+					priority: newPriority,
 					privateLayout: themeDisplay.isPrivateLayout()
 				};
 
