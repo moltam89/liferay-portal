@@ -8,9 +8,11 @@ AUI.add(
 
 		var STATUS_CODE = Liferay.STATUS_CODE;
 
+		var STR_EMPTY = '';
+
 		var STR_LAYOUT_ID = 'layoutId';
 
-		var STR_EMPTY = '';
+		var STR_LAYOUT_PRIORITY = 'priority';
 
 		var TPL_EDITOR = '<div class="add-page-editor"><div class="input-append"></div></div>';
 
@@ -123,6 +125,7 @@ AUI.add(
 
 									if (layoutConfig) {
 										item.setData(STR_LAYOUT_ID, layoutConfig.id);
+										item.setData(STR_LAYOUT_PRIORITY, layoutConfig.priority);
 
 										if (layoutConfig.deletable) {
 											cssClassBuffer.push('lfr-nav-deletable');
@@ -655,7 +658,38 @@ AUI.add(
 						function(event) {
 							var dragNode = event.target.get('node');
 
-							instance._saveSortables(dragNode);
+							var oldPriority = dragNode.getData(STR_LAYOUT_PRIORITY);
+
+							var newPriority = oldPriority;
+
+							var nextPriority;
+
+							var nextNode = dragNode.next();
+
+							if (nextNode) {
+								nextPriority = nextNode.getData(STR_LAYOUT_PRIORITY);
+							}
+
+							var previousPriority;
+
+							var previousNode = dragNode.previous();
+
+							if (previousNode) {
+								previousPriority = previousNode.getData(STR_LAYOUT_PRIORITY);
+							}
+
+							if (nextNode && (oldPriority > nextPriority)) {
+								newPriority = nextPriority;
+							}
+							else if (previousNode && (oldPriority < previousPriority)) {
+								newPriority = previousPriority;
+							}
+
+							if (oldPriority != newPriority) {
+								dragNode.setData(STR_LAYOUT_PRIORITY, newPriority);
+
+								instance._saveSortables(dragNode);
+							}
 						}
 					);
 
@@ -838,27 +872,13 @@ AUI.add(
 			function(node) {
 				var instance = this;
 
-				var navItems = instance.get('navBlock').all('li');
-
-				var priority = -1;
-
-				navItems.some(
-					function(item, index, collection) {
-						if (!item.ancestor().hasClass('child-menu')) {
-							priority++;
-						}
-
-						return item == node;
-					}
-				);
-
 				var data = {
 					cmd: 'priority',
 					doAsUserId: themeDisplay.getDoAsUserIdEncoded(),
 					groupId: themeDisplay.getSiteGroupId(),
 					layoutId: node.getData(STR_LAYOUT_ID),
 					p_auth: Liferay.authToken,
-					priority: priority,
+					priority: node.getData(STR_LAYOUT_PRIORITY),
 					privateLayout: themeDisplay.isPrivateLayout()
 				};
 
