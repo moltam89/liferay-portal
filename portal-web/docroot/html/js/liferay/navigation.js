@@ -885,6 +885,8 @@ AUI.add(
 				};
 
 				var processMovePageSuccess = function(result) {
+					node.setData(STR_LAYOUT_PRIORITY, newPriority);
+
 					Liferay.fire(
 						'navigation',
 						{
