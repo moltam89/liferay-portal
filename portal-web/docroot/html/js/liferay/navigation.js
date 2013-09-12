@@ -868,62 +868,64 @@ AUI.add(
 					newPriority = previousPriority;
 				}
 
-				var data = {
-					cmd: 'priority',
-					doAsUserId: themeDisplay.getDoAsUserIdEncoded(),
-					groupId: themeDisplay.getSiteGroupId(),
-					layoutId: node.getData(STR_LAYOUT_ID),
-					p_auth: Liferay.authToken,
-					priority: newPriority,
-					privateLayout: themeDisplay.isPrivateLayout()
-				};
+				if (newPriority != oldPriority) {
+					var data = {
+						cmd: 'priority',
+						doAsUserId: themeDisplay.getDoAsUserIdEncoded(),
+						groupId: themeDisplay.getSiteGroupId(),
+						layoutId: node.getData(STR_LAYOUT_ID),
+						p_auth: Liferay.authToken,
+						priority: newPriority,
+						privateLayout: themeDisplay.isPrivateLayout()
+					};
 
-				var processMovePageFailure = function(result) {
-					instance._displayNotice(result.message);
+					var processMovePageFailure = function(result) {
+						instance._displayNotice(result.message);
 
-					node.ancestor().insertBefore(node, instance._nextPageNode);
-				};
+						node.ancestor().insertBefore(node, instance._nextPageNode);
+					};
 
-				var processMovePageSuccess = function(result) {
-					node.setData(STR_LAYOUT_PRIORITY, newPriority);
+					var processMovePageSuccess = function(result) {
+						node.setData(STR_LAYOUT_PRIORITY, newPriority);
 
-					Liferay.fire(
-						'navigation',
+						Liferay.fire(
+							'navigation',
+							{
+								item: node.getDOM(),
+								type: 'sort'
+							}
+						);
+					};
+
+					A.io.request(
+						instance._updateURL,
 						{
-							item: node.getDOM(),
-							type: 'sort'
-						}
-					);
-				};
+							data: data,
+							dataType: 'json',
+							on: {
+								failure: function() {
+									processMovePageFailure(
+										{
+											message: Liferay.Language.get('your-request-failed-to-complete'),
+											status: STATUS_CODE.BAD_REQUEST
+										}
+									);
+								},
+								success: function(event, id, obj) {
+									var result = this.get('responseData');
 
-				A.io.request(
-					instance._updateURL,
-					{
-						data: data,
-						dataType: 'json',
-						on: {
-							failure: function() {
-								processMovePageFailure(
-									{
-										message: Liferay.Language.get('your-request-failed-to-complete'),
-										status: STATUS_CODE.BAD_REQUEST
+									var movePageFn = processMovePageFailure;
+
+									if (result.status === STATUS_CODE.OK) {
+										movePageFn = processMovePageSuccess;
 									}
-								);
-							},
-							success: function(event, id, obj) {
-								var result = this.get('responseData');
 
-								var movePageFn = processMovePageFailure;
-
-								if (result.status === STATUS_CODE.OK) {
-									movePageFn = processMovePageSuccess;
+									movePageFn(result);
 								}
-
-								movePageFn(result);
 							}
 						}
-					}
-				);
+					);
+				}
 			},
 			['aui-io-request'],
 			true
