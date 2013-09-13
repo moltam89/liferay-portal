@@ -348,6 +348,9 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 					<portlet:namespace />entryId: document.<portlet:namespace />fm.<portlet:namespace />entryId.value,
 					<portlet:namespace />redirect: document.<portlet:namespace />fm.<portlet:namespace />redirect.value,
 					<portlet:namespace />referringPortletResource: document.<portlet:namespace />fm.<portlet:namespace />referringPortletResource.value,
+					<portlet:namespace />smallFile: document.<portlet:namespace />fm.<portlet:namespace />smallFile.value,
+					<portlet:namespace />smallImage: document.<portlet:namespace />fm.<portlet:namespace />smallImage.value,
+					<portlet:namespace />smallImageURL: document.<portlet:namespace />fm.<portlet:namespace />smallImageURL.value,
 					<portlet:namespace />title: title,
 					<portlet:namespace />workflowAction: <%= WorkflowConstants.ACTION_SAVE_DRAFT %>
 				};
