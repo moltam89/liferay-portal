@@ -57,6 +57,8 @@ import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.portlet.blogs.service.BlogsEntryServiceUtil;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 import java.util.Calendar;
@@ -469,70 +471,59 @@ public class EditEntryAction extends PortletAction {
 	protected Object[] updateEntry(ActionRequest actionRequest)
 		throws Exception {
 
-		long entryId = ParamUtil.getLong(actionRequest, "entryId");
+		UploadPortletRequest uploadPortletRequest =
+			PortalUtil.getUploadPortletRequest(actionRequest);
 
-		String title = ParamUtil.getString(actionRequest, "title");
-		String description = ParamUtil.getString(actionRequest, "description");
-		String content = ParamUtil.getString(actionRequest, "content");
+		long entryId = ParamUtil.getLong(uploadPortletRequest, "entryId");
+
+		String title = ParamUtil.getString(uploadPortletRequest, "title");
+		String description = ParamUtil.getString(
+			uploadPortletRequest, "description");
+		String content = ParamUtil.getString(uploadPortletRequest, "content");
 
 		int displayDateMonth = ParamUtil.getInteger(
-			actionRequest, "displayDateMonth");
+			uploadPortletRequest, "displayDateMonth");
 		int displayDateDay = ParamUtil.getInteger(
-			actionRequest, "displayDateDay");
+			uploadPortletRequest, "displayDateDay");
 		int displayDateYear = ParamUtil.getInteger(
-			actionRequest, "displayDateYear");
+			uploadPortletRequest, "displayDateYear");
 		int displayDateHour = ParamUtil.getInteger(
-			actionRequest, "displayDateHour");
+			uploadPortletRequest, "displayDateHour");
 		int displayDateMinute = ParamUtil.getInteger(
-			actionRequest, "displayDateMinute");
+			uploadPortletRequest, "displayDateMinute");
 		int displayDateAmPm = ParamUtil.getInteger(
-			actionRequest, "displayDateAmPm");
+			uploadPortletRequest, "displayDateAmPm");
 
 		if (displayDateAmPm == Calendar.PM) {
 			displayDateHour += 12;
 		}
 
 		boolean allowPingbacks = ParamUtil.getBoolean(
-			actionRequest, "allowPingbacks");
+			uploadPortletRequest, "allowPingbacks");
 		boolean allowTrackbacks = ParamUtil.getBoolean(
-			actionRequest, "allowTrackbacks");
+			uploadPortletRequest, "allowTrackbacks");
 		String[] trackbacks = StringUtil.split(
-			ParamUtil.getString(actionRequest, "trackbacks"));
+			ParamUtil.getString(uploadPortletRequest, "trackbacks"));
 
-		boolean smallImage = false;
-		String smallImageURL = null;
-		String smallImageFileName = null;
+		File smallFile = uploadPortletRequest.getFile("smallFile");
+		boolean smallImage = ParamUtil.getBoolean(
+			uploadPortletRequest, "smallImage");
 		InputStream smallImageInputStream = null;
+		String smallImageFileName = null;
+		String smallImageURL = ParamUtil.getString(
+			uploadPortletRequest, "smallImageURL");
 
 		BlogsEntry entry = null;
 		String oldUrlTitle = null;
 
 		try {
-			boolean ajax = ParamUtil.getBoolean(actionRequest, "ajax");
-
-			if (!ajax) {
-				smallImage = ParamUtil.getBoolean(actionRequest, "smallImage");
-				smallImageURL = ParamUtil.getString(
-					actionRequest, "smallImageURL");
-
-				if (smallImage && Validator.isNull(smallImageURL)) {
-					boolean attachments = ParamUtil.getBoolean(
-						actionRequest, "attachments");
-
-					if (attachments) {
-						UploadPortletRequest uploadPortletRequest =
-							PortalUtil.getUploadPortletRequest(actionRequest);
-
-						smallImageFileName = uploadPortletRequest.getFileName(
-							"smallFile");
-						smallImageInputStream =
-							uploadPortletRequest.getFileAsStream("smallFile");
-					}
-				}
+			if ((smallFile != null) && smallFile.exists()) {
+				smallImageFileName = smallFile.getName();
+				smallImageInputStream = new FileInputStream(smallFile);
 			}
 
 			ServiceContext serviceContext = ServiceContextFactory.getInstance(
-				BlogsEntry.class.getName(), actionRequest);
+				BlogsEntry.class.getName(), uploadPortletRequest);
 
 			entry = null;
 			oldUrlTitle = StringPool.BLANK;

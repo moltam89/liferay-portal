@@ -47,13 +47,12 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 	<portlet:param name="struts_action" value="/blogs/edit_entry" />
 </portlet:actionURL>
 
-<aui:form action="<%= editEntryURL %>" method="post" name="fm" onSubmit="event.preventDefault();">
+<aui:form action="<%= editEntryURL %>" enctype="multipart/form-data" method="post" name="fm" onSubmit="event.preventDefault();">
 	<aui:input name="<%= Constants.CMD %>" type="hidden" />
 	<aui:input name="redirect" type="hidden" value="<%= redirect %>" />
 	<aui:input name="backURL" type="hidden" value="<%= backURL %>" />
 	<aui:input name="referringPortletResource" type="hidden" value="<%= referringPortletResource %>" />
 	<aui:input name="entryId" type="hidden" value="<%= entryId %>" />
-	<aui:input name="attachments" type="hidden" />
 	<aui:input name="preview" type="hidden" value="<%= false %>" />
 	<aui:input name="workflowAction" type="hidden" value="<%= WorkflowConstants.ACTION_PUBLISH %>" />
 
@@ -293,11 +292,6 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 		return "<%= UnicodeFormatter.toString(content) %>";
 	}
 
-	function <portlet:namespace />manageAttachments() {
-		document.<portlet:namespace />fm.encoding = "multipart/form-data";
-		document.<portlet:namespace />fm.<portlet:namespace />attachments.value = "true";
-	}
-
 	function <portlet:namespace />previewEntry() {
 		document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = "<%= (entry == null) ? Constants.ADD : Constants.UPDATE %>";
 		document.<portlet:namespace />fm.<portlet:namespace />preview.value = "true";
@@ -354,6 +348,9 @@ boolean showHeader = ParamUtil.getBoolean(request, "showHeader", true);
 					<portlet:namespace />entryId: document.<portlet:namespace />fm.<portlet:namespace />entryId.value,
 					<portlet:namespace />redirect: document.<portlet:namespace />fm.<portlet:namespace />redirect.value,
 					<portlet:namespace />referringPortletResource: document.<portlet:namespace />fm.<portlet:namespace />referringPortletResource.value,
+					<portlet:namespace />smallFile: document.<portlet:namespace />fm.<portlet:namespace />smallFile.value,
+					<portlet:namespace />smallImage: document.<portlet:namespace />fm.<portlet:namespace />smallImage.value,
+					<portlet:namespace />smallImageURL: document.<portlet:namespace />fm.<portlet:namespace />smallImageURL.value,
 					<portlet:namespace />title: title,
 					<portlet:namespace />workflowAction: <%= WorkflowConstants.ACTION_SAVE_DRAFT %>
 				};
