@@ -8,9 +8,11 @@ AUI.add(
 
 		var STATUS_CODE = Liferay.STATUS_CODE;
 
+		var STR_EMPTY = '';
+
 		var STR_LAYOUT_ID = 'layoutId';
 
-		var STR_EMPTY = '';
+		var STR_LAYOUT_PRIORITY = 'priority';
 
 		var TPL_EDITOR = '<div class="add-page-editor"><div class="input-append"></div></div>';
 
@@ -123,6 +125,7 @@ AUI.add(
 
 									if (layoutConfig) {
 										item.setData(STR_LAYOUT_ID, layoutConfig.id);
+										item.setData(STR_LAYOUT_PRIORITY, layoutConfig.priority);
 
 										if (layoutConfig.deletable) {
 											cssClassBuffer.push('lfr-nav-deletable');
@@ -838,74 +841,91 @@ AUI.add(
 			function(node) {
 				var instance = this;
 
-				var navItems = instance.get('navBlock').all('li');
+				var oldPriority = node.getData(STR_LAYOUT_PRIORITY);
 
-				var priority = -1;
+				var newPriority = oldPriority;
 
-				navItems.some(
-					function(item, index, collection) {
-						if (!item.ancestor().hasClass('child-menu')) {
-							priority++;
-						}
+				var nextPriority;
 
-						return item == node;
-					}
-				);
+				var nextNode = node.next();
 
-				var data = {
-					cmd: 'priority',
-					doAsUserId: themeDisplay.getDoAsUserIdEncoded(),
-					groupId: themeDisplay.getSiteGroupId(),
-					layoutId: node.getData(STR_LAYOUT_ID),
-					p_auth: Liferay.authToken,
-					priority: priority,
-					privateLayout: themeDisplay.isPrivateLayout()
-				};
+				if (nextNode) {
+					nextPriority = nextNode.getData(STR_LAYOUT_PRIORITY);
+				}
 
-				var processMovePageFailure = function(result) {
-					instance._displayNotice(result.message);
+				var previousPriority;
 
-					node.ancestor().insertBefore(node, instance._nextPageNode);
-				};
+				var previousNode = node.previous();
 
-				var processMovePageSuccess = function(result) {
-					Liferay.fire(
-						'navigation',
+				if (previousNode) {
+					previousPriority = previousNode.getData(STR_LAYOUT_PRIORITY);
+				}
+
+				if (nextNode && (oldPriority > nextPriority)) {
+					newPriority = nextPriority;
+				}
+				else if (previousNode && (oldPriority < previousPriority)) {
+					newPriority = previousPriority;
+				}
+
+				if (newPriority != oldPriority) {
+					var data = {
+						cmd: 'priority',
+						doAsUserId: themeDisplay.getDoAsUserIdEncoded(),
+						groupId: themeDisplay.getSiteGroupId(),
+						layoutId: node.getData(STR_LAYOUT_ID),
+						p_auth: Liferay.authToken,
+						priority: newPriority,
+						privateLayout: themeDisplay.isPrivateLayout()
+					};
+
+					var processMovePageFailure = function(result) {
+						instance._displayNotice(result.message);
+
+						node.ancestor().insertBefore(node, instance._nextPageNode);
+					};
+
+					var processMovePageSuccess = function(result) {
+						node.setData(STR_LAYOUT_PRIORITY, newPriority);
+
+						Liferay.fire(
+							'navigation',
+							{
+								item: node.getDOM(),
+								type: 'sort'
+							}
+						);
+					};
+
+					A.io.request(
+						instance._updateURL,
 						{
-							item: node.getDOM(),
-							type: 'sort'
-						}
-					);
-				};
+							data: data,
+							dataType: 'json',
+							on: {
+								failure: function() {
+									processMovePageFailure(
+										{
+											message: Liferay.Language.get('your-request-failed-to-complete'),
+											status: STATUS_CODE.BAD_REQUEST
+										}
+									);
+								},
+								success: function(event, id, obj) {
+									var result = this.get('responseData');
 
-				A.io.request(
-					instance._updateURL,
-					{
-						data: data,
-						dataType: 'json',
-						on: {
-							failure: function() {
-								processMovePageFailure(
-									{
-										message: Liferay.Language.get('your-request-failed-to-complete'),
-										status: STATUS_CODE.BAD_REQUEST
+									var movePageFn = processMovePageFailure;
+
+									if (result.status === STATUS_CODE.OK) {
+										movePageFn = processMovePageSuccess;
 									}
-								);
-							},
-							success: function(event, id, obj) {
-								var result = this.get('responseData');
 
-								var movePageFn = processMovePageFailure;
-
-								if (result.status === STATUS_CODE.OK) {
-									movePageFn = processMovePageSuccess;
+									movePageFn(result);
 								}
-
-								movePageFn(result);
 							}
 						}
-					}
-				);
+					);
+				}
 			},
 			['aui-io-request'],
 			true
