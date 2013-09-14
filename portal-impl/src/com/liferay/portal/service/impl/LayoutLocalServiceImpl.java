@@ -2745,6 +2745,43 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		return updatePriority(layout, priority);
 	}
 
+	@Override
+	public Layout updatePriority(
+			long groupId, boolean privateLayout, long layoutId,
+			long nextLayoutId, long previousLayoutId)
+		throws PortalException, SystemException {
+
+		Layout layout = getLayout(groupId, privateLayout, layoutId);
+
+		int priority = layout.getPriority();
+
+		Layout nextLayout = null;
+
+		if (nextLayoutId > -1) {
+			nextLayout = getLayout(groupId, privateLayout, nextLayoutId);
+		}
+
+		Layout previousLayout = null;
+
+		if (previousLayoutId > -1) {
+			previousLayout = getLayout(
+				groupId, privateLayout, previousLayoutId);
+		}
+
+		if ((nextLayout != null) &&
+			(layout.getPriority() > nextLayout.getPriority())) {
+
+			priority = nextLayout.getPriority();
+		}
+		else if ((previousLayout != null) &&
+				 (layout.getPriority() < previousLayout.getPriority())) {
+
+			priority = previousLayout.getPriority();
+		}
+
+		return updatePriority(layout, priority);
+	}
+
 	/**
 	 * Updates the priority of the layout matching the primary key.
 	 *
