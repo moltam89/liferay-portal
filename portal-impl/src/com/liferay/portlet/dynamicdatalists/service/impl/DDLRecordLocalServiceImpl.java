@@ -705,6 +705,8 @@ public class DDLRecordLocalServiceImpl extends DDLRecordLocalServiceBaseImpl {
 			int displayIndex, int status, ServiceContext serviceContext)
 		throws SystemException {
 
+		recordVersion.setUserId(user.getUserId());
+		recordVersion.setUserName(user.getFullName());
 		recordVersion.setVersion(version);
 		recordVersion.setDisplayIndex(displayIndex);
 		recordVersion.setStatus(status);
