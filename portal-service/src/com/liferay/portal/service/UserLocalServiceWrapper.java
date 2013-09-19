@@ -1872,6 +1872,14 @@ public class UserLocalServiceWrapper implements UserLocalService,
 		return _userLocalService.getGroupUsersCount(groupId, status);
 	}
 
+	@Override
+	public java.util.List<com.liferay.portal.model.User> getInheritedRoleUsers(
+		long roleId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return _userLocalService.getInheritedRoleUsers(roleId);
+	}
+
 	/**
 	* Returns all the users who have not had any announcements of the type
 	* delivered, excluding the default user.
