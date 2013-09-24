@@ -156,6 +156,10 @@ public class SetupWizardUtil {
 			request, PropsKeys.JDBC_DEFAULT_PASSWORD, null);
 		String jndiName = StringPool.BLANK;
 
+		if (Validator.isNotNull(PropsValues.JDBC_DEFAULT_JNDI_NAME)) {
+			jndiName = PropsValues.JDBC_DEFAULT_JNDI_NAME;
+		}
+
 		_testConnection(driverClassName, url, userName, password, jndiName);
 	}
 
@@ -338,7 +342,9 @@ public class SetupWizardUtil {
 			String password, String jndiName)
 		throws Exception {
 
-		Class.forName(driverClassName);
+		if (Validator.isNull(jndiName)) {
+			Class.forName(driverClassName);
+		}
 
 		DataSource dataSource = null;
 		Connection connection = null;
