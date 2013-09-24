@@ -154,6 +154,7 @@ public class SetupWizardUtil {
 			request, PropsKeys.JDBC_DEFAULT_USERNAME, null);
 		String password = _getParameter(
 			request, PropsKeys.JDBC_DEFAULT_PASSWORD, null);
+
 		String jndiName = StringPool.BLANK;
 
 		if (Validator.isNotNull(PropsValues.JDBC_DEFAULT_JNDI_NAME)) {
