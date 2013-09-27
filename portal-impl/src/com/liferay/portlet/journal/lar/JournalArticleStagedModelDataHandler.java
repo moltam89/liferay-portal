@@ -644,13 +644,15 @@ public class JournalArticleStagedModelDataHandler
 		long userId = portletDataContext.getUserId(article.getUserUuid());
 
 		Element articleElement =
-				portletDataContext.getImportDataStagedModelElement(article);
+			portletDataContext.getImportDataStagedModelElement(article);
+
+		String articleResourceUuid = articleElement.attributeValue(
+			"article-resource-uuid");
 
 		JournalArticleResource existingArticleResource =
 			JournalArticleResourceLocalServiceUtil.
 				fetchJournalArticleResourceByUuidAndGroupId(
-					articleElement.attributeValue("article-resource-uuid"),
-					portletDataContext.getScopeGroupId());
+					articleResourceUuid, portletDataContext.getScopeGroupId());
 
 		if (existingArticleResource == null) {
 			return;
