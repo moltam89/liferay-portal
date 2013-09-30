@@ -43,6 +43,7 @@ import com.liferay.portal.UserPortraitTypeException;
 import com.liferay.portal.UserReminderQueryException;
 import com.liferay.portal.UserScreenNameException;
 import com.liferay.portal.UserSmsException;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.shard.ShardCallable;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -121,8 +122,12 @@ import com.liferay.portal.security.pwd.PwdAuthenticator;
 import com.liferay.portal.security.pwd.PwdToolkitUtil;
 import com.liferay.portal.security.pwd.RegExpToolkit;
 import com.liferay.portal.service.BaseServiceImpl;
+import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.UserLocalServiceBaseImpl;
+import com.liferay.portal.service.persistence.OrganizationFinderUtil;
+import com.liferay.portal.service.persistence.UserFinderUtil;
+import com.liferay.portal.service.persistence.UserGroupFinderUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
@@ -2189,6 +2194,60 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		params.put("usersGroups", new Long(groupId));
 
 		return searchCount(group.getCompanyId(), null, status, params);
+	}
+
+	@Override
+	public List<User> getInheritedRoleUsers(long roleId)
+		throws PortalException, SystemException {
+
+		List<User> users = new ArrayList<User>();
+
+		Role role = null;
+
+		try {
+			role = roleLocalService.getRole(roleId);
+		}
+		catch (NoSuchRoleException nsre) {
+			return users;
+		}
+
+		List<Long> siteIds = new ArrayList<Long>();
+
+		List<Long> orgIds = new ArrayList<Long>();
+
+		List<Long> userGroupIds = new ArrayList<Long>();
+
+		for (Group group : GroupLocalServiceUtil.getRoleGroups(roleId)) {
+			if (group.isSite()) {
+				siteIds.add(group.getClassPK());
+			}
+			else if (group.isOrganization()) {
+				orgIds.add(group.getClassPK());
+			}
+			else if (group.isUserGroup()) {
+				userGroupIds.add(group.getClassPK());
+			}
+		}
+
+		for (Organization org : getOrganizationsBySiteIds(
+				role.getCompanyId(), siteIds)) {
+
+			orgIds.add(org.getOrganizationId());
+		}
+
+		for (UserGroup userGroup : getUserGroupsBySiteIds(
+				role.getCompanyId(), siteIds)) {
+
+			userGroupIds.add(userGroup.getUserGroupId());
+		}
+
+		users.addAll(getUsersBySiteIds(role.getCompanyId(), siteIds));
+
+		users.addAll(getUsersByRootOrgIds(role.getCompanyId(), orgIds));
+
+		users.addAll(getUsersByUserGroupIds(role.getCompanyId(), userGroupIds));
+
+		return users;
 	}
 
 	/**
@@ -5495,6 +5554,37 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		return StringUtil.lowerCase(StringUtil.trim(login));
 	}
 
+	protected List<Organization> getOrganizationsBySiteIds(
+			long companyId, List<Long> siteIds)
+		throws SystemException {
+
+		LinkedHashMap<String, Object> params;
+
+		params = new LinkedHashMap<String, Object>();
+
+		params.put(
+			"organizationsGroups", siteIds.toArray(new Long[siteIds.size()]));
+
+		return OrganizationFinderUtil.findByCompanyId(
+			companyId, params, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			(OrderByComparator)null);
+	}
+
+	protected List<UserGroup> getUserGroupsBySiteIds(
+			long companyId, List<Long> siteIds)
+		throws SystemException {
+
+		LinkedHashMap<String, Object> params =
+			new LinkedHashMap<String, Object>();
+
+		params.put(
+			"userGroupsGroups", siteIds.toArray(new Long[siteIds.size()]));
+
+		return UserGroupFinderUtil.findByKeywords(
+			companyId, null, params, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+			(OrderByComparator)null);
+	}
+
 	protected long[] getUserIds(List<User> users) {
 		long[] userIds = new long[users.size()];
 
@@ -5505,6 +5595,54 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		}
 
 		return userIds;
+	}
+
+	protected List<User> getUsersByRootOrgIds(long companyId, List<Long> orgIds)
+		throws PortalException, SystemException {
+
+		List<Organization> orgs =
+			organizationLocalService.getOrganizations(
+				ArrayUtil.toLongArray(orgIds));
+
+		LinkedHashMap<String, Object> params =
+			new LinkedHashMap<String, Object>();
+
+		params.put("usersOrgsTree", orgs);
+
+		return UserFinderUtil.findByKeywords(
+			companyId, null, WorkflowConstants.STATUS_APPROVED, params,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, (OrderByComparator)null);
+	}
+
+	protected List<User> getUsersBySiteIds(long companyId, List<Long> siteIds)
+		throws SystemException {
+
+		LinkedHashMap<String, Object> params;
+
+		params = new LinkedHashMap<String, Object>();
+
+		params.put("usersGroups", siteIds.toArray(new Long[siteIds.size()]));
+
+		return UserFinderUtil.findByKeywords(
+			companyId, null, WorkflowConstants.STATUS_APPROVED, params,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, (OrderByComparator)null);
+	}
+
+	protected List<User> getUsersByUserGroupIds(
+			long companyId, List<Long> userGroupIds)
+		throws SystemException {
+
+		LinkedHashMap<String, Object> params;
+
+		params = new LinkedHashMap<String, Object>();
+
+		params.put(
+			"usersUserGroups",
+			userGroupIds.toArray(new Long[userGroupIds.size()]));
+
+		return UserFinderUtil.findByKeywords(
+			companyId, null, WorkflowConstants.STATUS_APPROVED, params,
+			QueryUtil.ALL_POS, QueryUtil.ALL_POS, (OrderByComparator)null);
 	}
 
 	protected void reindex(final User user) {
