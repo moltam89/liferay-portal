@@ -537,32 +537,31 @@ public class JournalArticleStagedModelDataHandler
 			String articleResourceUuid = articleElement.attributeValue(
 				"article-resource-uuid");
 
+			JournalArticleResource articleResource =
+				JournalArticleResourceLocalServiceUtil.
+					fetchJournalArticleResourceByUuidAndGroupId(
+						articleResourceUuid,
+						portletDataContext.getScopeGroupId());
+
+			serviceContext.setUuid(articleResourceUuid);
+			serviceContext.setAttribute("urlTitle", article.getUrlTitle());
+
+			JournalArticle existingArticle = null;
+
+			if (articleResource != null) {
+				existingArticle =
+					JournalArticleLocalServiceUtil.fetchLatestArticle(
+						articleResource.getResourcePrimKey(),
+						WorkflowConstants.STATUS_ANY, false);
+			}
+
+			if (existingArticle == null) {
+				existingArticle = JournalArticleLocalServiceUtil.fetchArticle(
+					portletDataContext.getScopeGroupId(), newArticleId,
+					article.getVersion());
+			}
+
 			if (portletDataContext.isDataStrategyMirror()) {
-				JournalArticleResource articleResource =
-					JournalArticleResourceLocalServiceUtil.
-						fetchJournalArticleResourceByUuidAndGroupId(
-							articleResourceUuid,
-							portletDataContext.getScopeGroupId());
-
-				serviceContext.setUuid(articleResourceUuid);
-				serviceContext.setAttribute("urlTitle", article.getUrlTitle());
-
-				JournalArticle existingArticle = null;
-
-				if (articleResource != null) {
-					existingArticle =
-						JournalArticleLocalServiceUtil.fetchLatestArticle(
-							articleResource.getResourcePrimKey(),
-							WorkflowConstants.STATUS_ANY, false);
-				}
-
-				if (existingArticle == null) {
-					existingArticle =
-						JournalArticleLocalServiceUtil.fetchArticle(
-							portletDataContext.getScopeGroupId(), newArticleId,
-							article.getVersion());
-				}
-
 				if (existingArticle == null) {
 					importedArticle =
 						JournalArticleLocalServiceUtil.addArticle(
@@ -605,6 +604,11 @@ public class JournalArticleStagedModelDataHandler
 				}
 			}
 			else {
+				if (existingArticle != null) {
+					articleId = StringPool.BLANK;
+					autoArticleId = true;
+				}
+
 				importedArticle = JournalArticleLocalServiceUtil.addArticle(
 					userId, portletDataContext.getScopeGroupId(), folderId,
 					article.getClassNameId(), ddmStructureId, articleId,
