@@ -43,6 +43,7 @@ import com.liferay.portal.UserPortraitTypeException;
 import com.liferay.portal.UserReminderQueryException;
 import com.liferay.portal.UserScreenNameException;
 import com.liferay.portal.UserSmsException;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.dao.shard.ShardCallable;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
@@ -123,6 +124,7 @@ import com.liferay.portal.security.pwd.RegExpToolkit;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.UserLocalServiceBaseImpl;
+import com.liferay.portal.service.persistence.UserFinderUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
@@ -2189,6 +2191,36 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		params.put("usersGroups", new Long(groupId));
 
 		return searchCount(group.getCompanyId(), null, status, params);
+	}
+
+	@Override
+	public List<User> getInheritedRoleUsers(long roleId)
+		throws PortalException, SystemException {
+
+		List<User> users = new ArrayList<User>();
+
+		Role role = null;
+
+		try {
+			role = roleLocalService.getRole(roleId);
+		}
+		catch (NoSuchRoleException nsre) {
+			return users;
+		}
+
+		LinkedHashMap<String, Object> params =
+			new LinkedHashMap<String, Object>();
+
+		params.put("usersRoles", roleId);
+		params.put("inherit", Boolean.TRUE);
+
+		users.addAll(
+			UserFinderUtil.findByKeywords(
+				role.getCompanyId(), null, WorkflowConstants.STATUS_APPROVED,
+				params, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+				(OrderByComparator)null));
+
+		return users;
 	}
 
 	/**
