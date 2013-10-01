@@ -140,6 +140,9 @@ Group scopeGroup = themeDisplay.getScopeGroup();
 	function <portlet:namespace />openFileEntryTypeView() {
 		Liferay.Util.openWindow(
 			{
+				dialog: {
+					zIndex: (++Liferay.zIndex.WINDOW)
+				},
 				id: '<portlet:namespace />openFileEntryTypeView',
 				title: '<%= UnicodeLanguageUtil.get(pageContext, "document-types") %>',
 				uri: '<liferay-portlet:renderURL windowState="<%= LiferayWindowState.POP_UP.toString() %>"><portlet:param name="struts_action" value="/document_library/view_file_entry_type" /><portlet:param name="redirect" value="<%= currentURL %>" /></liferay-portlet:renderURL>'
@@ -152,7 +155,8 @@ Group scopeGroup = themeDisplay.getScopeGroup();
 			{
 				basePortletURL: '<%= PortletURLFactoryUtil.create(request, PortletKeys.DYNAMIC_DATA_MAPPING, themeDisplay.getPlid(), PortletRequest.RENDER_PHASE) %>',
 				dialog: {
-					destroyOnHide: true
+					destroyOnHide: true,
+					zIndex: (++Liferay.zIndex.WINDOW)
 				},
 				refererPortletName: '<%= PortletKeys.DOCUMENT_LIBRARY %>',
 				showGlobalScope: true,
