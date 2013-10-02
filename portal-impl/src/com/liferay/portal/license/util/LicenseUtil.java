@@ -493,7 +493,7 @@ public class LicenseUtil {
 			}
 			catch (Exception e) {
 			}
-			
+
 			Authenticator.setDefault(null);
 		}
 	}
