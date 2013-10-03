@@ -45,6 +45,17 @@ if (showPrototypes && (group != null)) {
 		if (Validator.isNotNull(layoutSetPrototypeUuid)) {
 			privateLayoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypeByUuidAndCompanyId(layoutSetPrototypeUuid, company.getCompanyId());
 		}
+		else if (liveGroup.isStaged() && !liveGroup.isStagedRemotely()) {
+			privateLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(liveGroup.getStagingGroup().getGroupId(), true);
+
+			privateLayoutSetPrototypeLinkEnabled = privateLayoutSet.isLayoutSetPrototypeLinkEnabled();
+
+			layoutSetPrototypeUuid = privateLayoutSet.getLayoutSetPrototypeUuid();
+
+			if (Validator.isNotNull(layoutSetPrototypeUuid)) {
+				privateLayoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypeByUuid(layoutSetPrototypeUuid);
+			}
+		}
 	}
 	catch (Exception e) {
 	}
@@ -60,6 +71,17 @@ if (showPrototypes && (group != null)) {
 
 		if (Validator.isNotNull(layoutSetPrototypeUuid)) {
 			publicLayoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypeByUuidAndCompanyId(layoutSetPrototypeUuid, company.getCompanyId());
+		}
+		else if (liveGroup.isStaged() && !liveGroup.isStagedRemotely()) {
+			publicLayoutSet = LayoutSetLocalServiceUtil.getLayoutSet(liveGroup.getStagingGroup().getGroupId(), false);
+
+			publicLayoutSetPrototypeLinkEnabled = publicLayoutSet.isLayoutSetPrototypeLinkEnabled();
+
+			layoutSetPrototypeUuid = publicLayoutSet.getLayoutSetPrototypeUuid();
+
+			if (Validator.isNotNull(layoutSetPrototypeUuid)) {
+				publicLayoutSetPrototype = LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototypeByUuid(layoutSetPrototypeUuid);
+			}
 		}
 	}
 	catch (Exception e) {
@@ -171,6 +193,12 @@ if ((group != null) && !LanguageUtil.isInheritLocales(group.getGroupId())) {
 	disableLayoutSetPrototypeInput = true;
 }
 
+boolean disablePropagationCheckbox = disableLayoutSetPrototypeInput;
+
+if (!disablePropagationCheckbox && ((group != null) && (group.isStaged() || group.isStagedRemotely()))) {
+	disablePropagationCheckbox = true;
+}
+
 boolean hasUnlinkLayoutSetPrototypePermission = PortalPermissionUtil.contains(permissionChecker, ActionKeys.UNLINK_LAYOUT_SET_PROTOTYPE);
 %>
 
@@ -217,7 +245,7 @@ boolean hasUnlinkLayoutSetPrototypePermission = PortalPermissionUtil.contains(pe
 												</div>
 											</c:if>
 
-											<aui:input disabled="<%= disableLayoutSetPrototypeInput %>" helpMessage="enable-propagation-of-changes-from-the-site-template-help" label="enable-propagation-of-changes-from-the-site-template" name="publicLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= publicLayoutSetPrototypeLinkEnabled %>" />
+											<aui:input disabled="<%= disablePropagationCheckbox %>" helpMessage="enable-propagation-of-changes-from-the-site-template-help" label="enable-propagation-of-changes-from-the-site-template" name="publicLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= publicLayoutSetPrototypeLinkEnabled %>" />
 										</div>
 									</c:when>
 									<c:otherwise>
@@ -258,7 +286,7 @@ boolean hasUnlinkLayoutSetPrototypePermission = PortalPermissionUtil.contains(pe
 													</div>
 												</c:if>
 
-												<aui:input disabled="<%= disableLayoutSetPrototypeInput %>" label='<%= LanguageUtil.format(pageContext, "enable-propagation-of-changes-from-the-site-template-x", HtmlUtil.escape(publicLayoutSetPrototype.getName(user.getLanguageId()))) %>' name="publicLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= publicLayoutSetPrototypeLinkEnabled %>" />
+												<aui:input disabled="<%= disablePropagationCheckbox %>" label='<%= LanguageUtil.format(pageContext, "enable-propagation-of-changes-from-the-site-template-x", HtmlUtil.escape(publicLayoutSetPrototype.getName(user.getLanguageId()))) %>' name="publicLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= publicLayoutSetPrototypeLinkEnabled %>" />
 
 												<div class='<%= publicLayoutSetPrototypeLinkEnabled ? "" : "hide" %>' id="<portlet:namespace/>publicLayoutSetPrototypeMergeAlert">
 
@@ -319,7 +347,7 @@ boolean hasUnlinkLayoutSetPrototypePermission = PortalPermissionUtil.contains(pe
 												</div>
 											</c:if>
 
-											<aui:input disabled="<%= disableLayoutSetPrototypeInput %>" helpMessage="enable-propagation-of-changes-from-the-site-template-help" label="enable-propagation-of-changes-from-the-site-template" name="privateLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= privateLayoutSetPrototypeLinkEnabled %>" />
+											<aui:input disabled="<%= disablePropagationCheckbox %>" helpMessage="enable-propagation-of-changes-from-the-site-template-help" label="enable-propagation-of-changes-from-the-site-template" name="privateLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= privateLayoutSetPrototypeLinkEnabled %>" />
 										</div>
 									</c:when>
 									<c:otherwise>
@@ -360,7 +388,7 @@ boolean hasUnlinkLayoutSetPrototypePermission = PortalPermissionUtil.contains(pe
 													</div>
 												</c:if>
 
-												<aui:input disabled="<%= disableLayoutSetPrototypeInput %>" label='<%= LanguageUtil.format(pageContext, "enable-propagation-of-changes-from-the-site-template-x", HtmlUtil.escape(privateLayoutSetPrototype.getName(user.getLanguageId()))) %>' name="privateLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= privateLayoutSetPrototypeLinkEnabled %>" />
+												<aui:input disabled="<%= disablePropagationCheckbox %>" label='<%= LanguageUtil.format(pageContext, "enable-propagation-of-changes-from-the-site-template-x", HtmlUtil.escape(privateLayoutSetPrototype.getName(user.getLanguageId()))) %>' name="privateLayoutSetPrototypeLinkEnabled" type="checkbox" value="<%= privateLayoutSetPrototypeLinkEnabled %>" />
 
 												<div class='<%= privateLayoutSetPrototypeLinkEnabled ? "" : "hide" %>' id="<portlet:namespace/>privateLayoutSetPrototypeMergeAlert">
 
