@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.lar.BaseStagedModelDataHandler;
+import com.liferay.portal.kernel.lar.ExportDataException;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.lar.PortletDataHandlerKeys;
@@ -58,6 +59,7 @@ import com.liferay.portal.model.LayoutStagingHandler;
 import com.liferay.portal.model.LayoutTemplate;
 import com.liferay.portal.model.LayoutTypePortlet;
 import com.liferay.portal.model.LayoutTypePortletConstants;
+import com.liferay.portal.model.WorkflowedModel;
 import com.liferay.portal.service.ImageLocalServiceUtil;
 import com.liferay.portal.service.LayoutFriendlyURLLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
@@ -84,6 +86,7 @@ import java.util.Map;
 
 /**
  * @author Mate Thurzo
+ * @author Vilmos Papp
  */
 public class LayoutStagedModelDataHandler
 	extends BaseStagedModelDataHandler<Layout> {
@@ -152,7 +155,7 @@ public class LayoutStagedModelDataHandler
 			portletDataContext.getParameterMap(), "exportLAR");
 
 		if (!exportLAR && LayoutStagingUtil.isBranchingLayout(layout) &&
-			!layout.isTypeURL()) {
+			!layout.isTypeLinkToLayout() &&!layout.isTypeURL()) {
 
 			long layoutSetBranchId = MapUtil.getLong(
 				portletDataContext.getParameterMap(), "layoutSetBranchId");
@@ -685,6 +688,14 @@ public class LayoutStagedModelDataHandler
 		UnicodeProperties typeSettings = layout.getTypeSettingsProperties();
 
 		String url = GetterUtil.getString(typeSettings.getProperty("url"));
+		String urlEmbedded = GetterUtil.getString(
+			typeSettings.getProperty("urlEmbedded"));
+		String propertyKey = "url";
+
+		if (Validator.isNotNull(urlEmbedded)) {
+			propertyKey = "urlEmbedded";
+			url = urlEmbedded;
+		}
 
 		String friendlyURLPrivateGroupPath =
 			PropsValues.LAYOUT_FRIENDLY_URL_PRIVATE_GROUP_SERVLET_MAPPING;
@@ -712,7 +723,7 @@ public class LayoutStagedModelDataHandler
 			return null;
 		}
 
-		return new Object[] {url.substring(x, y), url, x, y};
+		return new Object[] {url.substring(x, y), url, x, y, propertyKey};
 	}
 
 	protected void fixExportTypeSettings(Layout layout) throws Exception {
@@ -739,8 +750,10 @@ public class LayoutStagedModelDataHandler
 		int x = (Integer)friendlyURLInfo[2];
 		int y = (Integer)friendlyURLInfo[3];
 
+		String key = (String)friendlyURLInfo[4];
+
 		typeSettings.setProperty(
-			"url",
+			key,
 			url.substring(0, x) + LayoutExporter.SAME_GROUP_FRIENDLY_URL +
 				url.substring(y));
 	}
@@ -767,8 +780,10 @@ public class LayoutStagedModelDataHandler
 		int x = (Integer)friendlyURLInfo[2];
 		int y = (Integer)friendlyURLInfo[3];
 
+		String key = (String)friendlyURLInfo[4];
+
 		typeSettings.setProperty(
-			"url",
+			key,
 			url.substring(0, x) + group.getFriendlyURL() + url.substring(y));
 	}
 
@@ -1138,6 +1153,41 @@ public class LayoutStagedModelDataHandler
 		}
 		finally {
 			layout.setGroupId(groupId);
+		}
+	}
+
+	@Override
+	protected void validateExport(
+			PortletDataContext portletDataContext, Layout stagedModel)
+		throws ExportDataException {
+
+		super.validateExport(portletDataContext, stagedModel);
+
+		LayoutStagingHandler layoutStagingHandler =
+			LayoutStagingUtil.getLayoutStagingHandler(stagedModel);
+
+		if (layoutStagingHandler != null) {
+			LayoutRevision layoutRevision =
+				layoutStagingHandler.getLayoutRevision();
+
+			if ((layoutRevision != null) &&
+				!stagedModel.isTypeLinkToLayout() &&
+				!stagedModel.isTypeURL()) {
+
+				WorkflowedModel workflowedModel =
+					(WorkflowedModel)layoutRevision;
+
+				if (!ArrayUtil.contains(
+						getExportableStatuses(), workflowedModel.getStatus())) {
+
+					_log.error(
+						"Layout has no exportable status: " +
+						layoutStagingHandler.getLayout().getFriendlyURL());
+
+					throw new ExportDataException(
+						ExportDataException.STATUS_INVALID);
+				}
+			}
 		}
 	}
 

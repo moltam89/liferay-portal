@@ -70,8 +70,12 @@ public class DDLRecordSetStagedModelDataHandler
 
 		DDMStructure ddmStructure = recordSet.getDDMStructure();
 
-		StagedModelDataHandlerUtil.exportStagedModel(
+		boolean exported = StagedModelDataHandlerUtil.exportStagedModel(
 			portletDataContext, ddmStructure);
+
+		if (!exported) {
+			return;
+		}
 
 		List<DDMTemplate> ddmTemplates = ddmStructure.getTemplates();
 

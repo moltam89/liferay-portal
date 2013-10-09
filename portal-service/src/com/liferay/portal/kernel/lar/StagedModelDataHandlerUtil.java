@@ -16,6 +16,8 @@ package com.liferay.portal.kernel.lar;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Attribute;
@@ -114,11 +116,13 @@ public class StagedModelDataHandlerUtil {
 			}
 		}
 
-		exportStagedModel(portletDataContext, stagedModel);
+		boolean exported = exportStagedModel(portletDataContext, stagedModel);
 
-		referenceElement = portletDataContext.addReferenceElement(
-			referrerStagedModel, referrerStagedModelElement, stagedModel,
-			stagedModelClass, referenceType, false);
+		if (exported) {
+			referenceElement = portletDataContext.addReferenceElement(
+				referrerStagedModel, referrerStagedModelElement, stagedModel,
+				stagedModelClass, referenceType, false);
+		}
 
 		return referenceElement;
 	}
@@ -135,15 +139,31 @@ public class StagedModelDataHandlerUtil {
 			stagedModel.getModelClass(), referenceType);
 	}
 
-	public static <T extends StagedModel> void exportStagedModel(
+	public static <T extends StagedModel> boolean exportStagedModel(
 			PortletDataContext portletDataContext, T stagedModel)
 		throws PortletDataException {
 
 		StagedModelDataHandler<T> stagedModelDataHandler =
 			_getStagedModelDataHandler(stagedModel);
 
-		stagedModelDataHandler.exportStagedModel(
-			portletDataContext, stagedModel);
+		try {
+			stagedModelDataHandler.exportStagedModel(
+				portletDataContext, stagedModel);
+		}
+		catch (ExportDataException ede) {
+			if ((ede.getType() == ExportDataException.STATUS_IN_TRASH) ||
+				(ede.getType() == ExportDataException.STATUS_INVALID)) {
+
+				return false;
+			}
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(
+					"Unable to export:" + stagedModel.getModelClassName());
+			}
+		}
+
+		return true;
 	}
 
 	public static <T extends StagedModel> String getDisplayName(T stagedModel) {
@@ -249,5 +269,8 @@ public class StagedModelDataHandlerUtil {
 
 		return stagedModelDataHandler;
 	}
+
+	private static Log _log = LogFactoryUtil.getLog(
+		StagedModelDataHandlerUtil.class);
 
 }

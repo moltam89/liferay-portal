@@ -23,11 +23,11 @@ String description = StringPool.BLANK;
 if (selLayout != null) {
 	UnicodeProperties typeSettingsProperties = selLayout.getTypeSettingsProperties();
 
-	url = typeSettingsProperties.getProperty("url", StringPool.BLANK);
+	url = typeSettingsProperties.getProperty("urlEmbedded", StringPool.BLANK);
 	description = typeSettingsProperties.getProperty("description", StringPool.BLANK);
 }
 %>
 
-<aui:input cssClass="lfr-input-text-container" id="urlEmbedded" label="url" name="TypeSettingsProperties--url--" type="text" value="<%= url %>" />
+<aui:input cssClass="lfr-input-text-container" id="urlEmbedded" label="url" name="TypeSettingsProperties--urlEmbedded--" type="text" value="<%= url %>" />
 
 <aui:input cssClass="layout-description" id="descriptionEmbedded" label="description" name="TypeSettingsProperties--description--" type="textarea" value="<%= description %>" wrap="soft" />

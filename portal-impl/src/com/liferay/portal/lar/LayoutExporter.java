@@ -635,8 +635,12 @@ public class LayoutExporter {
 			return;
 		}
 
-		StagedModelDataHandlerUtil.exportStagedModel(
+		boolean exported = StagedModelDataHandlerUtil.exportStagedModel(
 			portletDataContext, layout);
+
+		if (!exported) {
+			return;
+		}
 
 		if (!layout.isSupportsEmbeddedPortlets()) {
 
