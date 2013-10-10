@@ -1,4 +1,3 @@
-<%--
 /**
  * Copyright (c) 2000-2013 Liferay, Inc. All rights reserved.
  *
@@ -12,19 +11,38 @@
  * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
  * details.
  */
---%>
 
-<%@ include file="/html/portal/init.jsp" %>
+package com.liferay.portal.kernel.lar;
 
-<%@ include file="/html/portal/layout/view/embedded_js.jspf" %>
+/**
+ * @author Vilmos Papp
+ */
+public class ExportDataException extends PortletDataException {
 
-<div id="iframe">
+	public static final int ALREADY_PROCESSED = 6;
 
-	<%
-	UnicodeProperties typeSettingsProperties = layout.getTypeSettingsProperties();
-	%>
+	public static final int STATUS_IN_TRASH = 7;
 
-	<iframe frameborder="0" id="embeddedIframe" src="<%= HtmlUtil.escapeHREF(typeSettingsProperties.getProperty("urlEmbedded")) %>" width="100%"></iframe>
-</div>
+	public static final int STATUS_INVALID = 8;
 
-<%@ include file="/html/portal/layout/view/common.jspf" %>
+	public ExportDataException() {
+		super();
+	}
+
+	public ExportDataException(int type) {
+		super(type);
+	}
+
+	public ExportDataException(String msg) {
+		super(msg);
+	}
+
+	public ExportDataException(String msg, Throwable cause) {
+		super(msg, cause);
+	}
+
+	public ExportDataException(Throwable cause) {
+		super(cause);
+	}
+
+}

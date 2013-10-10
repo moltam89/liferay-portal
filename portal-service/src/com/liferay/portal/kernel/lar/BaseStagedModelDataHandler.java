@@ -45,9 +45,7 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 			PortletDataContext portletDataContext, T stagedModel)
 		throws PortletDataException {
 
-		if (!isExportable(portletDataContext, stagedModel)) {
-			return;
-		}
+		validateExport(portletDataContext, stagedModel);
 
 		try {
 			ManifestSummary manifestSummary =
@@ -198,13 +196,15 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 		throw new UnsupportedOperationException();
 	}
 
-	protected boolean isExportable(
-		PortletDataContext portletDataContext, T stagedModel) {
+	protected void validateExport(
+			PortletDataContext portletDataContext, T stagedModel)
+		throws ExportDataException {
 
 		String path = ExportImportPathUtil.getModelPath(stagedModel);
 
 		if (portletDataContext.isPathExportedInScope(path)) {
-			return false;
+			throw new ExportDataException(
+				ExportDataException.ALREADY_PROCESSED);
 		}
 
 		if (stagedModel instanceof WorkflowedModel) {
@@ -213,7 +213,8 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 			if (!ArrayUtil.contains(
 					getExportableStatuses(), workflowedModel.getStatus())) {
 
-				return false;
+				throw new ExportDataException(
+					ExportDataException.STATUS_INVALID);
 			}
 		}
 
@@ -227,8 +228,12 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 				if (trashHandler.isInTrash(classPK) ||
 					trashHandler.isInTrashContainer(classPK)) {
 
-					return false;
+					throw new ExportDataException(
+						ExportDataException.STATUS_IN_TRASH);
 				}
+			}
+			catch (ExportDataException ede) {
+				throw ede;
 			}
 			catch (Exception e) {
 				if (_log.isWarnEnabled()) {
@@ -239,7 +244,7 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 			}
 		}
 
-		return true;
+		return;
 	}
 
 	protected boolean validateMissingReference(

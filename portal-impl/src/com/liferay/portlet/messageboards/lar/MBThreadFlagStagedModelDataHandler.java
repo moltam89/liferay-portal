@@ -79,8 +79,12 @@ public class MBThreadFlagStagedModelDataHandler
 			return;
 		}
 
-		StagedModelDataHandlerUtil.exportStagedModel(
+		boolean exported = StagedModelDataHandlerUtil.exportStagedModel(
 			portletDataContext, rootMessage);
+
+		if (!exported) {
+			return;
+		}
 
 		Element threadFlagElement = portletDataContext.getExportDataElement(
 			threadFlag);

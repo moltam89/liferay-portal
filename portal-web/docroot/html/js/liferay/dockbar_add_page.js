@@ -22,9 +22,15 @@ AUI.add(
 
 		var STR_CANCEL_ADD_OPERATION = 'cancelAddOperation';
 
+		var STR_EMBEDDED = "embedded";
+
 		var STR_HIDDEN_CHECKBOX = 'addLayoutHiddenCheckbox';
 
 		var STR_ID = 'id';
+
+		var STR_LINK_TO_LAYOUT = 'link_to_layout';
+
+		var STR_LINK_TO_LAYOUT_ID = 'linkToLayoutId';
 
 		var STR_NAME = 'addLayoutName';
 
@@ -35,6 +41,10 @@ AUI.add(
 		var STR_RESPONSE_DATA = 'responseData';
 
 		var STR_TRANSITION = 'transition';
+
+		var STR_URL = 'url';
+
+		var STR_URL_EMBEDDED = 'urlEmbedded';
 
 		var STR_VALUE = 'value';
 
@@ -101,6 +111,54 @@ AUI.add(
 								target: instance._addForm
 							}
 						);
+
+						var formValidator = instance._getFormValidator(instance._addForm);
+
+						var defaultRules = formValidator.get('rules');
+
+						instance._validatorRules = {};
+
+						instance._validatorRules['default'] = defaultRules;
+
+						var urlInput = instance.byId(STR_URL);
+
+						var urlInputName = urlInput.get('name');
+
+						var urlRule = {};
+
+						urlRule[urlInputName] = {
+							required: true,
+							url: true,
+							validateOnInput: true
+						};
+
+						instance._validatorRules[STR_URL] = instance._setupRules(defaultRules, urlRule);
+
+						var urlEmbeddedInput = instance.byId(STR_URL_EMBEDDED);
+
+						var urlEmbeddedInputName = urlEmbeddedInput.get('name');
+
+						var urlEmbeddedRule = {};
+
+						urlEmbeddedRule[urlEmbeddedInputName] = {
+							required: true,
+							url: true,
+							validateOnInput: true
+						};
+
+						instance._validatorRules[STR_EMBEDDED] = instance._setupRules(defaultRules, urlEmbeddedRule);
+
+						var linkToLayoutIdSelect = instance.byId(STR_LINK_TO_LAYOUT_ID);
+
+						var linkToLayoutIdSelectName = linkToLayoutIdSelect.get('name');
+
+						var linkToLayoutRule = {};
+
+						linkToLayoutRule[linkToLayoutIdSelectName] = {
+							required: true
+						};
+
+						instance._validatorRules[STR_LINK_TO_LAYOUT] = instance._setupRules(defaultRules, linkToLayoutRule);
 
 						instance._bindUI();
 					},
@@ -214,6 +272,41 @@ AUI.add(
 						return instance._formValidator;
 					},
 
+					_setupRules: function(defaultRules, newRules) {
+						var rules = {};
+
+						AObject.each(defaultRules,
+							function(item, index, collection) {
+								rules[index] = item;
+							}
+						);
+
+						AObject.each(newRules,
+							function(item, index, collection) {
+								rules[index] = item;
+							}
+						);
+
+						return rules;
+					},
+
+					_setValidatorRules: function(selectionType) {
+						var instance = this;
+
+						var formValidator = instance._getFormValidator(instance._addForm);
+
+						var rules = instance._validatorRules[selectionType];
+
+						if (rules) {
+							formValidator.set('rules', rules);
+						}
+						else {
+							formValidator.set('rules', instance._validatorRules['default']);
+						}
+
+						formValidator.resetAllFields();
+					},
+
 					_updateActivePage: function(event) {
 						var instance = this;
 
@@ -236,6 +329,8 @@ AUI.add(
 								selectedPageTemplate.attr('checked', true);
 
 								header.addClass(CSS_ACTIVE);
+
+								instance._setValidatorRules(selectedType);
 
 								instance.byId('addLayoutType').set(STR_VALUE, selectedType);
 
