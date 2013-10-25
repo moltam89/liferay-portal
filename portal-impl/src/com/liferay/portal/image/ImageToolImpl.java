@@ -14,6 +14,13 @@
 
 package com.liferay.portal.image;
 
+import com.drew.imaging.jpeg.JpegMetadataReader;
+import com.drew.imaging.jpeg.JpegProcessingException;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.MetadataException;
+import com.drew.metadata.adobe.AdobeJpegDirectory;
+import com.drew.metadata.jpeg.JpegDirectory;
+
 import com.liferay.portal.kernel.image.ImageBag;
 import com.liferay.portal.kernel.image.ImageMagick;
 import com.liferay.portal.kernel.image.ImageTool;
@@ -410,22 +417,37 @@ public class ImageToolImpl implements ImageTool {
 		RenderedImage renderedImage = null;
 		String type = TYPE_NOT_AVAILABLE;
 
-		Enumeration<ImageCodec> enu = ImageCodec.getCodecs();
+		if (isAdobeRgbJpeg(bytes)) {
+			try {
+				renderedImage = ImageIO.read(
+					new UnsyncByteArrayInputStream(bytes));
 
-		while (enu.hasMoreElements()) {
-			ImageCodec codec = enu.nextElement();
-
-			if (codec.isFormatRecognized(bytes)) {
-				type = codec.getFormatName();
-
-				renderedImage = read(bytes, type);
-
-				break;
+				type = TYPE_JPEG;
+			}
+			catch (IOException ioe) {
+				if (_log.isDebugEnabled()) {
+					_log.debug(type + ": " + ioe.getMessage());
+				}
 			}
 		}
+		else {
+			Enumeration<ImageCodec> enu = ImageCodec.getCodecs();
 
-		if (type.equals("jpeg")) {
-			type = TYPE_JPEG;
+			while (enu.hasMoreElements()) {
+				ImageCodec codec = enu.nextElement();
+
+				if (codec.isFormatRecognized(bytes)) {
+					type = codec.getFormatName();
+
+					renderedImage = read(bytes, type);
+
+					break;
+				}
+			}
+
+			if (type.equals("jpeg")) {
+				type = TYPE_JPEG;
+			}
 		}
 
 		return new ImageBag(renderedImage, type);
@@ -600,6 +622,45 @@ public class ImageToolImpl implements ImageTool {
 		}
 
 		return _imageMagick;
+	}
+
+	protected boolean isAdobeRgbJpeg(byte[] bytes) {
+
+		try {
+			Metadata metadata =
+				JpegMetadataReader.readMetadata(
+					new UnsyncByteArrayInputStream(bytes));
+
+			JpegDirectory jpegDirectory = metadata.getDirectory(
+				JpegDirectory.class);
+
+			if (jpegDirectory != null) {
+				int numberOfComponents =
+					jpegDirectory.getInt(
+						JpegDirectory.TAG_JPEG_NUMBER_OF_COMPONENTS);
+
+				if (numberOfComponents == 3) {
+					AdobeJpegDirectory adobeJpegDirectory =
+						metadata.getDirectory(AdobeJpegDirectory.class);
+
+					if (adobeJpegDirectory != null) {
+						int colorTransformTag =
+							adobeJpegDirectory.getInt(
+								AdobeJpegDirectory.TAG_COLOR_TRANSFORM);
+
+						if (colorTransformTag == 0) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+		catch (JpegProcessingException e) {
+		}
+		catch (MetadataException e) {
+		}
+
+		return false;
 	}
 
 	protected RenderedImage read(byte[] bytes, String type) {
