@@ -586,6 +586,26 @@ public class EditGroupAction extends PortletAction {
 			}
 		}
 
+		// Virtual hosts
+
+		LayoutSet publicLayoutSet = liveGroup.getPublicLayoutSet();
+
+		String publicVirtualHost = ParamUtil.getString(
+			actionRequest, "publicVirtualHost",
+			publicLayoutSet.getVirtualHostname());
+
+		LayoutSetServiceUtil.updateVirtualHost(
+			liveGroup.getGroupId(), false, publicVirtualHost);
+
+		LayoutSet privateLayoutSet = liveGroup.getPrivateLayoutSet();
+
+		String privateVirtualHost = ParamUtil.getString(
+			actionRequest, "privateVirtualHost",
+			privateLayoutSet.getVirtualHostname());
+
+		LayoutSetServiceUtil.updateVirtualHost(
+			liveGroup.getGroupId(), true, privateVirtualHost);
+
 		// Settings
 
 		UnicodeProperties typeSettingsProperties =
@@ -690,26 +710,6 @@ public class EditGroupAction extends PortletAction {
 				actionRequest, "TypeSettingsProperties--");
 
 		typeSettingsProperties.putAll(formTypeSettingsProperties);
-
-		// Virtual hosts
-
-		LayoutSet publicLayoutSet = liveGroup.getPublicLayoutSet();
-
-		String publicVirtualHost = ParamUtil.getString(
-			actionRequest, "publicVirtualHost",
-			publicLayoutSet.getVirtualHostname());
-
-		LayoutSetServiceUtil.updateVirtualHost(
-			liveGroup.getGroupId(), false, publicVirtualHost);
-
-		LayoutSet privateLayoutSet = liveGroup.getPrivateLayoutSet();
-
-		String privateVirtualHost = ParamUtil.getString(
-			actionRequest, "privateVirtualHost",
-			privateLayoutSet.getVirtualHostname());
-
-		LayoutSetServiceUtil.updateVirtualHost(
-			liveGroup.getGroupId(), true, privateVirtualHost);
 
 		// Staging
 
