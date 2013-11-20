@@ -46,6 +46,7 @@ import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.UniqueList;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.liveusers.LiveUsers;
+import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
@@ -75,6 +76,8 @@ import com.liferay.portal.struts.PortletAction;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
+import com.liferay.portal.util.PropsValues;
+import com.liferay.portal.util.RobotsUtil;
 import com.liferay.portal.util.WebKeys;
 import com.liferay.portlet.asset.AssetCategoryException;
 import com.liferay.portlet.asset.AssetTagException;
@@ -590,6 +593,8 @@ public class EditGroupAction extends PortletAction {
 
 		LayoutSet publicLayoutSet = liveGroup.getPublicLayoutSet();
 
+		String oldPublicVirtualHost = publicLayoutSet.getVirtualHostname();
+
 		String publicVirtualHost = ParamUtil.getString(
 			actionRequest, "publicVirtualHost",
 			publicLayoutSet.getVirtualHostname());
@@ -598,6 +603,8 @@ public class EditGroupAction extends PortletAction {
 			liveGroup.getGroupId(), false, publicVirtualHost);
 
 		LayoutSet privateLayoutSet = liveGroup.getPrivateLayoutSet();
+
+		String oldPrivateVirtualHost = privateLayoutSet.getVirtualHostname();
 
 		String privateVirtualHost = ParamUtil.getString(
 			actionRequest, "privateVirtualHost",
@@ -652,15 +659,73 @@ public class EditGroupAction extends PortletAction {
 			}
 		}
 
-		String publicRobots = ParamUtil.getString(
-			actionRequest, "publicRobots",
-			liveGroup.getTypeSettingsProperty("false-robots.txt"));
-		String privateRobots = ParamUtil.getString(
-			actionRequest, "privateRobots",
-			liveGroup.getTypeSettingsProperty("true-robots.txt"));
+		Group defaultGroup = GroupLocalServiceUtil.getGroup(
+			themeDisplay.getCompanyId(),
+			PropsValues.VIRTUAL_HOSTS_DEFAULT_SITE_NAME);
 
-		typeSettingsProperties.setProperty("false-robots.txt", publicRobots);
-		typeSettingsProperties.setProperty("true-robots.txt", privateRobots);
+		Company company = themeDisplay.getCompany();
+
+		String defaultPublicRobots = RobotsUtil.getDefaultRobots(
+			publicVirtualHost);
+
+		if (defaultGroup.equals(liveGroup) &&
+			publicVirtualHost.equals(StringPool.BLANK)) {
+
+			defaultPublicRobots = RobotsUtil.getDefaultRobots(
+				company.getVirtualHostname());
+		}
+
+		String oldPublicRobots = liveGroup.getTypeSettingsProperty(
+			"false-robots.txt");
+
+		if (Validator.isNull(oldPublicRobots)) {
+			oldPublicRobots = RobotsUtil.getDefaultRobots(oldPublicVirtualHost);
+
+			if (Validator.isNull(oldPublicVirtualHost)) {
+				oldPublicRobots = RobotsUtil.getDefaultRobots(
+					company.getVirtualHostname());
+			}
+		}
+
+		String publicRobots = ParamUtil.getString(
+			actionRequest, "publicRobots");
+
+		if (!StringUtil.equalsIgnoreCase(oldPublicRobots, publicRobots)) {
+			typeSettingsProperties.setProperty(
+				"false-robots.txt", publicRobots);
+		}
+
+		if ((Validator.isNull(publicVirtualHost) &&
+			 !defaultGroup.equals(liveGroup)) ||
+			StringUtil.equalsIgnoreCase(defaultPublicRobots, publicRobots)) {
+
+			typeSettingsProperties.remove("false-robots.txt");
+		}
+
+		String oldPrivateRobots = liveGroup.getTypeSettingsProperty(
+			"true-robots.txt");
+
+		if (Validator.isNull(oldPrivateRobots)) {
+			oldPrivateRobots = RobotsUtil.getDefaultRobots(
+				oldPrivateVirtualHost);
+		}
+
+		String privateRobots = ParamUtil.getString(
+			actionRequest, "privateRobots");
+
+		if (!StringUtil.equalsIgnoreCase(oldPrivateRobots, privateRobots)) {
+			typeSettingsProperties.setProperty(
+				"true-robots.txt", privateRobots);
+		}
+
+		String defaultPrivateRobots = RobotsUtil.getDefaultRobots(
+			privateVirtualHost);
+
+		if (Validator.isNull(privateVirtualHost) ||
+			StringUtil.equalsIgnoreCase(defaultPrivateRobots, privateRobots)) {
+
+			typeSettingsProperties.remove("true-robots.txt");
+		}
 
 		boolean trashEnabled = ParamUtil.getBoolean(
 			actionRequest, "trashEnabled",
