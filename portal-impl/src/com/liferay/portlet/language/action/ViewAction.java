@@ -157,7 +157,9 @@ public class ViewAction extends PortletAction {
 
 		redirect = redirect + queryString;
 
-		actionResponse.sendRedirect(redirect);
+		if (Validator.isNotNull(redirect)) {
+			actionResponse.sendRedirect(redirect);
+		}
 	}
 
 	@Override
