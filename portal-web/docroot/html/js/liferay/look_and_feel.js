@@ -1415,7 +1415,7 @@ AUI.add(
 				if (value == null) {
 					var portletTitle = portletTitles[key];
 
-					if (portletTitle != null) {
+					if (portletTitle && (portletTitle !== '')) {
 						return portletTitle;
 					}
 
