@@ -297,11 +297,11 @@ public class AssetCategoryServiceUtil {
 	}
 
 	public static com.liferay.portal.kernel.json.JSONArray search(
-		long[] groupIds, java.lang.String name, long[] vocabularyIds,
+		long[] groupIds, java.lang.String title, long[] vocabularyIds,
 		int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return getService().search(groupIds, name, vocabularyIds, start, end);
+		return getService().search(groupIds, title, vocabularyIds, start, end);
 	}
 
 	public static com.liferay.portlet.asset.model.AssetCategory updateCategory(
