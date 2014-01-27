@@ -516,11 +516,11 @@ public class AssetCategoryServiceSoap {
 	}
 
 	public static java.lang.String search(long[] groupIds,
-		java.lang.String name, long[] vocabularyIds, int start, int end)
+		java.lang.String title, long[] vocabularyIds, int start, int end)
 		throws RemoteException {
 		try {
 			com.liferay.portal.kernel.json.JSONArray returnValue = AssetCategoryServiceUtil.search(groupIds,
-					name, vocabularyIds, start, end);
+					title, vocabularyIds, start, end);
 
 			return returnValue.toString();
 		}

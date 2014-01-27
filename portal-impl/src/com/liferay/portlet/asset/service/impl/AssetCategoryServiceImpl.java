@@ -440,7 +440,7 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 
 	@Override
 	public JSONArray search(
-			long[] groupIds, String name, long[] vocabularyIds, int start,
+			long[] groupIds, String title, long[] vocabularyIds, int start,
 			int end)
 		throws PortalException, SystemException {
 
@@ -449,15 +449,15 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 		for (long groupId : groupIds) {
 			JSONArray categoriesJSONArray = null;
 
-			if (Validator.isNull(name)) {
+			if (Validator.isNull(title)) {
 				categoriesJSONArray = toJSONArray(
 					assetCategoryPersistence.filterFindByG_V(
 						groupId, vocabularyIds));
 			}
 			else {
 				categoriesJSONArray = toJSONArray(
-					assetCategoryPersistence.filterFindByG_LikeN_V(
-						groupId, name, vocabularyIds));
+					assetCategoryPersistence.filterFindByG_LikeT_V(
+						groupId, title, vocabularyIds));
 			}
 
 			for (int j = 0; j < categoriesJSONArray.length(); j++) {
@@ -541,7 +541,7 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 
 			StringBundler sb = new StringBundler(1 + names.size());
 
-			sb.append(vocabulary.getName());
+			sb.append(vocabulary.getTitleCurrentValue());
 			sb.append(names.toArray(new String[names.size()]));
 
 			categoryJSONObject.put("path", sb.toString());

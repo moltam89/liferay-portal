@@ -313,10 +313,10 @@ public class AssetCategoryServiceWrapper implements AssetCategoryService,
 
 	@Override
 	public com.liferay.portal.kernel.json.JSONArray search(long[] groupIds,
-		java.lang.String name, long[] vocabularyIds, int start, int end)
+		java.lang.String title, long[] vocabularyIds, int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
-		return _assetCategoryService.search(groupIds, name, vocabularyIds,
+		return _assetCategoryService.search(groupIds, title, vocabularyIds,
 			start, end);
 	}
 

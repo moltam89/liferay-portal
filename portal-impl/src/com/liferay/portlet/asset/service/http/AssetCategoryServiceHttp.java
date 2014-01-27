@@ -979,7 +979,7 @@ public class AssetCategoryServiceHttp {
 	}
 
 	public static com.liferay.portal.kernel.json.JSONArray search(
-		HttpPrincipal httpPrincipal, long[] groupIds, java.lang.String name,
+		HttpPrincipal httpPrincipal, long[] groupIds, java.lang.String title,
 		long[] vocabularyIds, int start, int end)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
@@ -988,7 +988,7 @@ public class AssetCategoryServiceHttp {
 					"search", _searchParameterTypes25);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
-					groupIds, name, vocabularyIds, start, end);
+					groupIds, title, vocabularyIds, start, end);
 
 			Object returnObj = null;
 
