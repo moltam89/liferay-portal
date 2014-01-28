@@ -109,8 +109,9 @@ public class AssetCategoryModelImpl extends BaseModelImpl<AssetCategory>
 	public static long GROUPID_COLUMN_BITMASK = 2L;
 	public static long NAME_COLUMN_BITMASK = 4L;
 	public static long PARENTCATEGORYID_COLUMN_BITMASK = 8L;
-	public static long UUID_COLUMN_BITMASK = 16L;
-	public static long VOCABULARYID_COLUMN_BITMASK = 32L;
+	public static long TITLE_COLUMN_BITMASK = 16L;
+	public static long UUID_COLUMN_BITMASK = 32L;
+	public static long VOCABULARYID_COLUMN_BITMASK = 64L;
 
 	/**
 	 * Converts the soap model instance into a normal model instance.
@@ -598,6 +599,12 @@ public class AssetCategoryModelImpl extends BaseModelImpl<AssetCategory>
 
 	@Override
 	public void setTitle(String title) {
+		_columnBitmask |= TITLE_COLUMN_BITMASK;
+
+		if (_originalTitle == null) {
+			_originalTitle = _title;
+		}
+
 		_title = title;
 	}
 
@@ -639,6 +646,10 @@ public class AssetCategoryModelImpl extends BaseModelImpl<AssetCategory>
 
 		setTitle(LocalizationUtil.updateLocalization(titleMap, getTitle(),
 				"Title", LocaleUtil.toLanguageId(defaultLocale)));
+	}
+
+	public String getOriginalTitle() {
+		return GetterUtil.getString(_originalTitle);
 	}
 
 	@JSON
@@ -968,6 +979,8 @@ public class AssetCategoryModelImpl extends BaseModelImpl<AssetCategory>
 
 		assetCategoryModelImpl._originalName = assetCategoryModelImpl._name;
 
+		assetCategoryModelImpl._originalTitle = assetCategoryModelImpl._title;
+
 		assetCategoryModelImpl._originalVocabularyId = assetCategoryModelImpl._vocabularyId;
 
 		assetCategoryModelImpl._setOriginalVocabularyId = false;
@@ -1196,6 +1209,7 @@ public class AssetCategoryModelImpl extends BaseModelImpl<AssetCategory>
 	private String _originalName;
 	private String _title;
 	private String _titleCurrentLanguageId;
+	private String _originalTitle;
 	private String _description;
 	private String _descriptionCurrentLanguageId;
 	private long _vocabularyId;
