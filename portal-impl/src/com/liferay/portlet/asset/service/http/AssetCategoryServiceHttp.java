@@ -1016,6 +1016,44 @@ public class AssetCategoryServiceHttp {
 		}
 	}
 
+	public static com.liferay.portal.kernel.json.JSONArray searchTitle(
+		HttpPrincipal httpPrincipal, long[] groupIds, java.lang.String title,
+		long[] vocabularyIds, int start, int end)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		try {
+			MethodKey methodKey = new MethodKey(AssetCategoryServiceUtil.class,
+					"searchTitle", _searchTitleParameterTypes26);
+
+			MethodHandler methodHandler = new MethodHandler(methodKey,
+					groupIds, title, vocabularyIds, start, end);
+
+			Object returnObj = null;
+
+			try {
+				returnObj = TunnelUtil.invoke(httpPrincipal, methodHandler);
+			}
+			catch (Exception e) {
+				if (e instanceof com.liferay.portal.kernel.exception.PortalException) {
+					throw (com.liferay.portal.kernel.exception.PortalException)e;
+				}
+
+				if (e instanceof com.liferay.portal.kernel.exception.SystemException) {
+					throw (com.liferay.portal.kernel.exception.SystemException)e;
+				}
+
+				throw new com.liferay.portal.kernel.exception.SystemException(e);
+			}
+
+			return (com.liferay.portal.kernel.json.JSONArray)returnObj;
+		}
+		catch (com.liferay.portal.kernel.exception.SystemException se) {
+			_log.error(se, se);
+
+			throw se;
+		}
+	}
+
 	public static com.liferay.portlet.asset.model.AssetCategory updateCategory(
 		HttpPrincipal httpPrincipal, long categoryId, long parentCategoryId,
 		java.util.Map<java.util.Locale, java.lang.String> titleMap,
@@ -1026,7 +1064,7 @@ public class AssetCategoryServiceHttp {
 			com.liferay.portal.kernel.exception.SystemException {
 		try {
 			MethodKey methodKey = new MethodKey(AssetCategoryServiceUtil.class,
-					"updateCategory", _updateCategoryParameterTypes26);
+					"updateCategory", _updateCategoryParameterTypes27);
 
 			MethodHandler methodHandler = new MethodHandler(methodKey,
 					categoryId, parentCategoryId, titleMap, descriptionMap,
@@ -1158,7 +1196,11 @@ public class AssetCategoryServiceHttp {
 			long[].class, java.lang.String.class, long[].class, int.class,
 			int.class
 		};
-	private static final Class<?>[] _updateCategoryParameterTypes26 = new Class[] {
+	private static final Class<?>[] _searchTitleParameterTypes26 = new Class[] {
+			long[].class, java.lang.String.class, long[].class, int.class,
+			int.class
+		};
+	private static final Class<?>[] _updateCategoryParameterTypes27 = new Class[] {
 			long.class, long.class, java.util.Map.class, java.util.Map.class,
 			long.class, java.lang.String[].class,
 			com.liferay.portal.service.ServiceContext.class

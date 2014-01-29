@@ -469,6 +469,36 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 	}
 
 	@Override
+	public JSONArray searchTitle(
+			long[] groupIds, String title, long[] vocabularyIds, int start,
+			int end)
+		throws PortalException, SystemException {
+
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		for (long groupId : groupIds) {
+			JSONArray categoriesJSONArray = null;
+
+			if (Validator.isNull(title)) {
+				categoriesJSONArray = toJSONArray(
+					assetCategoryPersistence.filterFindByG_V(
+						groupId, vocabularyIds));
+			}
+			else {
+				categoriesJSONArray = toJSONArray(
+					assetCategoryPersistence.filterFindByG_LikeT_V(
+						groupId, title, vocabularyIds));
+			}
+
+			for (int j = 0; j < categoriesJSONArray.length(); j++) {
+				jsonArray.put(categoriesJSONArray.getJSONObject(j));
+			}
+		}
+
+		return jsonArray;
+	}
+	
+	@Override
 	public AssetCategory updateCategory(
 			long categoryId, long parentCategoryId,
 			Map<Locale, String> titleMap, Map<Locale, String> descriptionMap,
@@ -541,7 +571,7 @@ public class AssetCategoryServiceImpl extends AssetCategoryServiceBaseImpl {
 
 			StringBundler sb = new StringBundler(1 + names.size());
 
-			sb.append(vocabulary.getName());
+			sb.append(vocabulary.getTitleCurrentValue());
 			sb.append(names.toArray(new String[names.size()]));
 
 			categoryJSONObject.put("path", sb.toString());
