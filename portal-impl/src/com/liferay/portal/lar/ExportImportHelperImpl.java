@@ -1255,6 +1255,10 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			String layoutUuid = matcher.group(3);
 			String friendlyURL = matcher.group(4);
 
+			long oldGroupId = GetterUtil.getLong(matcher.group(6));
+
+			long newGroupId = oldGroupId;
+
 			try {
 				Layout layout =
 					LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
@@ -1291,6 +1295,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 					}
 				}
 				else {
+					newGroupId = layout.getGroupId();
+
 					newLayoutId = layout.getLayoutId();
 				}
 			}
@@ -1322,6 +1328,12 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				oldLinkToLayout,
 				new String[] {sb.toString(), String.valueOf(oldLayoutId)},
 				new String[] {StringPool.BLANK, String.valueOf(newLayoutId)});
+
+			if ((oldGroupId != 0) && (oldGroupId != newGroupId)) {
+				newLinkToLayout = StringUtil.replaceLast(
+					newLinkToLayout, String.valueOf(oldGroupId),
+					String.valueOf(newGroupId));
+			}
 
 			oldLinksToLayout.add(oldLinkToLayout);
 			newLinksToLayout.add(newLinkToLayout);
