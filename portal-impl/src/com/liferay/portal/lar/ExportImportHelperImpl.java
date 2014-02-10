@@ -1324,7 +1324,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			sb.append(StringPool.AT);
 			sb.append(friendlyURL);
 
-			String newLinkToLayout = StringUtil.replace(
+			String newLinkToLayout = StringUtil.replaceFirst(
 				oldLinkToLayout,
 				new String[] {sb.toString(), String.valueOf(oldLayoutId)},
 				new String[] {StringPool.BLANK, String.valueOf(newLayoutId)});
