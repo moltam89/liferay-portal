@@ -26,7 +26,7 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Layout;
-import com.liferay.portal.service.LayoutLocalServiceUtil;
+import com.liferay.portal.service.persistence.LayoutUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
@@ -230,7 +230,7 @@ public class JournalContentPortletDataHandler
 
 			portletPreferences.setValue("groupId", importedArticleGroupId);
 
-			Layout layout = LayoutLocalServiceUtil.getLayout(
+			Layout layout = LayoutUtil.findByPrimaryKey(
 				portletDataContext.getPlid());
 
 			JournalContentSearchLocalServiceUtil.updateContentSearch(
