@@ -588,7 +588,7 @@ public class LayoutExporter {
 			portletDataContext.getParameterMap(), "exportLAR");
 
 		if (!exportLAR && LayoutStagingUtil.isBranchingLayout(layout) &&
-			!layout.isTypeURL()) {
+			!layout.isTypeLinkToLayout() && !layout.isTypeURL()) {
 
 			long layoutSetBranchId = MapUtil.getLong(
 				portletDataContext.getParameterMap(), "layoutSetBranchId");
