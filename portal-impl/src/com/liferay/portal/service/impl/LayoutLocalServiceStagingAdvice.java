@@ -314,7 +314,13 @@ public class LayoutLocalServiceStagingAdvice implements MethodInterceptor {
 
 		serviceContext.setAttribute("revisionInProgress", hasWorkflowTask);
 
-		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
+		if (layout.isTypeLinkToLayout() || layout.isTypeURL()) {
+			serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
+		}
+		else {
+			serviceContext.setWorkflowAction(
+				WorkflowConstants.ACTION_SAVE_DRAFT);
+		}
 
 		LayoutRevisionLocalServiceUtil.updateLayoutRevision(
 			serviceContext.getUserId(), layoutRevision.getLayoutRevisionId(),
@@ -359,8 +365,14 @@ public class LayoutLocalServiceStagingAdvice implements MethodInterceptor {
 		serviceContext.setAttribute("revisionInProgress", hasWorkflowTask);
 
 		if (!MergeLayoutPrototypesThreadLocal.isInProgress()) {
-			serviceContext.setWorkflowAction(
-				WorkflowConstants.ACTION_SAVE_DRAFT);
+			if (layout.isTypeLinkToLayout() || layout.isTypeURL()) {
+				serviceContext.setWorkflowAction(
+					WorkflowConstants.ACTION_PUBLISH);
+			}
+			else {
+				serviceContext.setWorkflowAction(
+					WorkflowConstants.ACTION_SAVE_DRAFT);
+			}
 		}
 
 		LayoutRevisionLocalServiceUtil.updateLayoutRevision(
@@ -416,8 +428,14 @@ public class LayoutLocalServiceStagingAdvice implements MethodInterceptor {
 		serviceContext.setAttribute("revisionInProgress", hasWorkflowTask);
 
 		if (!MergeLayoutPrototypesThreadLocal.isInProgress()) {
-			serviceContext.setWorkflowAction(
-				WorkflowConstants.ACTION_SAVE_DRAFT);
+			if (layout.isTypeLinkToLayout() || layout.isTypeURL()) {
+				serviceContext.setWorkflowAction(
+					WorkflowConstants.ACTION_PUBLISH);
+			}
+			else {
+				serviceContext.setWorkflowAction(
+					WorkflowConstants.ACTION_SAVE_DRAFT);
+			}
 		}
 
 		LayoutRevisionLocalServiceUtil.updateLayoutRevision(
@@ -460,7 +478,13 @@ public class LayoutLocalServiceStagingAdvice implements MethodInterceptor {
 
 		serviceContext.setAttribute("revisionInProgress", hasWorkflowTask);
 
-		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
+		if (layout.isTypeLinkToLayout() || layout.isTypeURL()) {
+			serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
+		}
+		else {
+			serviceContext.setWorkflowAction(
+				WorkflowConstants.ACTION_SAVE_DRAFT);
+		}
 
 		LayoutRevisionLocalServiceUtil.updateLayoutRevision(
 			serviceContext.getUserId(), layoutRevision.getLayoutRevisionId(),

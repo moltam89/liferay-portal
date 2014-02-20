@@ -245,8 +245,14 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 				layoutSetBranchId, layout.getPlid(), serviceContext);
 
 		if (!MergeLayoutPrototypesThreadLocal.isInProgress()) {
-			serviceContext.setWorkflowAction(
-				WorkflowConstants.ACTION_SAVE_DRAFT);
+			if (layout.isTypeURL() || layout.isTypeLinkToLayout()) {
+				serviceContext.setWorkflowAction(
+					WorkflowConstants.ACTION_PUBLISH);
+			}
+			else {
+				serviceContext.setWorkflowAction(
+					WorkflowConstants.ACTION_SAVE_DRAFT);
+			}
 		}
 
 		layoutRevision = LayoutRevisionLocalServiceUtil.addLayoutRevision(
