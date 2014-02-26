@@ -1509,7 +1509,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		Matcher matcher = _importLinksToLayoutPattern.matcher(content);
 
 		while (matcher.find()) {
-			long oldGroupId = GetterUtil.getLong(matcher.group(6));
+			long oldGroupId = GetterUtil.getLong(matcher.group(7));
 
 			long newGroupId = oldGroupId;
 
@@ -1521,8 +1521,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 			boolean privateLayout = type.startsWith("private");
 
-			String layoutUuid = matcher.group(3);
-			String friendlyURL = matcher.group(4);
+			String layoutUuid = matcher.group(4);
+			String friendlyURL = matcher.group(5);
 
 			try {
 				Layout layout =
@@ -2299,10 +2299,11 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		ExportImportHelperImpl.class);
 
 	private Pattern _exportLinksToLayoutPattern = Pattern.compile(
-		"\\[([\\d]+)@(public|private)(@([\\d]+))?\\]");
+		"\\[([\\d]+)@(public|private(-user|-group)?)(@([\\d]+))?\\]");
 	private Pattern _importLinksToLayoutPattern = Pattern.compile(
-		"\\[([\\d]+)@(public|private)@(\\p{XDigit}{8}\\-(?:\\p{XDigit}{4}\\-)" +
-			"{3}\\p{XDigit}{12})@([a-z0-9./_-]*)(@([\\d]+))?\\]");
+		"\\[([\\d]+)@(public|private(-user|-group)?)@(\\p{XDigit}{8}\\-" +
+			"(?:\\p{XDigit}{4}\\-){3}\\p{XDigit}{12})@([a-z0-9./_-]*)" +
+				"(@([\\d]+))?\\]");
 
 	private class ManifestSummaryElementProcessor implements ElementProcessor {
 
