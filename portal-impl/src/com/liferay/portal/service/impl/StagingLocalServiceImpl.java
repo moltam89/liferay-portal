@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.staging.LayoutStagingUtil;
 import com.liferay.portal.kernel.staging.StagingConstants;
 import com.liferay.portal.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
@@ -35,7 +36,11 @@ import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
+import com.liferay.portal.model.Layout;
+import com.liferay.portal.model.LayoutRevision;
 import com.liferay.portal.model.LayoutSet;
+import com.liferay.portal.model.LayoutSetBranch;
+import com.liferay.portal.model.LayoutStagingHandler;
 import com.liferay.portal.model.Repository;
 import com.liferay.portal.model.User;
 import com.liferay.portal.portletfilerepository.PortletFileRepositoryUtil;
@@ -131,6 +136,8 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 				typeSettingsProperties.getProperty("remoteGroupId"));
 
 			disableRemoteStaging(remoteURL, remoteGroupId);
+
+			updateLayoutsWithLatestRevisions(liveGroup, typeSettingsProperties);
 		}
 
 		typeSettingsProperties.remove("branchingPrivate");
@@ -622,6 +629,25 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 		}
 	}
 
+	protected void updateLayoutsWithLatestRevisions(
+			Group liveGroup, UnicodeProperties typeSettingsProperties)
+		throws PortalException, SystemException {
+
+		String branchingPrivate = typeSettingsProperties.getProperty(
+			"branchingPrivate", "false");
+
+		String branchingPublic = typeSettingsProperties.getProperty(
+			"branchingPublic", "false");
+
+		if (branchingPrivate.equals("true")) {
+			_updateLayoutsWithLatestRevisions(liveGroup, true);
+		}
+
+		if (branchingPublic.equals("true")) {
+			_updateLayoutsWithLatestRevisions(liveGroup, false);
+		}
+	}
+
 	protected void updateStagedPortlets(
 			String remoteURL, long remoteGroupId,
 			UnicodeProperties typeSettingsProperties)
@@ -677,6 +703,59 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			ree.setURL(remoteURL);
 
 			throw ree;
+		}
+	}
+
+	private Layout _copyLayoutRevisionToLayout(
+			Layout layout, LayoutRevision layoutRevision)
+		throws PortalException, SystemException {
+
+		LayoutStagingHandler layoutStagingHandler =
+			LayoutStagingUtil.getLayoutStagingHandler(layout);
+
+		layout = layoutStagingHandler.getLayout();
+
+		layout.setCompanyId(layoutRevision.getCompanyId());
+		layout.setUserId(layoutRevision.getUserId());
+		layout.setUserName(layoutRevision.getUserName());
+		layout.setCreateDate(layoutRevision.getCreateDate());
+		layout.setModifiedDate(layoutRevision.getModifiedDate());
+		layout.setPrivateLayout(layoutRevision.getPrivateLayout());
+		layout.setName(layoutRevision.getName());
+		layout.setTitle(layoutRevision.getTitle());
+		layout.setDescription(layoutRevision.getDescription());
+		layout.setKeywords(layoutRevision.getKeywords());
+		layout.setTypeSettings(layoutRevision.getTypeSettings());
+		layout.setIconImageId(layoutRevision.getIconImageId());
+		layout.setThemeId(layoutRevision.getThemeId());
+		layout.setColorSchemeId(layoutRevision.getColorSchemeId());
+		layout.setWapThemeId(layoutRevision.getWapThemeId());
+		layout.setWapColorSchemeId(layoutRevision.getWapColorSchemeId());
+		layout.setCss(layoutRevision.getCss());
+
+		return layout;
+	}
+
+	private void _updateLayoutsWithLatestRevisions(
+			Group stagingGroup, boolean privateLayout)
+		throws PortalException, SystemException {
+
+		LayoutSetBranch masterBranch =
+			layoutSetBranchLocalService.getMasterLayoutSetBranch(
+				stagingGroup.getGroupId(), privateLayout);
+
+		List<LayoutRevision> headRevisions =
+			layoutRevisionLocalService.getLayoutRevisions(
+				masterBranch.getLayoutSetBranchId(), true);
+
+		for (LayoutRevision layoutRevision : headRevisions) {
+			long plid = layoutRevision.getPlid();
+
+			Layout layout = layoutLocalService.fetchLayout(plid);
+
+			layout = _copyLayoutRevisionToLayout(layout, layoutRevision);
+
+			layoutLocalService.updateLayout(layout);
 		}
 	}
 
