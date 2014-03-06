@@ -409,7 +409,7 @@ if (hints != null) {
 					xml = BeanPropertiesUtil.getString(bean, field);
 				}
 				else {
-					Map<Locale, String> localizationMap = LocalizationUtil.getLocalizationMap(portletRequest, field);
+					Map<Locale, String> localizationMap = LocalizationUtil.getLocalizationMap(portletRequest, fieldParam);
 
 					xml = LocalizationUtil.updateLocalization(localizationMap, xml, field, defaultLanguageId);
 				}
