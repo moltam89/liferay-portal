@@ -553,6 +553,10 @@ public class EditLayoutsAction extends PortletAction {
 		long incompleteLayoutRevisionId = ParamUtil.getLong(
 			actionRequest, "incompleteLayoutRevisionId");
 
+		long plid = ParamUtil.getLong(actionRequest, "plid");
+
+		Layout layout = LayoutLocalServiceUtil.getLayout(plid);
+
 		LayoutRevision incompleteLayoutRevision =
 			LayoutRevisionLocalServiceUtil.getLayoutRevision(
 				incompleteLayoutRevisionId);
@@ -564,7 +568,13 @@ public class EditLayoutsAction extends PortletAction {
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
 
-		serviceContext.setWorkflowAction(WorkflowConstants.ACTION_SAVE_DRAFT);
+		if (layout.isTypeURL() || layout.isTypeLinkToLayout()) {
+			serviceContext.setWorkflowAction(WorkflowConstants.ACTION_PUBLISH);
+		}
+		else {
+			serviceContext.setWorkflowAction(
+				WorkflowConstants.ACTION_SAVE_DRAFT);
+		}
 
 		LayoutRevisionLocalServiceUtil.updateLayoutRevision(
 			serviceContext.getUserId(),
