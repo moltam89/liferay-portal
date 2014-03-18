@@ -325,16 +325,15 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 		if (!stagedRemotely) {
 			enableRemoteStaging(remoteURL, remoteGroupId);
 		}
-		else {
-			boolean currentylBranchingPrivate = GetterUtil.getBoolean(
-				typeSettingsProperties.getProperty("branchingPrivate"));
-			boolean currentlyBranchingPublic = GetterUtil.getBoolean(
-				typeSettingsProperties.getProperty("branchingPublic"));
 
-			updatePageVersioning(
-				liveGroup, currentylBranchingPrivate, currentlyBranchingPublic,
-				branchingPrivate, branchingPublic);
-		}
+		boolean currentylBranchingPrivate = GetterUtil.getBoolean(
+			typeSettingsProperties.getProperty("branchingPrivate"));
+		boolean currentlyBranchingPublic = GetterUtil.getBoolean(
+			typeSettingsProperties.getProperty("branchingPublic"));
+
+		updatePageVersioning(
+			liveGroup, currentylBranchingPrivate, currentlyBranchingPublic,
+			branchingPrivate, branchingPublic);
 
 		typeSettingsProperties.setProperty(
 			"branchingPrivate", String.valueOf(branchingPrivate));
