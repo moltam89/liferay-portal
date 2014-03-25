@@ -34,6 +34,8 @@ import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.StreamUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
@@ -62,6 +64,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -143,7 +148,8 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			boolean branchingPublic = GetterUtil.getBoolean(
 				typeSettingsProperties.getProperty("branchingPublic"));
 
-			updatePageVersioning(liveGroup, branchingPrivate, branchingPublic);
+			updatePageVersioning(
+				liveGroup.getGroupId(), branchingPrivate, branchingPublic);
 		}
 
 		typeSettingsProperties.remove("branchingPrivate");
@@ -270,8 +276,10 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			}
 		}
 		else {
+			Group stagingGroup = liveGroup.getStagingGroup();
+
 			updatePageVersioning(
-				liveGroup.getStagingGroup(), currentylBranchingPrivate,
+				stagingGroup.getGroupId(), currentylBranchingPrivate,
 				currentlyBranchingPublic, branchingPrivate, branchingPublic);
 		}
 
@@ -332,8 +340,8 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			typeSettingsProperties.getProperty("branchingPublic"));
 
 		updatePageVersioning(
-			liveGroup, currentylBranchingPrivate, currentlyBranchingPublic,
-			branchingPrivate, branchingPublic);
+			liveGroup.getGroupId(), currentylBranchingPrivate,
+			currentlyBranchingPublic, branchingPrivate, branchingPublic);
 
 		typeSettingsProperties.setProperty(
 			"branchingPrivate", String.valueOf(branchingPrivate));
@@ -557,6 +565,40 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			".lar";
 	}
 
+	protected Map<Long, Long> getPublishedLayoutRevisions(
+			List<Long> lastPublishDates,
+			Map<Long, Long> publishedLayoutSetBranches)
+		throws PortalException, SystemException {
+
+		Map<Long, Long> publishedLayoutRevisions = new HashMap<Long, Long>();
+
+		for (Long lastPublishDate : lastPublishDates) {
+			Long layoutSetBranchId = publishedLayoutSetBranches.get(
+				lastPublishDate);
+
+			LayoutSetBranch layoutSetBranch =
+				layoutSetBranchLocalService.getLayoutSetBranch(
+					layoutSetBranchId);
+
+			List<LayoutRevision> approvedRevisions =
+				layoutRevisionLocalService.getLayoutRevisions(
+					layoutSetBranch.getLayoutSetBranchId(),
+					WorkflowConstants.STATUS_APPROVED);
+
+			for (LayoutRevision layoutRevision : approvedRevisions) {
+				Date statusDate = layoutRevision.getStatusDate();
+
+				if (statusDate.getTime() <= lastPublishDate) {
+					publishedLayoutRevisions.put(
+						layoutRevision.getPlid(),
+						layoutRevision.getLayoutRevisionId());
+				}
+			}
+		}
+
+		return publishedLayoutRevisions;
+	}
+
 	protected FileEntry getStagingRequestFileEntry(
 			long userId, long stagingRequestId, Folder folder)
 		throws PortalException, SystemException {
@@ -655,19 +697,45 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 	}
 
 	protected void updateLayoutsWithLatestRevisions(
-			Group stagingGroup, boolean privateLayout)
+			long groupId, boolean privateLayout)
 		throws PortalException, SystemException {
 
-		LayoutSetBranch masterBranch =
-			layoutSetBranchLocalService.getMasterLayoutSetBranch(
-				stagingGroup.getGroupId(), privateLayout);
+		List<LayoutSetBranch> layoutSetBranches =
+			layoutSetBranchLocalService.getLayoutSetBranches(
+				groupId, privateLayout);
 
-		List<LayoutRevision> headRevisions =
-			layoutRevisionLocalService.getLayoutRevisions(
-				masterBranch.getLayoutSetBranchId(), true);
+		List<Long> lastPublishDates = new ArrayList<Long>();
 
-		for (LayoutRevision layoutRevision : headRevisions) {
-			long plid = layoutRevision.getPlid();
+		Map<Long, Long> publishedLayoutSetBranches = new HashMap<Long, Long>();
+
+		for (LayoutSetBranch layoutSetBranch : layoutSetBranches) {
+			String lastPublishDate = layoutSetBranch.getSettingsProperty(
+				"last-publish-date");
+
+			if (Validator.isNotNull(lastPublishDate)) {
+				Long lastPublishTime = new Long(lastPublishDate);
+
+				lastPublishDates.add(lastPublishTime);
+
+				publishedLayoutSetBranches.put(
+					lastPublishTime, layoutSetBranch.getLayoutSetBranchId());
+			}
+		}
+
+		Collections.sort(lastPublishDates);
+
+		Map<Long, Long> publishedLayoutRevisions =
+			getPublishedLayoutRevisions(
+				lastPublishDates, publishedLayoutSetBranches);
+
+		Set<Long> publishedLayoutPlids = publishedLayoutRevisions.keySet();
+
+		for (Long plid : publishedLayoutPlids) {
+			long layoutRevisionId = publishedLayoutRevisions.get(plid);
+
+			LayoutRevision layoutRevision =
+				layoutRevisionLocalService.fetchLayoutRevision(
+					layoutRevisionId);
 
 			Layout layout = layoutLocalService.fetchLayout(plid);
 
@@ -708,27 +776,27 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 	}
 
 	protected void updatePageVersioning(
-			Group stagingGroup, boolean currentlyBranchingPrivate,
+			long groupId, boolean currentlyBranchingPrivate,
 			boolean currentlyBranchingPublic)
 		throws PortalException, SystemException {
 
 		updatePageVersioning(
-			stagingGroup, currentlyBranchingPrivate, currentlyBranchingPublic,
-			false, false);
+			groupId, currentlyBranchingPrivate, currentlyBranchingPublic, false,
+			false);
 	}
 
 	protected void updatePageVersioning(
-			Group stagingGroup, boolean currentlyBranchingPrivate,
+			long groupId, boolean currentlyBranchingPrivate,
 			boolean currentlyBranchingPublic, boolean branchingPrivate,
 			boolean branchingPublic)
 		throws PortalException, SystemException {
 
 		if (!branchingPrivate && currentlyBranchingPrivate) {
-			updateLayoutsWithLatestRevisions(stagingGroup, true);
+			updateLayoutsWithLatestRevisions(groupId, true);
 		}
 
 		if (!branchingPublic && currentlyBranchingPublic) {
-			updateLayoutsWithLatestRevisions(stagingGroup, false);
+			updateLayoutsWithLatestRevisions(groupId, false);
 		}
 	}
 
