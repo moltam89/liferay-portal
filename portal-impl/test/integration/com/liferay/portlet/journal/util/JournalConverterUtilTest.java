@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Document;
@@ -612,17 +611,13 @@ public class JournalConverterUtilTest extends BaseDDMServiceTestCase {
 		docLibraryField.setDDMStructureId(ddmStructureId);
 		docLibraryField.setName("document_library");
 
-		StringBundler sb = new StringBundler(7);
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
-		sb.append("{\"groupId\":");
-		sb.append(fileEntry.getGroupId());
-		sb.append(",\"uuid\":\"");
-		sb.append(fileEntry.getUuid());
-		sb.append("\",\"version\":\"");
-		sb.append(fileEntry.getVersion());
-		sb.append("\"}");
+		jsonObject.put("groupId", fileEntry.getGroupId());
+		jsonObject.put("uuid", fileEntry.getUuid());
+		jsonObject.put("version", fileEntry.getVersion());
 
-		docLibraryField.addValue(_enLocale, sb.toString());
+		docLibraryField.addValue(_enLocale, jsonObject.toString());
 
 		return docLibraryField;
 	}
