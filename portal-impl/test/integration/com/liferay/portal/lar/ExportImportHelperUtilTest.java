@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.StagedModel;
+import com.liferay.portal.model.User;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceTestUtil;
@@ -54,6 +55,7 @@ import com.liferay.portal.util.PortalImpl;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.TestPropsValues;
+import com.liferay.portal.util.UserTestUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
@@ -363,6 +365,46 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 		assertLinksToLayouts(content, _stagingPrivateLayout, true);
 		assertLinksToLayouts(content, _stagingPublicLayout, false);
 		assertLinksToLayouts(content, _stagingPublicLayout, true);
+	}
+
+	@Test
+	public void testExportLinksToLayoutsUserGroup() throws Exception {
+		User user = UserTestUtil.addUser();
+
+		Group group = user.getGroup();
+
+		Layout privateLayout = LayoutTestUtil.addLayout(
+			group.getGroupId(), ServiceTestUtil.randomString(), true);
+		Layout publicLayout = LayoutTestUtil.addLayout(
+			group.getGroupId(), ServiceTestUtil.randomString(), false);
+
+		PortletDataContext portletDataContextExport =
+			PortletDataContextFactoryUtil.createExportPortletDataContext(
+				group.getCompanyId(), group.getGroupId(),
+				new HashMap<String, String[]>(),
+				new Date(System.currentTimeMillis() - Time.HOUR), new Date(),
+				new TestReaderWriter());
+
+		StagedModel referrerStagedModel = JournalTestUtil.addArticle(
+			group.getGroupId(), ServiceTestUtil.randomString(),
+			ServiceTestUtil.randomString());
+
+		Element rootElement = SAXReaderUtil.createElement("root");
+
+		rootElement.addElement("entry");
+
+		String content = replaceLinksToLayoutsParameters(
+			getContent("layout_links_user_group.txt"), privateLayout,
+			publicLayout);
+
+		content = ExportImportHelperUtil.replaceExportContentReferences(
+			portletDataContextExport, referrerStagedModel,
+			rootElement.element("entry"), content, true);
+
+		assertLinksToLayouts(content, privateLayout, false);
+		assertLinksToLayouts(content, privateLayout, true);
+		assertLinksToLayouts(content, publicLayout, false);
+		assertLinksToLayouts(content, publicLayout, true);
 	}
 
 	@Test
