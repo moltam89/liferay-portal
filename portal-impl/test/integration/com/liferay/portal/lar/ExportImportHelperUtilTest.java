@@ -15,6 +15,7 @@
 package com.liferay.portal.lar;
 
 import com.liferay.portal.kernel.dao.orm.FinderCacheUtil;
+import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.lar.ExportImportPathUtil;
 import com.liferay.portal.kernel.lar.MissingReference;
@@ -24,6 +25,7 @@ import com.liferay.portal.kernel.lar.PortletDataContextFactoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -357,29 +359,10 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 			_portletDataContextExport, _referrerStagedModel,
 			rootElement.element("entry"), content, true);
 
-		StringBundler sb = new StringBundler(5);
-
-		sb.append(StringPool.OPEN_BRACKET);
-		sb.append(_stagingPrivateLayout.getLayoutId());
-		sb.append("@private@");
-		sb.append(_stagingPrivateLayout.getUuid());
-		sb.append(StringPool.AT);
-		sb.append(_stagingPrivateLayout.getFriendlyURL());
-		sb.append(StringPool.CLOSE_BRACKET);
-
-		Assert.assertTrue(content.contains(sb.toString()));
-
-		sb.setIndex(0);
-
-		sb.append(StringPool.OPEN_BRACKET);
-		sb.append(_stagingPublicLayout.getLayoutId());
-		sb.append("@public@");
-		sb.append(_stagingPublicLayout.getUuid());
-		sb.append(StringPool.AT);
-		sb.append(_stagingPublicLayout.getFriendlyURL());
-		sb.append(StringPool.CLOSE_BRACKET);
-
-		Assert.assertTrue(content.contains(sb.toString()));
+		assertLinksToLayouts(content, _stagingPrivateLayout, false);
+		assertLinksToLayouts(content, _stagingPrivateLayout, true);
+		assertLinksToLayouts(content, _stagingPublicLayout, false);
+		assertLinksToLayouts(content, _stagingPublicLayout, true);
 	}
 
 	@Test
@@ -487,6 +470,54 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 		Assert.assertEquals(1, weakMissingReferences.size());
 
 		FileUtil.delete(zipWriter.getFile());
+	}
+
+	protected void assertLinksToLayouts(
+			String content, Layout layout, boolean addGroupId)
+		throws SystemException {
+
+		long groupId = 0;
+
+		if (addGroupId) {
+			groupId = layout.getGroupId();
+		}
+
+		Group group = GroupLocalServiceUtil.fetchGroup(groupId);
+
+		StringBundler sb = new StringBundler((group == null) ? 9 : 11);
+
+		sb.append(StringPool.OPEN_BRACKET);
+		sb.append(layout.getLayoutId());
+		sb.append(CharPool.AT);
+
+		if (layout.isPrivateLayout()) {
+			if (group == null) {
+				sb.append("private");
+			}
+			else if (group.isUser()) {
+				sb.append("private-user");
+			}
+			else {
+				sb.append("private-group");
+			}
+		}
+		else {
+			sb.append("public");
+		}
+
+		sb.append(CharPool.AT);
+		sb.append(layout.getUuid());
+		sb.append(StringPool.AT);
+		sb.append(layout.getFriendlyURL());
+
+		if (group != null) {
+			sb.append(CharPool.AT);
+			sb.append(String.valueOf(groupId));
+		}
+
+		sb.append(StringPool.CLOSE_BRACKET);
+
+		Assert.assertTrue(content.contains(sb.toString()));
 	}
 
 	protected String getContent(String fileName) throws Exception {
