@@ -14,8 +14,6 @@
 
 package com.liferay.portal.util.mail;
 
-import com.dumbster.smtp.SmtpMessage;
-
 import com.liferay.portal.kernel.mail.MailMessage;
 import com.liferay.portal.kernel.test.ExecutionTestListeners;
 import com.liferay.portal.test.LiferayIntegrationJUnitTestRunner;
@@ -51,18 +49,19 @@ public class MailEngineTest {
 
 		Assert.assertEquals(1, MailServiceTestUtil.getInboxSize());
 
-		List<SmtpMessage> smtMessages = MailServiceTestUtil.getMessages(
-			"Body", "My name is Inigo Montoya.");
+		List<com.dumbster.smtp.MailMessage> mailMessages =
+			MailServiceTestUtil.getMailMessages(
+				"Body", "My name is Inigo Montoya.");
 
-		Assert.assertEquals(1, smtMessages.size());
+		Assert.assertEquals(1, mailMessages.size());
 
-		smtMessages = MailServiceTestUtil.getMessages("Subject", "Hello");
+		mailMessages = MailServiceTestUtil.getMailMessages("Subject", "Hello");
 
-		Assert.assertEquals(1, smtMessages.size());
+		Assert.assertEquals(1, mailMessages.size());
 
-		smtMessages = MailServiceTestUtil.getMessages("To", "to@test.com");
+		mailMessages = MailServiceTestUtil.getMailMessages("To", "to@test.com");
 
-		Assert.assertEquals(1, smtMessages.size());
+		Assert.assertEquals(1, mailMessages.size());
 	}
 
 }

@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.parsers.bbcode.BBCodeTranslatorUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.sanitizer.Sanitizer;
 import com.liferay.portal.kernel.sanitizer.SanitizerUtil;
@@ -44,14 +45,20 @@ import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Organization;
+import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
+import com.liferay.portal.model.RoleConstants;
 import com.liferay.portal.model.Subscription;
+import com.liferay.portal.model.ThemeConstants;
 import com.liferay.portal.model.UserGroup;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.security.permission.PermissionChecker;
+import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.OrganizationLocalServiceUtil;
+import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.service.RoleLocalServiceUtil;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.SubscriptionLocalServiceUtil;
 import com.liferay.portal.service.UserGroupLocalServiceUtil;
 import com.liferay.portal.service.UserGroupRoleLocalServiceUtil;
@@ -112,6 +119,8 @@ public class MBUtil {
 	public static final String BB_CODE_EDITOR_WYSIWYG_IMPL_KEY =
 		"editor.wysiwyg.portal-web.docroot.html.portlet.message_boards." +
 			"edit_message.bb_code.jsp";
+
+	public static final String EMOTICONS = "/emoticons";
 
 	public static final String MESSAGE_POP_PORTLET_PREFIX = "mb_message.";
 
@@ -304,6 +313,13 @@ public class MBUtil {
 		sb.append(mbCategory.getName());
 
 		return sb.toString();
+	}
+
+	public static String getBBCodeHTML(String msgBody, String pathThemeImages) {
+		return StringUtil.replace(
+			BBCodeTranslatorUtil.getHTML(msgBody),
+			ThemeConstants.TOKEN_THEME_IMAGES_PATH + EMOTICONS,
+			pathThemeImages + EMOTICONS);
 	}
 
 	public static long getCategoryId(
@@ -926,13 +942,63 @@ public class MBUtil {
 		return true;
 	}
 
+	public static void propagatePermissions(
+			long companyId, long groupId, long parentMessageId,
+			ServiceContext serviceContext)
+		throws PortalException, SystemException {
+
+		MBMessage parentMessage = MBMessageLocalServiceUtil.getMBMessage(
+			parentMessageId);
+
+		Role defaultGroupRole = RoleLocalServiceUtil.getDefaultGroupRole(
+			groupId);
+		Role guestRole = RoleLocalServiceUtil.getRole(
+			companyId, RoleConstants.GUEST);
+
+		long[] roleIds = {defaultGroupRole.getRoleId(), guestRole.getRoleId()};
+
+		List<String> actionIds = ResourceActionsUtil.getModelResourceActions(
+			MBMessage.class.getName());
+
+		Map<Long, Set<String>> roleIdsToActionIds =
+			ResourcePermissionLocalServiceUtil.
+				getAvailableResourcePermissionActionIds(
+					companyId, MBMessage.class.getName(),
+					ResourceConstants.SCOPE_INDIVIDUAL,
+					String.valueOf(parentMessage.getMessageId()), roleIds,
+					actionIds);
+
+		Set<String> defaultGroupActionIds = roleIdsToActionIds.get(
+			defaultGroupRole.getRoleId());
+
+		if (defaultGroupActionIds == null) {
+			serviceContext.setGroupPermissions(new String[]{});
+		}
+		else {
+			serviceContext.setGroupPermissions(
+				defaultGroupActionIds.toArray(
+					new String[defaultGroupActionIds.size()]));
+		}
+
+		Set<String> guestActionIds = roleIdsToActionIds.get(
+			guestRole.getRoleId());
+
+		if (guestActionIds == null) {
+			serviceContext.setGuestPermissions(new String[]{});
+		}
+		else {
+			serviceContext.setGuestPermissions(
+				guestActionIds.toArray(new String[guestActionIds.size()]));
+		}
+	}
+
 	public static String replaceMessageBodyPaths(
 		ThemeDisplay themeDisplay, String messageBody) {
 
 		return StringUtil.replace(
 			messageBody,
 			new String[] {
-				"@theme_images_path@", "href=\"/", "src=\"/"
+				ThemeConstants.TOKEN_THEME_IMAGES_PATH, "href=\"/", "src=\"/"
 			},
 			new String[] {
 				themeDisplay.getPathThemeImages(),
