@@ -40,7 +40,6 @@ import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.StagedModel;
-import com.liferay.portal.model.User;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.service.GroupLocalServiceUtil;
 import com.liferay.portal.service.ServiceTestUtil;
@@ -55,11 +54,11 @@ import com.liferay.portal.util.PortalImpl;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portal.util.TestPropsValues;
-import com.liferay.portal.util.UserTestUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLAppTestUtil;
+import com.liferay.portlet.journal.model.JournalArticle;
 import com.liferay.portlet.journal.util.JournalTestUtil;
 
 import java.io.File;
@@ -369,9 +368,7 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 
 	@Test
 	public void testExportLinksToLayoutsUserGroup() throws Exception {
-		User user = UserTestUtil.addUser();
-
-		Group group = user.getGroup();
+		Group group = TestPropsValues.getUser().getGroup();
 
 		Layout privateLayout = LayoutTestUtil.addLayout(
 			group.getGroupId(), ServiceTestUtil.randomString(), true);
@@ -385,7 +382,7 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 				new Date(System.currentTimeMillis() - Time.HOUR), new Date(),
 				new TestReaderWriter());
 
-		StagedModel referrerStagedModel = JournalTestUtil.addArticle(
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
 			group.getGroupId(), ServiceTestUtil.randomString(),
 			ServiceTestUtil.randomString());
 
@@ -398,7 +395,7 @@ public class ExportImportHelperUtilTest extends PowerMockito {
 			publicLayout);
 
 		content = ExportImportHelperUtil.replaceExportContentReferences(
-			portletDataContextExport, referrerStagedModel,
+			portletDataContextExport, journalArticle,
 			rootElement.element("entry"), content, true);
 
 		assertLinksToLayouts(content, privateLayout, false);
