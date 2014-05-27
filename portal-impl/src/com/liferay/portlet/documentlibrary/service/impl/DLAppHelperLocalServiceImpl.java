@@ -186,6 +186,11 @@ public class DLAppHelperLocalServiceImpl
 		}
 	}
 
+	/**
+	 * @deprecated As of 7.0.0, replaced by {@link #cancelCheckOut(FileEntry,
+	 *             FileVersion)}
+	 */
+	@Deprecated
 	@Override
 	public void cancelCheckOut(
 			long userId, FileEntry fileEntry, FileVersion sourceFileVersion,
