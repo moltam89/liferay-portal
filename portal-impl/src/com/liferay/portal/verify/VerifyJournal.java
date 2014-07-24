@@ -22,6 +22,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.FriendlyURLNormalizerUtil;
+import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.service.ResourceLocalServiceUtil;
@@ -60,6 +61,7 @@ public class VerifyJournal extends VerifyProcess {
 	@Override
 	protected void doVerify() throws Exception {
 		updateFolderAssets();
+		verifyFolder();
 		verifyOracleNewLine();
 		verifyPermissionsAndAssets();
 		verifySearch();
@@ -171,6 +173,41 @@ public class VerifyJournal extends VerifyProcess {
 					contentSearch.getGroupId(), contentSearch.isPrivateLayout(),
 					contentSearch.getLayoutId(), contentSearch.getPortletId(),
 					articleId, true);
+			}
+		}
+		finally {
+			DataAccess.cleanUp(con, ps, rs);
+		}
+	}
+
+	protected void verifyFolder() throws Exception {
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+
+		try {
+			StringBundler sb = new StringBundler(4);
+
+			sb.append("select distinct groupId, articleId, folderId from ");
+			sb.append("JournalArticle ja where exists (select 1 from ");
+			sb.append("JournalArticle ja2 where ja.articleId = ja2.articleId ");
+			sb.append("and ja.folderId != ja2.folderId) and version = ?");
+
+			con = DataAccess.getUpgradeOptimizedConnection();
+
+			ps = con.prepareStatement(sb.toString());
+
+			ps.setDouble(1, JournalArticleConstants.VERSION_DEFAULT);
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				String articleId = rs.getString("articleId");
+				long folderId = rs.getLong("folderId");
+				long groupId = rs.getLong("groupId");
+
+				JournalArticleLocalServiceUtil.moveArticle(
+					groupId, articleId, folderId);
 			}
 		}
 		finally {
