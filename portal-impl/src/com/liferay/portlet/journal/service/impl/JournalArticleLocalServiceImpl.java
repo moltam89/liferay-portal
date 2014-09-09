@@ -5505,14 +5505,10 @@ public class JournalArticleLocalServiceImpl
 
 		int oldStatus = article.getStatus();
 
-		boolean neverExpire = false;
-
 		if (status == WorkflowConstants.STATUS_APPROVED) {
 			Date expirationDate = article.getExpirationDate();
 
 			if ((expirationDate != null) && expirationDate.before(now)) {
-				neverExpire = true;
-
 				article.setExpirationDate(null);
 			}
 		}
