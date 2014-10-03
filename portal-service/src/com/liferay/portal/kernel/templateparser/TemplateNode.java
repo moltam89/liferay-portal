@@ -235,6 +235,7 @@ public class TemplateNode extends LinkedHashMap<String, Object> {
 		return GetterUtil.getLong(data);
 	}
 MAKK
+EDIT
 	protected long getLayoutId() {
 		String data = (String)get("data");
 
