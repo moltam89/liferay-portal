@@ -157,7 +157,8 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 			return portletPreferences;
 		}
 
-		DLAppLocalServiceUtil.deleteAll(portletDataContext.getScopeGroupId());
+		DLAppLocalServiceUtil.deleteAllRepositories(
+			portletDataContext.getScopeGroupId());
 
 		return portletPreferences;
 	}
