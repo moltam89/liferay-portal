@@ -61,6 +61,37 @@ public class AssetPublisherPortletDataHandler
 	}
 
 	@Override
+	public String exportData(
+		PortletDataContext portletDataContext, String portletId,
+		PortletPreferences portletPreferences) {
+
+		try {
+			return doExportData(
+				portletDataContext, portletId, portletPreferences);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+
+			return StringPool.BLANK;
+		}
+	}
+
+	@Override
+	public PortletPreferences importData(
+		PortletDataContext portletDataContext, String portletId,
+		PortletPreferences portletPreferences, String data) {
+
+		try {
+			return doImportData(
+				portletDataContext, portletId, portletPreferences, data);
+		} catch (Exception e) {
+			e.printStackTrace();
+
+			return null;
+		}
+	}
+
+	@Override
 	protected String doExportData(
 			final PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
