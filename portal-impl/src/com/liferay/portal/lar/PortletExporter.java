@@ -125,13 +125,14 @@ public class PortletExporter {
 		PortletDataHandler portletDataHandler =
 			portlet.getPortletDataHandlerInstance();
 
+		String portletId = portlet.getPortletId();
+
 		if ((portletDataHandler == null) ||
-			portletDataHandler.isDataPortletInstanceLevel()) {
+			portletDataHandler.isDataPortletInstanceLevel() &&
+			!portletId.startsWith("101")) {
 
 			return;
 		}
-
-		String portletId = portlet.getPortletId();
 
 		Group liveGroup = layout.getGroup();
 
