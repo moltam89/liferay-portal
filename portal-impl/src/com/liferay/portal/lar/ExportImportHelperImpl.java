@@ -282,7 +282,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			companyId, portletId, parameterMap);
 
 		exportPortletControlsMap.put(
-			PortletDataHandlerKeys.PORTLET_DATA, exportPortletData);
+			PortletDataHandlerKeys.PORTLET_DATA, true);
 
 		exportPortletControlsMap.putAll(
 			getExportPortletSetupControlsMap(
