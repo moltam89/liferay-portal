@@ -35,6 +35,7 @@ import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
+import com.liferay.portlet.asset.model.AssetEntry;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.assetpublisher.util.AssetPublisher;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
@@ -96,6 +97,11 @@ public class AssetPublisherPortletDataHandler
 			final PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
 		throws Exception {
+
+		List<AssetEntry> assetEntries = AssetPublisherUtil.getAssetEntries(
+			null, portletPreferences,
+			PermissionThreadLocal.getPermissionChecker(),
+			new long[] {portletDataContext.getScopeGroupId()} , false, false);
 
 		return StringPool.BLANK;
 	}
