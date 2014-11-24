@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.lar.DataLevel;
 import com.liferay.portal.kernel.lar.DefaultConfigurationPortletDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -34,14 +35,20 @@ import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.portal.util.PortletKeys;
+import com.liferay.portlet.asset.AssetRendererFactoryRegistryUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.model.AssetRenderer;
+import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.assetpublisher.util.AssetPublisher;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
+import com.liferay.portlet.journal.asset.JournalArticleAssetRenderer;
+import com.liferay.portlet.journal.asset.JournalArticleAssetRendererFactory;
 import com.liferay.portlet.journal.model.JournalArticle;
 
 import java.util.ArrayList;
@@ -102,6 +109,53 @@ public class AssetPublisherPortletDataHandler
 			null, portletPreferences,
 			PermissionThreadLocal.getPermissionChecker(),
 			new long[] {portletDataContext.getScopeGroupId()} , false, false);
+
+		for (AssetEntry assetEntry : assetEntries) {
+			long classPK = assetEntry.getClassPK();
+
+			AssetRendererFactory assetRendererFactory =
+				AssetRendererFactoryRegistryUtil.
+					getAssetRendererFactoryByClassNameId(
+						assetEntry.getClassNameId());
+
+			if (assetRendererFactory == null) {
+				continue;
+			}
+
+			AssetRenderer assetRenderer = null;
+
+			try {
+				assetRenderer = assetRendererFactory.getAssetRenderer(classPK);
+			}
+			catch (Exception e) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(e, e);
+				}
+
+				continue;
+			}
+
+			if ((assetRenderer == null) || !assetRenderer.isDisplayable()) {
+				continue;
+			}
+
+			if (assetRenderer.getClassName().
+					equals(JournalArticle.class.getName())) {
+
+				JournalArticleAssetRenderer journalArticleAssetRenderer = 
+					(JournalArticleAssetRenderer)assetRenderer;
+
+				JournalArticle journalArticle =
+					journalArticleAssetRenderer.getArticle(); 
+
+				StagedModelDataHandlerUtil.exportReferenceStagedModel(
+					portletDataContext, PortletKeys.ASSET_PUBLISHER,
+					journalArticle);
+				
+				StagedModelDataHandlerUtil.exportStagedModel(
+					portletDataContext, journalArticle);
+			}
+		}
 
 		return StringPool.BLANK;
 	}
