@@ -182,11 +182,15 @@ public class PortletImporter {
 						portletPreferences.getPreferences());
 		}
 
-		String portletData = portletDataContext.getZipEntryAsString(
-			portletDataElement.attributeValue("path"));
+		String portletData = null;
 
-		if (Validator.isNull(portletData)) {
-			return null;
+		if (!portletId.startsWith("101")) {
+			portletData = portletDataContext.getZipEntryAsString(
+				portletDataElement.attributeValue("path"));
+
+			if (Validator.isNull(portletData)) {
+				return null;
+			}
 		}
 
 		portletPreferencesImpl =

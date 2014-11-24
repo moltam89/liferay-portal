@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
@@ -166,7 +167,17 @@ public class AssetPublisherPortletDataHandler
 			PortletPreferences portletPreferences, String data)
 		throws Exception {
 
-		return null;
+		Element articlesElement = portletDataContext.getImportDataGroupElement(
+			JournalArticle.class);
+
+		List<Element> articleElements = articlesElement.elements();
+
+		for (Element articleElement : articleElements) {
+			StagedModelDataHandlerUtil.importStagedModel(
+				portletDataContext, articleElement);
+		}
+
+		return portletPreferences;
 	}
 
 	@Override
