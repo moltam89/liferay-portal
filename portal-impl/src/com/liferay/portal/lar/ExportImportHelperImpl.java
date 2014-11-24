@@ -349,7 +349,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			new HashMap<String, Boolean>();
 
 		importPortletControlsMap.put(
-			PortletDataHandlerKeys.PORTLET_DATA, importCurPortletData);
+			PortletDataHandlerKeys.PORTLET_DATA, true);
 
 		importPortletControlsMap.putAll(
 			getImportPortletSetupControlsMap(
