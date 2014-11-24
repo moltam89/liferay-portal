@@ -151,7 +151,8 @@ public class PortletImporter {
 			portlet.getPortletDataHandlerInstance();
 
 		if ((portletDataHandler == null) ||
-			portletDataHandler.isDataPortletInstanceLevel()) {
+			portletDataHandler.isDataPortletInstanceLevel() &&
+			!portletId.startsWith("101")) {
 
 			if (_log.isDebugEnabled()) {
 				StringBundler sb = new StringBundler(4);
