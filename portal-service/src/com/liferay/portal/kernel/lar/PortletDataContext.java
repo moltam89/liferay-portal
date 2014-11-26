@@ -347,9 +347,6 @@ public interface PortletDataContext extends Serializable {
 	public Element getImportDataGroupElement(
 		Class<? extends StagedModel> clazz);
 
-	public Element getImportDataGroupElement(
-		String clazz);
-
 	public Element getImportDataRootElement();
 
 	public Element getImportDataStagedModelElement(StagedModel stagedModel);

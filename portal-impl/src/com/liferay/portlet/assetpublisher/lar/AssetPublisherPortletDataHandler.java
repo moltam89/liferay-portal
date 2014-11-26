@@ -175,7 +175,7 @@ public class AssetPublisherPortletDataHandler
 		throws Exception {
 
 		Element articlesElement = portletDataContext.getImportDataGroupElement(
-			AssetPublisherPortletDataHandler.class.getSimpleName());
+			JournalArticle.class);
 
 		List<Element> articleElements = articlesElement.elements();
 
