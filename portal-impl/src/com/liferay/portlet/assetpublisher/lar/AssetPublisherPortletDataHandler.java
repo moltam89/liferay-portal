@@ -91,6 +91,8 @@ public class AssetPublisherPortletDataHandler
 		PortletPreferences portletPreferences, String data) {
 
 		try {
+			addImportDataRootElement(portletDataContext, data);
+
 			return doImportData(
 				portletDataContext, portletId, portletPreferences, data);
 		} catch (Exception e) {
