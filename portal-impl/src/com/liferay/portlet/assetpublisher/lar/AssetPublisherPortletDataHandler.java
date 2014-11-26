@@ -106,6 +106,11 @@ public class AssetPublisherPortletDataHandler
 			PortletPreferences portletPreferences)
 		throws Exception {
 
+		Element rootElement = addExportDataRootElement(portletDataContext);
+
+		rootElement.addAttribute(
+			"group-id", String.valueOf(portletDataContext.getScopeGroupId()));
+
 		List<AssetEntry> assetEntries = AssetPublisherUtil.getAssetEntries(
 			null, portletPreferences,
 			PermissionThreadLocal.getPermissionChecker(),
@@ -158,7 +163,7 @@ public class AssetPublisherPortletDataHandler
 			}
 		}
 
-		return StringPool.BLANK;
+		return getExportDataRootElementString(rootElement);
 	}
 
 	@Override
@@ -168,7 +173,7 @@ public class AssetPublisherPortletDataHandler
 		throws Exception {
 
 		Element articlesElement = portletDataContext.getImportDataGroupElement(
-			JournalArticle.class);
+			AssetPublisherPortletDataHandler.class.getSimpleName());
 
 		List<Element> articleElements = articlesElement.elements();
 
