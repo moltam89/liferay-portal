@@ -2215,7 +2215,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 		return groupElement;
 	}
 
-	protected Element getImportDataGroupElement(String name) {
+	public Element getImportDataGroupElement(String name) {
 		if (_importDataRootElement == null) {
 			throw new IllegalStateException(
 				"Root data element not initialized");
