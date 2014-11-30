@@ -148,8 +148,7 @@ public class PortletImporter {
 			portlet.getPortletDataHandlerInstance();
 
 		if ((portletDataHandler == null) ||
-			portletDataHandler.isDataPortletInstanceLevel() &&
-			!portletId.startsWith("101")) {
+			portletDataHandler.isDataPortletInstanceLevel()) {
 
 			if (_log.isDebugEnabled()) {
 				_log.debug(
