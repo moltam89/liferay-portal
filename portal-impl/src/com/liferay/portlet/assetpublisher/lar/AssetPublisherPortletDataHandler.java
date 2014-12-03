@@ -23,10 +23,8 @@ import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
-import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
@@ -50,13 +48,11 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.journal.asset.JournalArticleAssetRenderer;
-import com.liferay.portlet.journal.asset.JournalArticleAssetRendererFactory;
 import com.liferay.portlet.journal.model.JournalArticle;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 
 import javax.portlet.PortletPreferences;
 
@@ -97,13 +93,13 @@ public class AssetPublisherPortletDataHandler
 
 	protected void exportAssetEntries(
 			PortletDataContext portletDataContext,
-			PortletPreferences portletPreferences) 
+			PortletPreferences portletPreferences)
 		throws Exception {
 
 		List<AssetEntry> assetEntries = AssetPublisherUtil.getAssetEntries(
 			null, portletPreferences,
 			PermissionThreadLocal.getPermissionChecker(),
-			new long[] {portletDataContext.getScopeGroupId()} , false, false);
+			new long[] {portletDataContext.getScopeGroupId()}, false, false);
 
 		for (AssetEntry assetEntry : assetEntries) {
 			long classPK = assetEntry.getClassPK();
@@ -137,11 +133,11 @@ public class AssetPublisherPortletDataHandler
 			if (assetRenderer.getClassName().
 					equals(JournalArticle.class.getName())) {
 
-				JournalArticleAssetRenderer journalArticleAssetRenderer = 
+				JournalArticleAssetRenderer journalArticleAssetRenderer =
 					(JournalArticleAssetRenderer)assetRenderer;
 
 				JournalArticle journalArticle =
-					journalArticleAssetRenderer.getArticle(); 
+					journalArticleAssetRenderer.getArticle();
 
 				StagedModelDataHandlerUtil.exportReferenceStagedModel(
 					portletDataContext, PortletKeys.ASSET_PUBLISHER,
@@ -152,7 +148,7 @@ public class AssetPublisherPortletDataHandler
 
 	protected void importAssetEntries(
 			PortletDataContext portletDataContext,
-			PortletPreferences portletPreferences) 
+			PortletPreferences portletPreferences)
 		throws Exception {
 
 		StagedModelDataHandlerUtil.importReferenceStagedModels(
