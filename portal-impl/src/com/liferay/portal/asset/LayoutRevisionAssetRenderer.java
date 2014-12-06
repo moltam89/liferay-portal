@@ -69,6 +69,11 @@ public class LayoutRevisionAssetRenderer extends BaseAssetRenderer {
 	}
 
 	@Override
+	public Object getEntry() {
+		return _layoutRevision;
+	}
+
+	@Override
 	public long getGroupId() {
 		return _layoutRevision.getGroupId();
 	}
