@@ -170,10 +170,6 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 		rootElement.addAttribute(
 			"group-id", String.valueOf(portletDataContext.getScopeGroupId()));
 
-		if (true) {
-			return getExportDataRootElementString(rootElement);
-		}
-
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "feeds")) {
 			ActionableDynamicQuery feedActionableDynamicQuery =
 				JournalFeedLocalServiceUtil.getExportActionableDynamicQuery(
@@ -227,10 +223,6 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences, String data)
 		throws Exception {
-
-		if (true) {
-			return portletPreferences;
-		}
 
 		portletDataContext.importPortletPermissions(
 			JournalPermission.RESOURCE_NAME);
