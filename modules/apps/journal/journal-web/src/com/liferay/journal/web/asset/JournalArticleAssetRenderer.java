@@ -124,6 +124,11 @@ public class JournalArticleAssetRenderer
 	}
 
 	@Override
+	public Object getEntry() {
+		return _article;
+	}
+
+	@Override
 	public long getGroupId() {
 		return _article.getGroupId();
 	}

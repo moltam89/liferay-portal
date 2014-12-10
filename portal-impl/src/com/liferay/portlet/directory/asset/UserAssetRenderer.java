@@ -57,6 +57,11 @@ public class UserAssetRenderer extends BaseAssetRenderer {
 	}
 
 	@Override
+	public Object getEntry() {
+		return _user;
+	}
+
+	@Override
 	public long getGroupId() {
 		return 0;
 	}
