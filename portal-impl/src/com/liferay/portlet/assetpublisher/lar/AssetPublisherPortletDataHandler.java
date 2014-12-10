@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.lar.DataLevel;
 import com.liferay.portal.kernel.lar.DefaultConfigurationPortletDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
 import com.liferay.portal.kernel.lar.PortletDataContext;
+import com.liferay.portal.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -28,6 +29,7 @@ import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Portlet;
+import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
@@ -35,13 +37,20 @@ import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
+import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.assetpublisher.util.AssetPublisher;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
+import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
+import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.journal.model.JournalArticle;
+import com.liferay.portlet.journal.model.JournalFolder;
+import com.liferay.portlet.messageboards.model.MBMessage;
+import com.liferay.portlet.wiki.model.WikiPage;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -66,6 +75,8 @@ public class AssetPublisherPortletDataHandler
 			PortletPreferences portletPreferences)
 		throws Exception {
 
+		exportAssetEntries(portletDataContext, portletPreferences);
+
 		return updateExportPortletPreferences(
 			portletDataContext, portletId, portletPreferences);
 	}
@@ -76,8 +87,62 @@ public class AssetPublisherPortletDataHandler
 			PortletPreferences portletPreferences)
 		throws Exception {
 
+		importAssetEntries(portletDataContext, portletPreferences);
+
 		return updateImportPortletPreferences(
 			portletDataContext, portletId, portletPreferences);
+	}
+
+	protected void exportAssetEntries(
+			PortletDataContext portletDataContext,
+			PortletPreferences portletPreferences)
+		throws Exception {
+
+		List<AssetEntry> assetEntries = AssetPublisherUtil.getAssetEntries(
+			null, portletPreferences,
+			PermissionThreadLocal.getPermissionChecker(),
+			new long[] {portletDataContext.getScopeGroupId()}, false, false);
+
+		for (AssetEntry assetEntry : assetEntries) {
+			AssetRenderer assetRenderer = assetEntry.getAssetRenderer();
+
+			if ((assetRenderer == null) ||
+				!(assetRenderer.getEntry() instanceof StagedModel)) {
+
+				continue;
+			}
+
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, portletDataContext.getPortletId(),
+				(StagedModel)assetRenderer.getEntry());
+		}
+	}
+
+	protected void importAssetEntries(
+			PortletDataContext portletDataContext,
+			PortletPreferences portletPreferences)
+		throws Exception {
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, BlogsEntry.class);
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, DLFileEntry.class);
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, DLFolder.class);
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, JournalArticle.class);
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, JournalFolder.class);
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, MBMessage.class);
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, WikiPage.class);
 	}
 
 	protected void updateExportClassNameIds(
