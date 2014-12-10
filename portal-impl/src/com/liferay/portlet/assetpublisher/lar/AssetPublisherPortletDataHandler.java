@@ -43,10 +43,15 @@ import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.assetpublisher.util.AssetPublisher;
 import com.liferay.portlet.assetpublisher.util.AssetPublisherUtil;
+import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
+import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.journal.model.JournalArticle;
+import com.liferay.portlet.journal.model.JournalFolder;
+import com.liferay.portlet.messageboards.model.MBMessage;
+import com.liferay.portlet.wiki.model.WikiPage;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -120,7 +125,25 @@ public class AssetPublisherPortletDataHandler
 		throws Exception {
 
 		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, BlogsEntry.class);
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, DLFileEntry.class);
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, DLFolder.class);
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
 			portletDataContext, JournalArticle.class);
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, JournalFolder.class);
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, MBMessage.class);
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, WikiPage.class);
 	}
 
 	protected void updateExportClassNameIds(
