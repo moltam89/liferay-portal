@@ -63,6 +63,8 @@ public interface AssetRenderer {
 
 	public Date getDisplayDate();
 
+	public Object getEntry();
+
 	public long getGroupId();
 
 	public String getIconCssClass() throws PortalException;
