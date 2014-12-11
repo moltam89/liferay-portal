@@ -107,7 +107,7 @@ public class AssetPublisherPortletDataHandler
 			AssetRenderer assetRenderer = assetEntry.getAssetRenderer();
 
 			if ((assetRenderer == null) ||
-				!(assetRenderer.getEntry() instanceof StagedModel)) {
+				!isEntryExportable(assetRenderer.getEntry())) {
 
 				continue;
 			}
@@ -123,26 +123,20 @@ public class AssetPublisherPortletDataHandler
 			PortletPreferences portletPreferences)
 		throws Exception {
 
-		StagedModelDataHandlerUtil.importReferenceStagedModels(
-			portletDataContext, BlogsEntry.class);
+		for (Class<?> clazz : _exportImportClasses) {
+			StagedModelDataHandlerUtil.importReferenceStagedModels(
+				portletDataContext, clazz);
+		}
+	}
 
-		StagedModelDataHandlerUtil.importReferenceStagedModels(
-			portletDataContext, DLFileEntry.class);
+	protected boolean isEntryExportable(Object entry) {
+		for (Class<?> clazz : _exportImportClasses) {
+			if (clazz.isInstance(entry)) {
+				return true;
+			}
+		}
 
-		StagedModelDataHandlerUtil.importReferenceStagedModels(
-			portletDataContext, DLFolder.class);
-
-		StagedModelDataHandlerUtil.importReferenceStagedModels(
-			portletDataContext, JournalArticle.class);
-
-		StagedModelDataHandlerUtil.importReferenceStagedModels(
-			portletDataContext, JournalFolder.class);
-
-		StagedModelDataHandlerUtil.importReferenceStagedModels(
-			portletDataContext, MBMessage.class);
-
-		StagedModelDataHandlerUtil.importReferenceStagedModels(
-			portletDataContext, WikiPage.class);
+		return false;
 	}
 
 	protected void updateExportClassNameIds(
@@ -484,5 +478,11 @@ public class AssetPublisherPortletDataHandler
 
 	private static Log _log = LogFactoryUtil.getLog(
 		AssetPublisherPortletDataHandler.class);
+
+	private static Class<?>[] _exportImportClasses = new Class[] {
+		BlogsEntry.class, DLFileEntry.class, DLFolder.class,
+		JournalArticle.class, JournalFolder.class, MBMessage.class,
+		WikiPage.class
+	};
 
 }
