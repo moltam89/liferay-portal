@@ -144,7 +144,7 @@ public class DDMStructureStagedModelDataHandler
 		DDMStructure existingStructure = null;
 
 		existingStructure = fetchExistingStructure(
-			uuid, groupId, classNameId, structureKey, preloaded);
+			uuid, groupId, classNameId, structureKey, preloaded, true);
 
 		Map<Long, Long> structureIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
@@ -186,7 +186,7 @@ public class DDMStructureStagedModelDataHandler
 			referenceElement.attributeValue("preloaded"));
 
 		DDMStructure existingStructure = fetchExistingStructure(
-			uuid, groupId, classNameId, structureKey, preloaded);
+			uuid, groupId, classNameId, structureKey, preloaded, true);
 
 		if (existingStructure == null) {
 			return false;
@@ -261,7 +261,7 @@ public class DDMStructureStagedModelDataHandler
 			DDMStructure existingStructure = fetchExistingStructure(
 				structure.getUuid(), portletDataContext.getScopeGroupId(),
 				structure.getClassNameId(), structure.getStructureKey(),
-				preloaded);
+				preloaded, false);
 
 			if (existingStructure == null) {
 				serviceContext.setUuid(structure.getUuid());
@@ -300,12 +300,18 @@ public class DDMStructureStagedModelDataHandler
 
 	protected DDMStructure fetchExistingStructure(
 		String uuid, long groupId, long classNameId, String structureKey,
-		boolean preloaded) {
+		boolean preloaded, boolean includeGroupHierarchy) {
 
 		DDMStructure existingStructure = null;
 
 		if (!preloaded) {
-			existingStructure = fetchStagedModelByUuidAndGroupId(uuid, groupId);
+			if (includeGroupHierarchy) {
+				existingStructure = super.fetchMissingReference(uuid, groupId);
+			}
+			else {
+				existingStructure = fetchStagedModelByUuidAndGroupId(
+					uuid, groupId);
+			}
 		}
 		else {
 			existingStructure = DDMStructureLocalServiceUtil.fetchStructure(

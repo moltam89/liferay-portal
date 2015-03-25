@@ -153,7 +153,7 @@ public class DDMTemplateStagedModelDataHandler
 		DDMTemplate existingTemplate = null;
 
 		existingTemplate = fetchExistingTemplate(
-			uuid, groupId, classNameId, templateKey, preloaded);
+			uuid, groupId, classNameId, templateKey, preloaded, true);
 
 		Map<Long, Long> templateIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
@@ -195,7 +195,7 @@ public class DDMTemplateStagedModelDataHandler
 			referenceElement.attributeValue("preloaded"));
 
 		DDMTemplate existingTemplate = fetchExistingTemplate(
-			uuid, groupId, classNameId, templateKey, preloaded);
+			uuid, groupId, classNameId, templateKey, preloaded, true);
 
 		if (existingTemplate == null) {
 			return false;
@@ -339,7 +339,7 @@ public class DDMTemplateStagedModelDataHandler
 				DDMTemplate existingTemplate = fetchExistingTemplate(
 					template.getUuid(), portletDataContext.getScopeGroupId(),
 					template.getClassNameId(), template.getTemplateKey(),
-					preloaded);
+					preloaded, false);
 
 				if (existingTemplate == null) {
 					serviceContext.setUuid(template.getUuid());
@@ -398,12 +398,18 @@ public class DDMTemplateStagedModelDataHandler
 
 	protected DDMTemplate fetchExistingTemplate(
 		String uuid, long groupId, long classNameId, String templateKey,
-		boolean preloaded) {
+		boolean preloaded, boolean includeGroupHierarchy) {
 
 		DDMTemplate existingTemplate = null;
 
 		if (!preloaded) {
-			existingTemplate = fetchStagedModelByUuidAndGroupId(uuid, groupId);
+			if (includeGroupHierarchy) {
+				existingTemplate = super.fetchMissingReference(uuid, groupId);
+			}
+			else {
+				existingTemplate = fetchStagedModelByUuidAndGroupId(
+					uuid, groupId);
+			}
 		}
 		else {
 			existingTemplate = DDMTemplateLocalServiceUtil.fetchTemplate(

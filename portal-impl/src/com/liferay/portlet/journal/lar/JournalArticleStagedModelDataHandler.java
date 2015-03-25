@@ -210,7 +210,7 @@ public class JournalArticleStagedModelDataHandler
 
 		existingArticle = fetchExistingArticle(
 			uuid, articleResourceUuid, groupId, articleArticleId, null, 0.0,
-			preloaded);
+			preloaded, true);
 
 		Map<String, String> articleArticleIds =
 			(Map<String, String>)portletDataContext.getNewPrimaryKeysMap(
@@ -253,7 +253,7 @@ public class JournalArticleStagedModelDataHandler
 
 		JournalArticle existingArticle = fetchExistingArticle(
 			uuid, articleResourceUuid, groupId, articleArticleId, null, 0.0,
-			preloaded);
+			preloaded, true);
 
 		if (existingArticle == null) {
 			return false;
@@ -640,7 +640,7 @@ public class JournalArticleStagedModelDataHandler
 				JournalArticle existingArticle = fetchExistingArticle(
 					article.getUuid(), articleResourceUuid,
 					portletDataContext.getScopeGroupId(), articleId,
-					newArticleId, article.getVersion(), preloaded);
+					newArticleId, article.getVersion(), preloaded, false);
 
 				if (existingArticle == null) {
 					importedArticle = JournalArticleLocalServiceUtil.addArticle(
@@ -741,7 +741,7 @@ public class JournalArticleStagedModelDataHandler
 		JournalArticle existingArticle = fetchExistingArticle(
 			article.getUuid(), articleResourceUuid,
 			portletDataContext.getScopeGroupId(), article.getArticleId(),
-			article.getArticleId(), article.getVersion(), preloaded);
+			article.getArticleId(), article.getVersion(), preloaded, false);
 
 		if ((existingArticle == null) || !existingArticle.isInTrash()) {
 			return;
@@ -800,13 +800,19 @@ public class JournalArticleStagedModelDataHandler
 	protected JournalArticle fetchExistingArticle(
 		String articleUuid, String articleResourceUuid, long groupId,
 		String articleId, String newArticleId, double version,
-		boolean preloaded) {
+		boolean preloaded, boolean includeGroupHierarchy) {
 
 		JournalArticle existingArticle = null;
 
 		if (!preloaded) {
-			existingArticle = fetchStagedModelByUuidAndGroupId(
-				articleUuid, groupId);
+			if (includeGroupHierarchy) {
+				existingArticle = super.fetchMissingReference(
+					articleUuid, groupId);
+			}
+			else {
+				existingArticle = fetchStagedModelByUuidAndGroupId(
+					articleUuid, groupId);
+			}
 
 			if (existingArticle != null) {
 				return existingArticle;

@@ -145,7 +145,7 @@ public class DLFileEntryTypeStagedModelDataHandler
 		DLFileEntryType existingFileEntryType = null;
 
 		existingFileEntryType = fetchExistingFileEntryType(
-			uuid, groupId, fileEntryTypeKey, preloaded);
+			uuid, groupId, fileEntryTypeKey, preloaded, true);
 
 		Map<Long, Long> fileEntryTypeIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
@@ -181,7 +181,7 @@ public class DLFileEntryTypeStagedModelDataHandler
 			referenceElement.attributeValue("preloaded"));
 
 		DLFileEntryType existingFileEntryType = fetchExistingFileEntryType(
-			uuid, groupId, fileEntryTypeKey, preloaded);
+			uuid, groupId, fileEntryTypeKey, preloaded, true);
 
 		if (existingFileEntryType == null) {
 			return false;
@@ -270,7 +270,7 @@ public class DLFileEntryTypeStagedModelDataHandler
 				fetchExistingFileEntryType(
 					fileEntryType.getUuid(),
 					portletDataContext.getScopeGroupId(),
-					fileEntryType.getFileEntryTypeKey(), preloaded);
+					fileEntryType.getFileEntryTypeKey(), preloaded, false);
 
 			if (existingDLFileEntryType == null) {
 				serviceContext.setUuid(fileEntryType.getUuid());
@@ -340,13 +340,20 @@ public class DLFileEntryTypeStagedModelDataHandler
 	}
 
 	protected DLFileEntryType fetchExistingFileEntryType(
-		String uuid, long groupId, String fileEntryTypeKey, boolean preloaded) {
+		String uuid, long groupId, String fileEntryTypeKey, boolean preloaded,
+		boolean includeGroupHierarchy) {
 
 		DLFileEntryType existingDLFileEntryType = null;
 
 		if (!preloaded) {
-			existingDLFileEntryType = fetchStagedModelByUuidAndGroupId(
-				uuid, groupId);
+			if (includeGroupHierarchy) {
+				existingDLFileEntryType = super.fetchMissingReference(
+					uuid, groupId);
+			}
+			else {
+				existingDLFileEntryType = fetchStagedModelByUuidAndGroupId(
+					uuid, groupId);
+			}
 		}
 		else {
 			existingDLFileEntryType =
