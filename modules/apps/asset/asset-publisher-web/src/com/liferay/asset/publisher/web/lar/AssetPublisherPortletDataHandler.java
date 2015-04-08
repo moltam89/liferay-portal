@@ -99,10 +99,13 @@ public class AssetPublisherPortletDataHandler
 			PortletPreferences portletPreferences)
 		throws Exception {
 
+		PortletPreferences updatedportletPreferences =
+			updateImportPortletPreferences(
+				portletDataContext, portletId, portletPreferences);
+
 		importAssetEntries(portletDataContext, portletPreferences);
 
-		return updateImportPortletPreferences(
-			portletDataContext, portletId, portletPreferences);
+		return updatedportletPreferences;
 	}
 
 	protected void exportAssetEntries(
