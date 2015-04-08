@@ -183,7 +183,7 @@ public class AssetPublisherPortletDataHandler
 		throws Exception {
 
 		StagedModelDataHandlerUtil.importReferenceStagedModels(
-			portletDataContext, null);
+			portletDataContext, null, true);
 	}
 
 	protected void restorePortletPreference(

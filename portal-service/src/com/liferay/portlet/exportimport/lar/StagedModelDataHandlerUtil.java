@@ -16,16 +16,24 @@ package com.liferay.portlet.exportimport.lar;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.portal.NoSuchGroupException;
+import com.liferay.portal.NoSuchLayoutException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.spring.orm.LastSessionRecorderHelperUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Attribute;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.model.Group;
+import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.model.TypedModel;
+import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 
@@ -230,6 +238,15 @@ public class StagedModelDataHandlerUtil {
 			PortletDataContext portletDataContext, Class<?> stagedModelClass)
 		throws PortletDataException {
 
+		importReferenceStagedModels(
+			portletDataContext, stagedModelClass, false);
+	}
+
+	public static void importReferenceStagedModels(
+			PortletDataContext portletDataContext, Class<?> stagedModelClass,
+			boolean checkScopeGroupId)
+		throws PortletDataException {
+
 		Element importDataRootElement =
 			portletDataContext.getImportDataRootElement();
 
@@ -270,7 +287,57 @@ public class StagedModelDataHandlerUtil {
 				continue;
 			}
 
-			importStagedModel(portletDataContext, referenceElement);
+			String scopeLayoutUuid = GetterUtil.getString(
+				referenceElement.attributeValue("scope-layout-uuid"));
+
+			long previousScopeGroupId = portletDataContext.getScopeGroupId();
+
+			try {
+				if (checkScopeGroupId && Validator.isNotNull(scopeLayoutUuid)) {
+					try {
+						Layout scopeLayout =
+							LayoutLocalServiceUtil.getLayoutByUuidAndGroupId(
+								scopeLayoutUuid,
+								portletDataContext.getGroupId(),
+								portletDataContext.isPrivateLayout());
+
+						Group scopeGroup = GroupLocalServiceUtil.getLayoutGroup(
+							portletDataContext.getCompanyId(),
+							scopeLayout.getPlid());
+
+						portletDataContext.setScopeGroupId(
+							scopeGroup.getGroupId());
+					}
+					catch (NoSuchGroupException nsge) {
+						if (_log.isInfoEnabled()) {
+							_log.info(
+								"Ignoring element because the referenced " +
+									"group was not found",
+								nsge);
+						}
+
+						continue;
+					}
+					catch (NoSuchLayoutException nsle) {
+						if (_log.isInfoEnabled()) {
+							_log.info(
+								"Ignoring element because the referenced " +
+									"layout was not found",
+								nsle);
+						}
+
+						continue;
+					}
+					catch (PortalException pe) {
+						throw new PortletDataException(pe);
+					}
+				}
+
+				importStagedModel(portletDataContext, referenceElement);
+			}
+			finally {
+				portletDataContext.setScopeGroupId(previousScopeGroupId);
+			}
 		}
 	}
 
@@ -397,5 +464,8 @@ public class StagedModelDataHandlerUtil {
 
 		return stagedModelDataHandler;
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		StagedModelDataHandlerUtil.class);
 
 }
