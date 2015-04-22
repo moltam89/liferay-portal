@@ -31,6 +31,7 @@ import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Portlet;
+import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
@@ -40,6 +41,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.model.AssetRenderer;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil;
@@ -85,6 +87,8 @@ public class AssetPublisherPortletDataHandler
 			PortletPreferences portletPreferences)
 		throws Exception {
 
+		exportAssetEntries(portletDataContext, portletPreferences);
+
 		return updateExportPortletPreferences(
 			portletDataContext, portletId, portletPreferences);
 	}
@@ -95,8 +99,41 @@ public class AssetPublisherPortletDataHandler
 			PortletPreferences portletPreferences)
 		throws Exception {
 
+		importAssetEntries(portletDataContext, portletPreferences);
+
 		return updateImportPortletPreferences(
 			portletDataContext, portletId, portletPreferences);
+	}
+
+	protected void exportAssetEntries(
+			PortletDataContext portletDataContext,
+			PortletPreferences portletPreferences)
+		throws Exception {
+
+		Layout layout = LayoutLocalServiceUtil.getLayout(
+			portletDataContext.getPlid());
+
+		long[] groupIds = AssetPublisherUtil.getGroupIds(
+			portletPreferences, portletDataContext.getScopeGroupId(), layout);
+
+		List<AssetEntry> assetEntries = AssetPublisherUtil.getAssetEntries(
+			null, portletPreferences,
+			PermissionThreadLocal.getPermissionChecker(), groupIds, false,
+			false);
+
+		for (AssetEntry assetEntry : assetEntries) {
+			AssetRenderer assetRenderer = assetEntry.getAssetRenderer();
+
+			if ((assetRenderer == null) ||
+				!(assetRenderer.getEntry() instanceof StagedModel)) {
+
+				continue;
+			}
+
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, portletDataContext.getPortletId(),
+				(StagedModel)assetRenderer.getEntry());
+		}
 	}
 
 	@Override
@@ -138,6 +175,15 @@ public class AssetPublisherPortletDataHandler
 		}
 
 		return 0;
+	}
+
+	protected void importAssetEntries(
+			PortletDataContext portletDataContext,
+			PortletPreferences portletPreferences)
+		throws Exception {
+
+		StagedModelDataHandlerUtil.importReferenceStagedModels(
+			portletDataContext, null);
 	}
 
 	protected void restorePortletPreference(
