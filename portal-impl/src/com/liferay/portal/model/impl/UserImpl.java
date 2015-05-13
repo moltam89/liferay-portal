@@ -569,7 +569,7 @@ public class UserImpl extends UserBaseImpl {
 			String[] classNames, boolean includeControlPanel, int max)
 		throws PortalException {
 
-		return GroupServiceUtil.getUserSitesGroups(
+		return GroupServiceUtil.getUserPlaces(
 			getUserId(), classNames, includeControlPanel, max);
 	}
 
