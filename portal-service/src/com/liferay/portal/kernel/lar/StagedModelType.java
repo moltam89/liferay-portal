@@ -171,7 +171,11 @@ public class StagedModelType {
 
 	protected void setReferrerClassNameId(long referrerClassNameId) {
 		if (referrerClassNameId > 0) {
-			_referrerClassName = PortalUtil.getClassName(referrerClassNameId);
+			try {
+				_referrerClassName = PortalUtil.getClassName(referrerClassNameId);
+			} catch (RuntimeException e) {
+				_referrerClassName = null;
+			}
 		}
 		else {
 			_referrerClassName = null;
