@@ -18,7 +18,6 @@ import com.liferay.asset.publisher.web.constants.AssetPublisherPortletKeys;
 import com.liferay.asset.publisher.web.util.AssetPublisherUtil;
 import com.liferay.portal.NoSuchGroupException;
 import com.liferay.portal.NoSuchLayoutException;
-import com.liferay.portal.ResourceBlocksNotSupportedException;
 import com.liferay.portal.kernel.lar.DataLevel;
 import com.liferay.portal.kernel.lar.DefaultConfigurationPortletDataHandler;
 import com.liferay.portal.kernel.lar.ExportImportHelperUtil;
@@ -36,16 +35,12 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Layout;
-import com.liferay.portal.model.PermissionedModel;
-import com.liferay.portal.model.PersistedModel;
 import com.liferay.portal.model.Portlet;
 import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.CompanyLocalServiceUtil;
 import com.liferay.portal.service.LayoutLocalServiceUtil;
-import com.liferay.portal.service.PersistedModelLocalService;
-import com.liferay.portal.service.PersistedModelLocalServiceRegistryUtil;
 import com.liferay.portal.service.PortletLocalServiceUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portlet.PortletPreferencesFactoryUtil;
@@ -132,29 +127,15 @@ public class AssetPublisherPortletDataHandler
 		for (AssetEntry assetEntry : assetEntries) {
 			AssetRenderer assetRenderer = assetEntry.getAssetRenderer();
 
-			if (assetRenderer == null) {
-				continue;
-			}
+			if ((assetRenderer == null) ||
+				!(assetRenderer.getEntry() instanceof StagedModel)) {
 
-			PersistedModelLocalService persistedModelLocalService =
-				PersistedModelLocalServiceRegistryUtil.
-					getPersistedModelLocalService(assetRenderer.getClassName());
-
-			if (persistedModelLocalService == null) {
-				continue;
-			}
-
-			PersistedModel persistedModel =
-				persistedModelLocalService.getPersistedModel(
-					assetRenderer.getClassPK());
-
-			if (!(persistedModel instanceof StagedModel)) {
 				continue;
 			}
 
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
 				portletDataContext, portletDataContext.getPortletId(),
-				(StagedModel)persistedModel);
+				(StagedModel)assetRenderer.getEntry());
 		}
 	}
 
