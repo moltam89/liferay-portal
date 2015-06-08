@@ -65,6 +65,8 @@ import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetEntryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.portlet.asset.util.test.AssetTestUtil;
+import com.liferay.portlet.blogs.model.BlogsEntry;
+import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil;
@@ -272,11 +274,6 @@ public class AssetPublisherExportImportTest
 				portletPreferences.getValue("displayStyle", null)));
 	}
 
-	@Test
-	public void testExportImportAssetEntries() throws Exception {
-		testExportImportAssetEntries(group);
-	}
-
 	@Ignore()
 	@Override
 	@Test
@@ -284,46 +281,43 @@ public class AssetPublisherExportImportTest
 	}
 
 	@Test
-	public void testExportImportLayoutScopedAssetEntries() throws Exception {
-		Group layoutGroup = GroupTestUtil.addGroup(
-			TestPropsValues.getUserId(), layout);
-
-		testExportImportAssetEntries(layoutGroup);
+	public void testExportImportBlogsAssetEntries() throws Exception {
+		testExportImportAssetEntries(group, BlogsEntry.class.getName());
 	}
 
 	@Test
-	public void testExportImportSeveralScopedAssetEntries() throws Exception {
-		List<Group> groups = new ArrayList<>();
+	public void testExportImportJournalAssetEntries() throws Exception {
+		testExportImportAssetEntries(group, JournalArticle.class.getName());
+	}
 
-		groups.add(group);
+	@Test
+	public void testExportImportLayoutScopedBlogsAssetEntries()
+		throws Exception {
 
-		Company company = CompanyLocalServiceUtil.getCompany(
-			layout.getCompanyId());
+		testExportImportLayoutScopedAssetEntries(BlogsEntry.class.getName());
+	}
 
-		Group companyGroup = company.getGroup();
+	@Test
+	public void testExportImportLayoutScopedJournalAssetEntries()
+		throws Exception {
 
-		groups.add(companyGroup);
+		testExportImportLayoutScopedAssetEntries(
+			JournalArticle.class.getName());
+	}
 
-		Group otherGroup = GroupTestUtil.addGroup();
+	@Test
+	public void testExportImportSeveralScopedBlogsAssetEntries()
+		throws Exception {
 
-		groups.add(otherGroup);
+		testExportImportSeveralScopedAssetEntries(BlogsEntry.class.getName());
+	}
 
-		Group layoutGroup1 = GroupTestUtil.addGroup(
-			TestPropsValues.getUserId(), layout);
+	@Test
+	public void testExportImportSeveralScopedJournalAssetEntries()
+		throws Exception {
 
-		Layout layout2 = LayoutTestUtil.addLayout(group);
-		Group layoutGroup2 = GroupTestUtil.addGroup(
-			TestPropsValues.getUserId(), layout2);
-
-		Layout layout3 = LayoutTestUtil.addLayout(group);
-		Group layoutGroup3 = GroupTestUtil.addGroup(
-			TestPropsValues.getUserId(), layout3);
-
-		groups.add(layoutGroup1);
-		groups.add(layoutGroup2);
-		groups.add(layoutGroup3);
-
-		testExportImportAssetEntries(groups);
+		testExportImportSeveralScopedAssetEntries(
+			JournalArticle.class.getName());
 	}
 
 	@Test
@@ -739,16 +733,34 @@ public class AssetPublisherExportImportTest
 	}
 
 	protected List<AssetEntry> addAssetEntries(
-			Group group, int count, List<AssetEntry> assetEntries)
+			Group group, int count, List<AssetEntry> assetEntries,
+			String className)
 		throws Exception {
 
 		for (int i = 0; i < count; i++) {
-			JournalArticle article = JournalTestUtil.addArticle(
-				group.getGroupId(), RandomTestUtil.randomString(),
-				RandomTestUtil.randomString(100));
+			AssetEntry assetEntry = null;
 
-			AssetEntry assetEntry = AssetEntryLocalServiceUtil.getEntry(
-				JournalArticle.class.getName(), article.getResourcePrimKey());
+			if (className.equals(JournalArticle.class.getName())) {
+				JournalArticle article = JournalTestUtil.addArticle(
+					group.getGroupId(), RandomTestUtil.randomString(),
+					RandomTestUtil.randomString(100));
+
+				assetEntry = AssetEntryLocalServiceUtil.getEntry(
+					JournalArticle.class.getName(),
+					article.getResourcePrimKey());
+			}
+			else if (className.equals(BlogsEntry.class.getName())) {
+				ServiceContext serviceContext =
+					ServiceContextTestUtil.getServiceContext(
+						group.getGroupId());
+
+				BlogsEntry blogsEntry = BlogsEntryLocalServiceUtil.addEntry(
+					TestPropsValues.getUserId(), RandomTestUtil.randomString(),
+					RandomTestUtil.randomString(), serviceContext);
+
+				assetEntry = AssetEntryLocalServiceUtil.getEntry(
+					BlogsEntry.class.getName(), blogsEntry.getEntryId());
+			}
 
 			assetEntries.add(assetEntry);
 		}
@@ -901,22 +913,26 @@ public class AssetPublisherExportImportTest
 		return getExportParameterMap();
 	}
 
-	protected void testExportImportAssetEntries(Group group) throws Exception {
+	protected void testExportImportAssetEntries(Group group, String className)
+		throws Exception {
+
 		List<Group> groups = new ArrayList<>();
 
 		groups.add(group);
 
-		testExportImportAssetEntries(groups);
+		testExportImportAssetEntries(groups, className);
 	}
 
-	protected void testExportImportAssetEntries(List<Group> groups)
+	protected void testExportImportAssetEntries(
+			List<Group> groups, String className)
 		throws Exception {
 
 		List<AssetEntry> assetEntries = new ArrayList<>();
 		String[] scopeIds = new String[0];
 
 		for (Group selectedGroup : groups) {
-			assetEntries = addAssetEntries(selectedGroup, 3, assetEntries);
+			assetEntries = addAssetEntries(
+				selectedGroup, 3, assetEntries, className);
 
 			String scopeId = AssetPublisherUtil.getScopeId(
 				selectedGroup, group.getGroupId());
@@ -947,6 +963,51 @@ public class AssetPublisherExportImportTest
 				false, false);
 
 		assertAssetEntries(assetEntries, currentAssetEntries);
+	}
+
+	protected void testExportImportLayoutScopedAssetEntries(String className)
+		throws Exception {
+
+		Group layoutGroup = GroupTestUtil.addGroup(
+			TestPropsValues.getUserId(), layout);
+
+		testExportImportAssetEntries(layoutGroup, className);
+	}
+
+	protected void testExportImportSeveralScopedAssetEntries(String className)
+		throws Exception {
+
+		List<Group> groups = new ArrayList<>();
+
+		groups.add(group);
+
+		Company company = CompanyLocalServiceUtil.getCompany(
+			layout.getCompanyId());
+
+		Group companyGroup = company.getGroup();
+
+		groups.add(companyGroup);
+
+		Group otherGroup = GroupTestUtil.addGroup();
+
+		groups.add(otherGroup);
+
+		Group layoutGroup1 = GroupTestUtil.addGroup(
+			TestPropsValues.getUserId(), layout);
+
+		Layout layout2 = LayoutTestUtil.addLayout(group);
+		Group layoutGroup2 = GroupTestUtil.addGroup(
+			TestPropsValues.getUserId(), layout2);
+
+		Layout layout3 = LayoutTestUtil.addLayout(group);
+		Group layoutGroup3 = GroupTestUtil.addGroup(
+			TestPropsValues.getUserId(), layout3);
+
+		groups.add(layoutGroup1);
+		groups.add(layoutGroup2);
+		groups.add(layoutGroup3);
+
+		testExportImportAssetEntries(groups, className);
 	}
 
 	protected void testSortByAssetVocabulary(boolean globalVocabulary)
