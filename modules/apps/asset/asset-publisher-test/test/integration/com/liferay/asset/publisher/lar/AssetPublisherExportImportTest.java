@@ -68,8 +68,11 @@ import com.liferay.portlet.asset.util.test.AssetTestUtil;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
+import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
+import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.util.test.DLTestUtil;
 import com.liferay.portlet.dynamicdatamapping.model.DDMStructure;
 import com.liferay.portlet.dynamicdatamapping.util.test.DDMStructureTestUtil;
 import com.liferay.portlet.journal.model.JournalArticle;
@@ -286,6 +289,12 @@ public class AssetPublisherExportImportTest
 	}
 
 	@Test
+	public void testExportImportDLFileEntryAssetEntries() throws Exception {
+		testExportImportAssetEntries(
+			group, DLFileEntryConstants.getClassName());
+	}
+
+	@Test
 	public void testExportImportJournalAssetEntries() throws Exception {
 		testExportImportAssetEntries(group, JournalArticle.class.getName());
 	}
@@ -295,6 +304,14 @@ public class AssetPublisherExportImportTest
 		throws Exception {
 
 		testExportImportLayoutScopedAssetEntries(BlogsEntry.class.getName());
+	}
+
+	@Test
+	public void testExportImportLayoutScopedDLFileEntryAssetEntries()
+		throws Exception {
+
+		testExportImportLayoutScopedAssetEntries(
+			DLFileEntryConstants.getClassName());
 	}
 
 	@Test
@@ -310,6 +327,14 @@ public class AssetPublisherExportImportTest
 		throws Exception {
 
 		testExportImportSeveralScopedAssetEntries(BlogsEntry.class.getName());
+	}
+
+	@Test
+	public void testExportImportSeveralScopedDLFileEntryAssetEntries()
+		throws Exception {
+
+		testExportImportSeveralScopedAssetEntries(
+			DLFileEntryConstants.getClassName());
 	}
 
 	@Test
@@ -760,6 +785,16 @@ public class AssetPublisherExportImportTest
 
 				assetEntry = AssetEntryLocalServiceUtil.getEntry(
 					BlogsEntry.class.getName(), blogsEntry.getEntryId());
+			}
+			else if (className.equals(DLFileEntryConstants.getClassName())) {
+				DLFolder dlFolder = DLTestUtil.addDLFolder(group.getGroupId());
+
+				DLFileEntry dlFileEntry = DLTestUtil.addDLFileEntry(
+					dlFolder.getFolderId());
+
+				assetEntry = AssetEntryLocalServiceUtil.getEntry(
+					DLFileEntryConstants.getClassName(),
+					dlFileEntry.getFileEntryId());
 			}
 
 			assetEntries.add(assetEntry);
