@@ -77,6 +77,7 @@ import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.model.Team;
 import com.liferay.portal.security.permission.ResourceActionsUtil;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ResourceBlockLocalServiceUtil;
 import com.liferay.portal.service.ResourceBlockPermissionLocalServiceUtil;
 import com.liferay.portal.service.ResourcePermissionLocalServiceUtil;
@@ -2145,6 +2146,14 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 				referenceElement.addAttribute(
 					"live-group-id", String.valueOf(liveGroupId));
+
+				if (group.isLayout()) {
+					Layout layout = LayoutLocalServiceUtil.getLayout(
+						group.getClassPK());
+
+					referenceElement.addAttribute(
+						"scope-layout-uuid", layout.getUuid());
+				}
 			}
 			catch (Exception e) {
 				if (_log.isWarnEnabled()) {
