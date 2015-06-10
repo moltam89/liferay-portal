@@ -67,6 +67,7 @@ import com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.portlet.asset.util.test.AssetTestUtil;
 import com.liferay.portlet.blogs.model.BlogsEntry;
 import com.liferay.portlet.blogs.service.BlogsEntryLocalServiceUtil;
+import com.liferay.portlet.blogs.util.test.BlogsTestUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
@@ -779,9 +780,9 @@ public class AssetPublisherExportImportTest
 					ServiceContextTestUtil.getServiceContext(
 						group.getGroupId());
 
-				BlogsEntry blogsEntry = BlogsEntryLocalServiceUtil.addEntry(
+				BlogsEntry blogsEntry = BlogsTestUtil.addEntryWithWorkflow(
 					TestPropsValues.getUserId(), RandomTestUtil.randomString(),
-					RandomTestUtil.randomString(), serviceContext);
+					true, serviceContext);
 
 				assetEntry = AssetEntryLocalServiceUtil.getEntry(
 					BlogsEntry.class.getName(), blogsEntry.getEntryId());
