@@ -87,6 +87,11 @@ public class DDLRecordAssetRenderer extends BaseAssetRenderer {
 	}
 
 	@Override
+	public Object getEntry() {
+		return _record;
+	}
+
+	@Override
 	public long getGroupId() {
 		return _record.getGroupId();
 	}
