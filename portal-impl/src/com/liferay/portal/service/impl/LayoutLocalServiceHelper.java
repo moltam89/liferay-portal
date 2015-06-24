@@ -244,7 +244,7 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 			}
 		}
 		else {
-			Layout layout = layoutPersistence.findByG_P_L(
+			Layout layout = layoutPersistence.fetchByG_P_L(
 				groupId, privateLayout, layoutId);
 			Layout parentLayout = layoutPersistence.findByG_P_L(
 				groupId, privateLayout, parentLayoutId);
@@ -252,7 +252,8 @@ public class LayoutLocalServiceHelper implements IdentifiableBean {
 			// Layout cannot become a child of a layout that is not sortable
 			// because it is linked to a layout set prototype
 
-			if (Validator.isNull(layout.getSourcePrototypeLayoutUuid()) &&
+			if (((layout == null) ||
+				 Validator.isNull(layout.getSourcePrototypeLayoutUuid())) &&
 				!SitesUtil.isLayoutSortable(parentLayout)) {
 
 				throw new LayoutParentLayoutIdException(
