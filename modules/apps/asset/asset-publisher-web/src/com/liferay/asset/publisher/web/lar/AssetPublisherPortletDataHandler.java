@@ -135,7 +135,8 @@ public class AssetPublisherPortletDataHandler
 
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
 				portletDataContext, portletDataContext.getPortletId(),
-				(StagedModel)assetRenderer.getEntry());
+				(StagedModel)assetRenderer.getEntry(),
+				PortletDataContext.REFERENCE_TYPE_WEAK);
 		}
 	}
 

@@ -72,6 +72,16 @@ public class StagedModelDataHandlerUtil {
 			T stagedModel)
 		throws PortletDataException {
 
+		return exportReferenceStagedModel(
+			portletDataContext, referrerPortletId, stagedModel,
+			PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+	}
+
+	public static <T extends StagedModel> Element exportReferenceStagedModel(
+			PortletDataContext portletDataContext, String referrerPortletId,
+			T stagedModel, String referenceType)
+		throws PortletDataException {
+
 		Portlet referrerPortlet = PortletLocalServiceUtil.getPortletById(
 			referrerPortletId);
 
@@ -80,15 +90,14 @@ public class StagedModelDataHandlerUtil {
 
 			return portletDataContext.addReferenceElement(
 				referrerPortlet, portletDataContext.getExportDataRootElement(),
-				stagedModel, PortletDataContext.REFERENCE_TYPE_DEPENDENCY,
-				true);
+				stagedModel, referenceType, true);
 		}
 
 		exportStagedModel(portletDataContext, stagedModel);
 
 		return portletDataContext.addReferenceElement(
 			referrerPortlet, portletDataContext.getExportDataRootElement(),
-			stagedModel, PortletDataContext.REFERENCE_TYPE_DEPENDENCY, false);
+			stagedModel, referenceType, false);
 	}
 
 	/**
