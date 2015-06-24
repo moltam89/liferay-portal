@@ -290,8 +290,14 @@ public class StagedModelDataHandlerUtil {
 			}
 
 			if (missing) {
-				stagedModelDataHandler.importMissingReference(
-					portletDataContext, referenceElement);
+				String type = GetterUtil.get(
+					referenceElement.attributeValue("type"),
+					StringPool.BLANK);
+
+				if (!type.equals(PortletDataContext.REFERENCE_TYPE_WEAK)) {
+					stagedModelDataHandler.importMissingReference(
+						portletDataContext, referenceElement);
+				}
 
 				continue;
 			}
