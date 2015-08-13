@@ -5738,6 +5738,8 @@ public class JournalArticleLocalServiceImpl
 
 		// Article
 
+		userId = PortalUtil.getValidUserId(article.getCompanyId(), userId);
+
 		User user = userPersistence.findByPrimaryKey(userId);
 		Date now = new Date();
 
