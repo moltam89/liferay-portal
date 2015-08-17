@@ -19,6 +19,7 @@ import com.liferay.calendar.model.Calendar;
 import com.liferay.calendar.model.CalendarResource;
 import com.liferay.calendar.service.CalendarLocalServiceUtil;
 import com.liferay.calendar.service.CalendarResourceLocalServiceUtil;
+import com.liferay.calendar.service.persistence.CalendarResourceUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -185,6 +186,9 @@ public class CalendarResourceStagedModelDataHandler
 			}
 
 			if (existingCalendarResource == null) {
+				calendarResource = getUniqueCalendarResource(
+					portletDataContext, calendarResource);
+
 				serviceContext.setUuid(calendarResource.getUuid());
 
 				importedCalendarResource =
@@ -206,6 +210,9 @@ public class CalendarResourceStagedModelDataHandler
 			}
 		}
 		else {
+			calendarResource = getUniqueCalendarResource(
+				portletDataContext, calendarResource);
+
 			importedCalendarResource =
 				CalendarResourceLocalServiceUtil.addCalendarResource(
 					userId, portletDataContext.getScopeGroupId(),
@@ -269,6 +276,29 @@ public class CalendarResourceStagedModelDataHandler
 		}
 
 		return classPK;
+	}
+
+	protected CalendarResource getUniqueCalendarResource(
+			PortletDataContext portletDataContext,
+			CalendarResource calendarResource)
+		throws Exception {
+
+		String code = calendarResource.getCode();
+
+		for (int i = 1;; i++) {
+			CalendarResource duplicateCalendarResource =
+				CalendarResourceUtil.fetchByG_C_First(
+					portletDataContext.getScopeGroupId(),
+					calendarResource.getCode(), null);
+
+			if (duplicateCalendarResource == null) {
+				break;
+			}
+
+			calendarResource.setCode(code + i);
+		}
+
+		return calendarResource;
 	}
 
 	protected void updateCalendars(
