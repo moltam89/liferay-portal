@@ -619,10 +619,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		throws Exception {
 
 		StagedModelDataHandlerUtil.importReferenceStagedModels(
-			portletDataContext, AssetVocabulary.class);
-
-		StagedModelDataHandlerUtil.importReferenceStagedModels(
-			portletDataContext, AssetCategory.class);
+			portletDataContext, null);
 
 		Company company = CompanyLocalServiceUtil.getCompanyById(
 			portletDataContext.getCompanyId());
