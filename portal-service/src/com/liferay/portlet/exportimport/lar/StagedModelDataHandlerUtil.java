@@ -243,10 +243,13 @@ public class StagedModelDataHandlerUtil {
 
 		for (Element referenceElement : referenceElements) {
 			String className = referenceElement.attributeValue("class-name");
-			String stagedModelClassName = stagedModelClass.getName();
 
-			if (!stagedModelClassName.equals(className)) {
-				continue;
+			if (stagedModelClass != null) {
+				String stagedModelClassName = stagedModelClass.getName();
+
+				if (!stagedModelClassName.equals(className)) {
+					continue;
+				}
 			}
 
 			boolean missing = GetterUtil.getBoolean(
@@ -254,7 +257,7 @@ public class StagedModelDataHandlerUtil {
 
 			StagedModelDataHandler<?> stagedModelDataHandler =
 				StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
-					stagedModelClassName);
+					className);
 
 			if (stagedModelDataHandler == null) {
 				continue;
