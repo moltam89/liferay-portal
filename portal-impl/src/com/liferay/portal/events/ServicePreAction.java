@@ -430,7 +430,9 @@ public class ServicePreAction extends Action {
 					layout.getGroupId(), layout.isPrivateLayout(),
 					LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
 
-				if (!group.isControlPanel()) {
+				if (!group.isControlPanel() &&
+					(!viewableGroup || !viewableSourceGroup)) {
+
 					doAsGroupId = 0;
 				}
 			}
