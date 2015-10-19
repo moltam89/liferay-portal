@@ -577,7 +577,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 	protected void deleteLayoutSetBranches(long groupId, boolean privateLayout)
 		throws PortalException {
 
-		// Find the latest layout revision for all the published layouts
+		// Find the latest layout revision for all the layouts
 
 		Map<Long, LayoutRevision> layoutRevisions = new HashMap<>();
 
@@ -640,7 +640,7 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			}
 		}
 
-		// Update all layouts based on their latest published revision
+		// Update all layouts based on their latest revision
 
 		for (LayoutRevision layoutRevision : layoutRevisions.values()) {
 			updateLayoutWithLayoutRevision(layoutRevision);
