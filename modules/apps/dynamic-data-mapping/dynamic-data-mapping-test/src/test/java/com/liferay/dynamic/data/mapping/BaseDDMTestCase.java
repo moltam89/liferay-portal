@@ -290,6 +290,13 @@ public abstract class BaseDDMTestCase extends PowerMockito {
 		return document;
 	}
 
+	protected Field createBRField(
+		long ddmStructureId, String fieldName, List<Serializable> ptValues) {
+
+		return new MockField(
+			ddmStructureId, fieldName, ptValues, LocaleUtil.BRAZIL);
+	}
+
 	protected Field createField(
 		long ddmStructureId, String fieldName, List<Serializable> enValues,
 		List<Serializable> ptValues) {
