@@ -26,6 +26,7 @@ import com.liferay.exportimport.portlet.preferences.processor.capability.Referen
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.portal.NoSuchGroupException;
 import com.liferay.portal.NoSuchLayoutException;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -37,6 +38,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
+import com.liferay.portal.model.GroupConstants;
 import com.liferay.portal.model.Layout;
 import com.liferay.portal.model.Organization;
 import com.liferay.portal.model.Portlet;
@@ -44,6 +46,7 @@ import com.liferay.portal.model.StagedModel;
 import com.liferay.portal.security.auth.PrincipalException;
 import com.liferay.portal.security.permission.PermissionThreadLocal;
 import com.liferay.portal.service.CompanyLocalService;
+import com.liferay.portal.service.GroupLocalService;
 import com.liferay.portal.service.LayoutLocalService;
 import com.liferay.portal.service.OrganizationLocalService;
 import com.liferay.portal.service.PortletLocalService;
@@ -61,6 +64,7 @@ import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryType;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalService;
 import com.liferay.portlet.documentlibrary.service.persistence.DLFileEntryTypeUtil;
+import com.liferay.portlet.exportimport.lar.ExportImportThreadLocal;
 import com.liferay.portlet.exportimport.lar.PortletDataContext;
 import com.liferay.portlet.exportimport.lar.PortletDataException;
 import com.liferay.portlet.exportimport.lar.StagedModelDataHandlerUtil;
@@ -337,6 +341,38 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		return null;
 	}
 
+	protected String replaceGroupIdWithLiveGroupId(
+			String scopeId, Layout layout, long companyGroupId)
+		throws PortalException {
+
+		String newScopeId = scopeId;
+
+		long groupId = AssetPublisherUtil.getGroupIdFromScopeId(
+			scopeId, layout.getGroupId(), layout.isPrivateLayout());
+
+		if ((groupId != layout.getGroupId()) && (groupId != companyGroupId)) {
+			Group group = _groupLocalService.fetchGroup(groupId);
+
+			if ((group != null) && !group.isLayout()) {
+				long liveGroupId = group.getLiveGroupId();
+
+				if (group.isStagedRemotely()) {
+					liveGroupId = group.getRemoteLiveGroupId();
+				}
+
+				if (liveGroupId == GroupConstants.DEFAULT_LIVE_GROUP_ID) {
+					liveGroupId = group.getGroupId();
+				}
+
+				newScopeId = StringUtil.replace(
+					scopeId, String.valueOf(groupId),
+					String.valueOf(liveGroupId));
+			}
+		}
+
+		return newScopeId;
+	}
+
 	protected void restorePortletPreference(
 			PortletDataContext portletDataContext, String name,
 			PortletPreferences portletPreferences)
@@ -406,6 +442,11 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		DLFileEntryTypeLocalService dlFileEntryTypeLocalService) {
 
 		_dlFileEntryTypeLocalService = dlFileEntryTypeLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setGroupLocalService(GroupLocalService GroupLocalService) {
+		_groupLocalService = GroupLocalService;
 	}
 
 	@Reference(unbind = "-")
@@ -600,6 +641,11 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 
 		for (int i = 0; i < oldValues.length; i++) {
 			String oldValue = oldValues[i];
+
+			if (ExportImportThreadLocal.isStagingInProcess()) {
+				oldValue = replaceGroupIdWithLiveGroupId(
+					oldValue, layout, portletDataContext.getCompanyGroupId());
+			}
 
 			if (oldValue.startsWith(AssetPublisherUtil.SCOPE_ID_GROUP_PREFIX)) {
 				newValues[i] = StringUtil.replace(
@@ -823,6 +869,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 	private CompanyLocalService _companyLocalService;
 	private DDMStructureLocalService _ddmStructureLocalService;
 	private DLFileEntryTypeLocalService _dlFileEntryTypeLocalService;
+	private GroupLocalService _groupLocalService;
 	private LayoutLocalService _layoutLocalService;
 	private OrganizationLocalService _organizationLocalService;
 	private PortletLocalService _portletLocalService;
