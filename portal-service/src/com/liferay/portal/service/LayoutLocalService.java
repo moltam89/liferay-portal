@@ -232,6 +232,10 @@ public interface LayoutLocalService extends BaseLocalService,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws PortalException;
 
+	public com.liferay.portal.model.Group checkScopeGroup(
+		com.liferay.portal.model.Layout layout, long userId)
+		throws PortalException;
+
 	/**
 	* Creates a new layout with the primary key. Does not add the layout to the database.
 	*
