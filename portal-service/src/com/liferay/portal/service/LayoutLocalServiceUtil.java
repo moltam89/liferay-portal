@@ -242,6 +242,12 @@ public class LayoutLocalServiceUtil {
 			typeSettings, hidden, friendlyURLMap, serviceContext);
 	}
 
+	public static com.liferay.portal.model.Group checkScopeGroup(
+		com.liferay.portal.model.Layout layout, long userId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		return getService().checkScopeGroup(layout, userId);
+	}
+
 	/**
 	* Creates a new layout with the primary key. Does not add the layout to the database.
 	*
