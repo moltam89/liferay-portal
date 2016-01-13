@@ -17,11 +17,14 @@ package com.liferay.asset.publisher.lar.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.asset.publisher.test.util.AssetPublisherTestUtil;
 import com.liferay.asset.publisher.web.constants.AssetPublisherPortletKeys;
+import com.liferay.asset.publisher.web.display.context.AssetEntryResult;
+import com.liferay.asset.publisher.web.display.context.AssetPublisherDisplayContext;
 import com.liferay.asset.publisher.web.util.AssetPublisherUtil;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.test.util.JournalTestUtil;
+import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.Sync;
 import com.liferay.portal.kernel.test.rule.SynchronousDestinationTestRule;
@@ -36,6 +39,7 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.lar.test.BasePortletExportImportTestCase;
 import com.liferay.portal.model.Company;
 import com.liferay.portal.model.Group;
@@ -50,6 +54,7 @@ import com.liferay.portal.service.LayoutLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
+import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.test.LayoutTestUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
@@ -88,6 +93,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.portlet.MockPortletRequest;
 
 /**
@@ -736,22 +742,9 @@ public class AssetPublisherExportImportTest
 	}
 
 	protected List<AssetEntry> addAssetEntries(
-			Group group, int count, List<AssetEntry> assetEntries)
+			Group group, int count, List<AssetEntry> assetEntries,
+			ServiceContext serviceContext)
 		throws Exception {
-
-		ServiceContext serviceContext =
-			ServiceContextTestUtil.getServiceContext();
-
-		if (group.isLayout()) {
-
-			// Creating structures and templates in layout scope group is not
-			// possible
-
-			Company company = CompanyLocalServiceUtil.getCompany(
-				layout.getCompanyId());
-
-			serviceContext.setAttribute("ddmGroupId", company.getGroupId());
-		}
 
 		for (int i = 0; i < count; i++) {
 			JournalArticle journalArticle = JournalTestUtil.addArticle(
@@ -899,6 +892,68 @@ public class AssetPublisherExportImportTest
 		return getExportParameterMap();
 	}
 
+	protected void testDynamicExportImport(
+			Map<String, String[]> preferenceMap,
+			List<AssetEntry> expectedAssetEntries, boolean filtering)
+		throws Exception {
+
+		if (filtering) {
+
+			// Creating entries to validate filtering
+
+			addAssetEntries(
+				group, 2, new ArrayList<AssetEntry>(),
+				ServiceContextTestUtil.getServiceContext());
+		}
+
+		String scopeId = AssetPublisherUtil.getScopeId(
+			group, group.getGroupId());
+
+		preferenceMap.put("scopeIds", new String[] {scopeId});
+
+		preferenceMap.put("selectionStyle", new String[] {"dynamic"});
+
+		PortletPreferences portletPreferences = getImportedPortletPreferences(
+			preferenceMap);
+
+		MockHttpServletRequest mockHttpServletRequest =
+			new MockHttpServletRequest();
+
+		ThemeDisplay themeDisplay = new ThemeDisplay();
+
+		Company company = CompanyLocalServiceUtil.getCompany(
+			TestPropsValues.getCompanyId());
+
+		themeDisplay.setCompany(company);
+		themeDisplay.setLayout(importedLayout);
+		themeDisplay.setScopeGroupId(importedGroup.getGroupId());
+		themeDisplay.setUser(TestPropsValues.getUser());
+
+		mockHttpServletRequest.setAttribute(
+			WebKeys.THEME_DISPLAY, themeDisplay);
+
+		AssetPublisherDisplayContext assetPublisherDisplayContext =
+			new AssetPublisherDisplayContext(
+				mockHttpServletRequest, portletPreferences);
+
+		SearchContainer<AssetEntry> searchContainer = new SearchContainer<>();
+
+		searchContainer.setTotal(10);
+
+		List<AssetEntryResult> actualAssetEntryResults =
+			AssetPublisherUtil.getAssetEntryResults(
+				assetPublisherDisplayContext, searchContainer,
+				portletPreferences);
+
+		List<AssetEntry> actualAssetEntries = new ArrayList<>();
+
+		for (AssetEntryResult assetEntryResult : actualAssetEntryResults) {
+			actualAssetEntries.addAll(assetEntryResult.getAssetEntries());
+		}
+
+		assertAssetEntries(expectedAssetEntries, actualAssetEntries);
+	}
+
 	protected void testExportImportAssetEntries(Group scopeGroup)
 		throws Exception {
 
@@ -916,7 +971,22 @@ public class AssetPublisherExportImportTest
 		String[] scopeIds = new String[0];
 
 		for (Group scopeGroup : scopeGroups) {
-			assetEntries = addAssetEntries(scopeGroup, 3, assetEntries);
+			ServiceContext serviceContext =
+				ServiceContextTestUtil.getServiceContext();
+
+			if (scopeGroup.isLayout()) {
+
+				// Creating structures and templates in layout scope group is
+				// not possible
+
+				Company company = CompanyLocalServiceUtil.getCompany(
+					layout.getCompanyId());
+
+				serviceContext.setAttribute("ddmGroupId", company.getGroupId());
+			}
+
+			assetEntries = addAssetEntries(
+				scopeGroup, 3, assetEntries, serviceContext);
 
 			String scopeId = AssetPublisherUtil.getScopeId(
 				scopeGroup, group.getGroupId());
