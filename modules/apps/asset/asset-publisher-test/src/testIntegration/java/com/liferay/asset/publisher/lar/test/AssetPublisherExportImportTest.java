@@ -23,6 +23,8 @@ import com.liferay.asset.publisher.web.util.AssetPublisherUtil;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.model.JournalArticleConstants;
+import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.test.util.JournalTestUtil;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
@@ -59,6 +61,7 @@ import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.test.LayoutTestUtil;
 import com.liferay.portlet.asset.model.AssetCategory;
 import com.liferay.portlet.asset.model.AssetEntry;
+import com.liferay.portlet.asset.model.AssetTag;
 import com.liferay.portlet.asset.model.AssetVocabulary;
 import com.liferay.portlet.asset.service.AssetCategoryLocalServiceUtil;
 import com.liferay.portlet.asset.service.AssetVocabularyLocalServiceUtil;
@@ -81,6 +84,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.portlet.PortletPreferences;
@@ -275,6 +279,182 @@ public class AssetPublisherExportImportTest
 			"The display style should not be null",
 			Validator.isNotNull(
 				portletPreferences.getValue("displayStyle", null)));
+	}
+
+	@Test
+	public void testDynamicExportImportAssetCategoryFiltering()
+		throws Exception {
+
+		AssetVocabulary assetVocabulary = AssetTestUtil.addVocabulary(
+			group.getGroupId());
+
+		AssetCategory assetCategory = AssetTestUtil.addCategory(
+			group.getGroupId(), assetVocabulary.getVocabularyId());
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext();
+
+		serviceContext.setAssetCategoryIds(
+			new long[] {assetCategory.getCategoryId()});
+
+		List<AssetEntry> expectedAssetEntries = addAssetEntries(
+			group, 2, new ArrayList<AssetEntry>(), serviceContext);
+
+		Map<String, String[]> preferenceMap = new HashMap<>();
+
+		preferenceMap.put("queryContains0", new String[] {"true"});
+
+		preferenceMap.put("queryName0", new String[] {"assetCategories"});
+
+		preferenceMap.put(
+			"queryValues0",
+			new String[] {String.valueOf(assetCategory.getCategoryId())});
+
+		testDynamicExportImport(preferenceMap, expectedAssetEntries, true);
+	}
+
+	@Test
+	public void testDynamicExportImportAssetTagFiltering() throws Exception {
+		AssetTag assetTag = AssetTestUtil.addTag(group.getGroupId());
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext();
+
+		serviceContext.setAssetTagNames(new String[] {assetTag.getName()});
+
+		List<AssetEntry> expectedAssetEntries = addAssetEntries(
+			group, 2, new ArrayList<AssetEntry>(), serviceContext);
+
+		Map<String, String[]> preferenceMap = new HashMap<>();
+
+		preferenceMap.put(
+			"queryContains0", new String[] {Boolean.TRUE.toString()});
+
+		preferenceMap.put("queryValues0", new String[] {assetTag.getName()});
+
+		testDynamicExportImport(preferenceMap, expectedAssetEntries, true);
+	}
+
+	@Test
+	public void testDynamicExportImportAssetVocabularyFiltering()
+		throws Exception {
+
+		AssetVocabulary assetVocabulary = AssetTestUtil.addVocabulary(
+			group.getGroupId());
+
+		AssetCategory assetCategory = AssetTestUtil.addCategory(
+			group.getGroupId(), assetVocabulary.getVocabularyId());
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext();
+
+		serviceContext.setAssetCategoryIds(
+			new long[] {assetCategory.getCategoryId()});
+
+		List<AssetEntry> expectedAssetEntries = addAssetEntries(
+			group, 1, new ArrayList<AssetEntry>(), serviceContext);
+
+		AssetCategory assetCategory2 = AssetTestUtil.addCategory(
+			group.getGroupId(), assetVocabulary.getVocabularyId());
+
+		serviceContext.setAssetCategoryIds(
+			new long[] {assetCategory2.getCategoryId()});
+
+		expectedAssetEntries = addAssetEntries(
+			group, 1, expectedAssetEntries, serviceContext);
+
+		Map<String, String[]> preferenceMap = new HashMap<>();
+
+		preferenceMap.put(
+			"assetVocabularyId",
+			new String[] {String.valueOf(assetVocabulary.getVocabularyId())});
+
+		testDynamicExportImport(preferenceMap, expectedAssetEntries, true);
+	}
+
+	@Test
+	public void testDynamicExportImportClassTypeFiltering() throws Exception {
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			group.getGroupId(), RandomTestUtil.randomString(),
+			RandomTestUtil.randomString(100),
+			ServiceContextTestUtil.getServiceContext());
+
+		List<AssetEntry> expectedAssetEntries = new ArrayList<>();
+
+		expectedAssetEntries.add(getAssetEntry(journalArticle));
+
+		Map<String, String[]> preferenceMap = new HashMap<>();
+
+		long journalArticleClassNameId = PortalUtil.getClassNameId(
+			JournalArticle.class);
+
+		preferenceMap.put(
+			"anyAssetType",
+			new String[] {String.valueOf(journalArticleClassNameId)});
+
+		DDMStructure ddmStructure = journalArticle.getDDMStructure();
+
+		preferenceMap.put(
+			"classTypeIds",
+			new String[] {String.valueOf(ddmStructure.getStructureId())});
+
+		testDynamicExportImport(preferenceMap, expectedAssetEntries, true);
+	}
+
+	@Test
+	public void testDynamicExportImportLayoutFiltering() throws Exception {
+		Map<Locale, String> titleMap = new HashMap<>();
+
+		titleMap.put(LocaleUtil.getDefault(), RandomTestUtil.randomString());
+
+		Map<Locale, String> contentMap = new HashMap<>();
+
+		contentMap.put(
+			LocaleUtil.getDefault(), RandomTestUtil.randomString(100));
+
+		JournalArticle journalArticle = JournalTestUtil.addArticle(
+			group.getGroupId(), JournalFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			JournalArticleConstants.CLASSNAME_ID_DEFAULT, titleMap, titleMap,
+			contentMap, layout.getUuid(), LocaleUtil.getDefault(), null, false,
+			false, ServiceContextTestUtil.getServiceContext());
+
+		List<AssetEntry> expectedAssetEntries = new ArrayList<>();
+
+		expectedAssetEntries.add(getAssetEntry(journalArticle));
+
+		Map<String, String[]> preferenceMap = new HashMap<>();
+
+		preferenceMap.put(
+			"showOnlyLayoutAssets", new String[] {Boolean.TRUE.toString()});
+
+		testDynamicExportImport(preferenceMap, expectedAssetEntries, true);
+	}
+
+	@Test
+	public void testDynamicExportImportOtherClassNameFiltering()
+		throws Exception {
+
+		Map<String, String[]> preferenceMap = new HashMap<>();
+
+		long dlFileEntryClassNameId = PortalUtil.getClassNameId(
+			DLFileEntry.class);
+
+		preferenceMap.put(
+			"anyAssetType",
+			new String[] {String.valueOf(dlFileEntryClassNameId)});
+
+		testDynamicExportImport(
+			preferenceMap, new ArrayList<AssetEntry>(), true);
+	}
+
+	@Test
+	public void testDynamicExportImportWithNoFiltering() throws Exception {
+		List<AssetEntry> expectedAssetEntries = addAssetEntries(
+			group, 2, new ArrayList<AssetEntry>(),
+			ServiceContextTestUtil.getServiceContext());
+
+		testDynamicExportImport(
+			new HashMap<String, String[]>(), expectedAssetEntries, false);
 	}
 
 	@Test
