@@ -303,9 +303,7 @@ public class AssetPublisherExportImportTest
 		Map<String, String[]> preferenceMap = new HashMap<>();
 
 		preferenceMap.put("queryContains0", new String[] {"true"});
-
 		preferenceMap.put("queryName0", new String[] {"assetCategories"});
-
 		preferenceMap.put(
 			"queryValues0",
 			new String[] {String.valueOf(assetCategory.getCategoryId())});
@@ -329,7 +327,6 @@ public class AssetPublisherExportImportTest
 
 		preferenceMap.put(
 			"queryContains0", new String[] {Boolean.TRUE.toString()});
-
 		preferenceMap.put("queryValues0", new String[] {assetTag.getName()});
 
 		testDynamicExportImport(preferenceMap, expectedAssetEntries, true);
@@ -342,14 +339,14 @@ public class AssetPublisherExportImportTest
 		AssetVocabulary assetVocabulary = AssetTestUtil.addVocabulary(
 			group.getGroupId());
 
-		AssetCategory assetCategory = AssetTestUtil.addCategory(
+		AssetCategory assetCategory1 = AssetTestUtil.addCategory(
 			group.getGroupId(), assetVocabulary.getVocabularyId());
 
 		ServiceContext serviceContext =
 			ServiceContextTestUtil.getServiceContext();
 
 		serviceContext.setAssetCategoryIds(
-			new long[] {assetCategory.getCategoryId()});
+			new long[] {assetCategory1.getCategoryId()});
 
 		List<AssetEntry> expectedAssetEntries = addAssetEntries(
 			group, 1, new ArrayList<AssetEntry>(), serviceContext);
@@ -1105,6 +1102,7 @@ public class AssetPublisherExportImportTest
 			TestPropsValues.getCompanyId());
 
 		themeDisplay.setCompany(company);
+
 		themeDisplay.setLayout(importedLayout);
 		themeDisplay.setScopeGroupId(importedGroup.getGroupId());
 		themeDisplay.setUser(TestPropsValues.getUser());
