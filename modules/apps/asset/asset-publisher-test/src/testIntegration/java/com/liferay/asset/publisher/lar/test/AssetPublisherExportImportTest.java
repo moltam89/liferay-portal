@@ -371,12 +371,12 @@ public class AssetPublisherExportImportTest
 
 	@Test
 	public void testDynamicExportImportClassTypeFiltering() throws Exception {
+		List<AssetEntry> expectedAssetEntries = new ArrayList<>();
+
 		JournalArticle journalArticle = JournalTestUtil.addArticle(
 			group.getGroupId(), RandomTestUtil.randomString(),
 			RandomTestUtil.randomString(100),
 			ServiceContextTestUtil.getServiceContext());
-
-		List<AssetEntry> expectedAssetEntries = new ArrayList<>();
 
 		expectedAssetEntries.add(getAssetEntry(journalArticle));
 
@@ -400,6 +400,8 @@ public class AssetPublisherExportImportTest
 
 	@Test
 	public void testDynamicExportImportLayoutFiltering() throws Exception {
+		List<AssetEntry> expectedAssetEntries = new ArrayList<>();
+
 		Map<Locale, String> titleMap = new HashMap<>();
 
 		titleMap.put(LocaleUtil.getDefault(), RandomTestUtil.randomString());
@@ -414,8 +416,6 @@ public class AssetPublisherExportImportTest
 			JournalArticleConstants.CLASSNAME_ID_DEFAULT, titleMap, titleMap,
 			contentMap, layout.getUuid(), LocaleUtil.getDefault(), null, false,
 			false, ServiceContextTestUtil.getServiceContext());
-
-		List<AssetEntry> expectedAssetEntries = new ArrayList<>();
 
 		expectedAssetEntries.add(getAssetEntry(journalArticle));
 
@@ -1083,16 +1083,6 @@ public class AssetPublisherExportImportTest
 				ServiceContextTestUtil.getServiceContext());
 		}
 
-		String scopeId = AssetPublisherUtil.getScopeId(
-			group, group.getGroupId());
-
-		preferenceMap.put("scopeIds", new String[] {scopeId});
-
-		preferenceMap.put("selectionStyle", new String[] {"dynamic"});
-
-		PortletPreferences portletPreferences = getImportedPortletPreferences(
-			preferenceMap);
-
 		MockHttpServletRequest mockHttpServletRequest =
 			new MockHttpServletRequest();
 
@@ -1109,6 +1099,16 @@ public class AssetPublisherExportImportTest
 
 		mockHttpServletRequest.setAttribute(
 			WebKeys.THEME_DISPLAY, themeDisplay);
+
+		String scopeId = AssetPublisherUtil.getScopeId(
+			group, group.getGroupId());
+
+		preferenceMap.put("scopeIds", new String[] {scopeId});
+
+		preferenceMap.put("selectionStyle", new String[] {"dynamic"});
+
+		PortletPreferences portletPreferences = getImportedPortletPreferences(
+			preferenceMap);
 
 		AssetPublisherDisplayContext assetPublisherDisplayContext =
 			new AssetPublisherDisplayContext(
