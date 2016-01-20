@@ -233,8 +233,6 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		AssetEntryQuery assetEntryQuery = AssetPublisherUtil.getAssetEntryQuery(
 			portletPreferences, groupIds, null, null);
 
-		assetEntryQuery.setGroupIds(groupIds);
-
 		long[] classNameIds = AssetPublisherUtil.getClassNameIds(
 			portletPreferences,
 			AssetRendererFactoryRegistryUtil.getClassNameIds(companyId, true));
@@ -248,6 +246,7 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 
 		assetEntryQuery.setEnablePermissions(false);
 		assetEntryQuery.setExcludeZeroViewCount(false);
+		assetEntryQuery.setGroupIds(groupIds);
 
 		boolean showOnlyLayoutAssets = GetterUtil.getBoolean(
 			portletPreferences.getValue("showOnlyLayoutAssets", null));
