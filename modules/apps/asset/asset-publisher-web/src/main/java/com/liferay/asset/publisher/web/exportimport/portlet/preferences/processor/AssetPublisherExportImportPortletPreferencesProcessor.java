@@ -245,6 +245,15 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		assetEntryQuery.setClassTypeIds(classTypeIds);
 
 		assetEntryQuery.setEnablePermissions(false);
+
+		int end = AssetPublisherWebConfigurationValues.DYNAMIC_EXPORT_LIMIT;
+
+		if (end == 0) {
+			end = QueryUtil.ALL_POS;
+		}
+
+		assetEntryQuery.setEnd(end);
+
 		assetEntryQuery.setExcludeZeroViewCount(false);
 		assetEntryQuery.setGroupIds(groupIds);
 
@@ -275,15 +284,12 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 
 		assetEntryQuery.setOrderByType2(orderByType2);
 
-		int end = AssetPublisherWebConfigurationValues.DYNAMIC_EXPORT_LIMIT;
 		int start = 0;
 
 		if (end == 0) {
 			start = QueryUtil.ALL_POS;
-			end = QueryUtil.ALL_POS;
 		}
 
-		assetEntryQuery.setEnd(end);
 		assetEntryQuery.setStart(start);
 
 		return assetEntryQuery;
