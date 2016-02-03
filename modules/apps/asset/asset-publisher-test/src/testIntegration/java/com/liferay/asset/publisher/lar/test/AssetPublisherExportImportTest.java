@@ -73,6 +73,7 @@ import com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUt
 import com.liferay.portlet.exportimport.configuration.ExportImportConfigurationConstants;
 import com.liferay.portlet.exportimport.configuration.ExportImportConfigurationSettingsMapFactory;
 import com.liferay.portlet.exportimport.lar.ExportImportHelperUtil;
+import com.liferay.portlet.exportimport.lar.ExportImportThreadLocal;
 import com.liferay.portlet.exportimport.lar.PortletDataHandlerKeys;
 import com.liferay.portlet.exportimport.model.ExportImportConfiguration;
 import com.liferay.portlet.exportimport.service.ExportImportConfigurationLocalServiceUtil;
@@ -916,6 +917,41 @@ public class AssetPublisherExportImportTest
 	@Test
 	public void testSortByGlobalAssetVocabulary() throws Exception {
 		testSortByAssetVocabulary(true);
+	}
+
+	@Test
+	public void testStagingGroupScopeId() throws Exception {
+		Map<String, String[]> preferenceMap = new HashMap<>();
+
+		Group liveGroup = GroupTestUtil.addGroup();
+
+		GroupTestUtil.enableLocalStaging(liveGroup);
+
+		Group stagingGroup = liveGroup.getStagingGroup();
+
+		preferenceMap.put(
+			"scopeIds",
+			new String[] {
+				AssetPublisherUtil.SCOPE_ID_GROUP_PREFIX +
+					stagingGroup.getGroupId()
+			});
+
+		try {
+			ExportImportThreadLocal.setLayoutStagingInProcess(true);
+
+			PortletPreferences portletPreferences =
+				getImportedPortletPreferences(preferenceMap);
+
+			Assert.assertEquals(
+				AssetPublisherUtil.SCOPE_ID_GROUP_PREFIX +
+					liveGroup.getGroupId(),
+				portletPreferences.getValue("scopeIds", null));
+			Assert.assertEquals(
+				null, portletPreferences.getValue("scopeId", null));
+		}
+		finally {
+			ExportImportThreadLocal.setLayoutStagingInProcess(false);
+		}
 	}
 
 	protected List<AssetEntry> addAssetEntries(
