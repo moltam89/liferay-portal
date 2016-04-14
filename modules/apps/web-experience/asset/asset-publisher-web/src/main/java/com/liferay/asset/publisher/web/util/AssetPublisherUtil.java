@@ -878,9 +878,10 @@ public class AssetPublisherUtil {
 		}
 
 		long defaultClassTypeId = GetterUtil.getLong(
-			portletPreferences.getValue("anyClassType" + className, null));
+			portletPreferences.getValue("anyClassType" + className, null),
+			Long.MIN_VALUE);
 
-		if (defaultClassTypeId > 0) {
+		if (defaultClassTypeId > Long.MIN_VALUE) {
 			return new Long[] {defaultClassTypeId};
 		}
 
