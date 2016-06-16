@@ -2211,7 +2211,7 @@ Export-Package: com.liferay.ibm.icu;version="4.0.1",com.liferay.ibm.ic
  ernel.exception,com.liferay.exportimport.kernel.model,com.liferay.por
  tal.kernel.dao.orm,com.liferay.portal.kernel.service,com.liferay.port
  al.kernel.service.persistence,com.liferay.portal.kernel.util",com.lif
- eray.exportimport.kernel.staging;version="1.0.0";uses:="com.liferay.e
+ eray.exportimport.kernel.staging;version="1.1.0";uses:="com.liferay.e
  xportimport.kernel.lar,com.liferay.exportimport.kernel.model,com.life
  ray.portal.kernel.exception,com.liferay.portal.kernel.json,com.lifera
  y.portal.kernel.model,com.liferay.portal.kernel.service,com.liferay.p
