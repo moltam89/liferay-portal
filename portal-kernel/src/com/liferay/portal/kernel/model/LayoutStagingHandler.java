@@ -39,6 +39,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -161,9 +162,37 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 					layout.getPlid(), true);
 
 			if (lastLayoutRevision == null) {
-				lastLayoutRevision =
-					LayoutRevisionLocalServiceUtil.fetchLastLayoutRevision(
-						layout.getPlid(), false);
+				List<LayoutRevision> layoutRevisions =
+					LayoutRevisionLocalServiceUtil.getLayoutRevisions(
+						layout.getPlid());
+
+				for (LayoutRevision curLayoutRevision : layoutRevisions) {
+					if (!curLayoutRevision.isInactive()) {
+						return curLayoutRevision;
+					}
+				}
+			}
+			else {
+				List<LayoutRevision> layoutRevisions =
+					LayoutRevisionLocalServiceUtil.getLayoutRevisions(
+						lastLayoutRevision.getLayoutSetBranchId(),
+						layout.getPlid());
+
+				for (LayoutRevision curLayoutRevision : layoutRevisions) {
+					if (!curLayoutRevision.isInactive() &&
+						(curLayoutRevision.getStatus() !=
+							WorkflowConstants.STATUS_APPROVED)) {
+
+						if (curLayoutRevision.getLayoutRevisionId() >
+								lastLayoutRevision.getLayoutRevisionId()) {
+
+							return curLayoutRevision;
+						}
+						else {
+							return lastLayoutRevision;
+						}
+					}
+				}
 			}
 
 			return lastLayoutRevision;
