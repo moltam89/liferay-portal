@@ -14,6 +14,7 @@
 
 package com.liferay.portal.service.impl;
 
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.staging.LayoutRevisionThreadLocal;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
@@ -278,6 +279,14 @@ public class PortletPreferencesLocalServiceStagingAdvice
 				WorkflowConstants.ACTION_SAVE_DRAFT);
 		}
 
+		if (ExportImportThreadLocal.isImportInProcess() &&
+			(LayoutRevisionThreadLocal.getLayoutRevisionId() > 0) &&
+			(layoutRevision.getLayoutRevisionId() !=
+				LayoutRevisionThreadLocal.getLayoutRevisionId())) {
+
+			LayoutRevisionThreadLocal.setLayoutRevisionId(0);
+		}
+
 		layoutRevision = LayoutRevisionLocalServiceUtil.updateLayoutRevision(
 			serviceContext.getUserId(), layoutRevision.getLayoutRevisionId(),
 			layoutRevision.getLayoutBranchId(), layoutRevision.getName(),
@@ -290,7 +299,6 @@ public class PortletPreferencesLocalServiceStagingAdvice
 
 		arguments[2] = layoutRevision.getLayoutRevisionId();
 
-		LayoutRevisionThreadLocal.setLayoutRevisionId(0);
 		ProxiedLayoutsThreadLocal.clearProxiedLayouts();
 
 		return method.invoke(methodInvocation.getThis(), arguments);
