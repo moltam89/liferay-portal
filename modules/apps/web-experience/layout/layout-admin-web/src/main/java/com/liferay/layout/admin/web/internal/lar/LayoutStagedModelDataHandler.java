@@ -637,9 +637,23 @@ public class LayoutStagedModelDataHandler
 		LayoutRevision layoutRevision = getLayoutRevision(importedLayout);
 
 		if (layoutRevision != null) {
+			String iconImagePath = layoutElement.elementText("icon-image-path");
+
+			byte[] iconBytes = portletDataContext.getZipEntryAsByteArray(
+				iconImagePath);
+
+			serviceContext.setAttribute(
+				"layoutPrototypeLinkEnabled",
+				importedLayout.getLayoutPrototypeLinkEnabled());
+			serviceContext.setModifiedDate(null);
+
 			_layoutLocalService.updateLayout(
 				groupId, privateLayout, importedLayout.getLayoutId(),
-				importedLayout.getTypeSettings());
+				parentLayoutId, layout.getNameMap(), layout.getTitleMap(),
+				layout.getDescriptionMap(), layout.getKeywordsMap(),
+				layout.getRobotsMap(), layout.getType(), layout.getHidden(),
+				importedLayout.getFriendlyURLMap(), layout.getIconImage(),
+				iconBytes, serviceContext);
 
 			LayoutRevisionThreadLocal.setLayoutRevisionId(0);
 		}
