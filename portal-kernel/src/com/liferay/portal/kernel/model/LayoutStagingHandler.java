@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.model;
 
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -153,6 +154,8 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
+		User user = null;
+
 		if ((serviceContext == null) || !serviceContext.isSignedIn()) {
 			LayoutRevision lastLayoutRevision = null;
 
@@ -166,10 +169,26 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 						layout.getPlid(), false);
 			}
 
+			if (ExportImportThreadLocal.isImportInProcess() &&
+				(lastLayoutRevision != null)) {
+
+				user = UserLocalServiceUtil.getUser(
+					lastLayoutRevision.getUserId());
+
+				long lastLayoutRevisionId =
+					StagingUtil.getRecentLayoutRevisionId(
+						user, lastLayoutRevision.getLayoutSetBranchId(),
+						layout.getPlid());
+
+				lastLayoutRevision =
+					LayoutRevisionLocalServiceUtil.fetchLayoutRevision(
+						lastLayoutRevisionId);
+			}
+
 			return lastLayoutRevision;
 		}
 
-		User user = UserLocalServiceUtil.getUser(serviceContext.getUserId());
+		user = UserLocalServiceUtil.getUser(serviceContext.getUserId());
 
 		long layoutSetBranchId = ParamUtil.getLong(
 			serviceContext, "layoutSetBranchId");

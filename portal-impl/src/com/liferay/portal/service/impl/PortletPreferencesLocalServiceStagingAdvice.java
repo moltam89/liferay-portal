@@ -14,6 +14,8 @@
 
 package com.liferay.portal.service.impl;
 
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
+import com.liferay.exportimport.kernel.staging.LayoutRevisionThreadLocal;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
@@ -275,6 +277,14 @@ public class PortletPreferencesLocalServiceStagingAdvice
 		if (!MergeLayoutPrototypesThreadLocal.isInProgress()) {
 			serviceContext.setWorkflowAction(
 				WorkflowConstants.ACTION_SAVE_DRAFT);
+		}
+
+		if (ExportImportThreadLocal.isImportInProcess() &&
+			(LayoutRevisionThreadLocal.getLayoutRevisionId() > 0) &&
+			(layoutRevision.getLayoutRevisionId() !=
+				LayoutRevisionThreadLocal.getLayoutRevisionId())) {
+
+			LayoutRevisionThreadLocal.setLayoutRevisionId(0);
 		}
 
 		layoutRevision = LayoutRevisionLocalServiceUtil.updateLayoutRevision(
