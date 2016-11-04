@@ -106,7 +106,11 @@ OrderByComparator<BackgroundTask> orderByComparator = BackgroundTaskComparatorFa
 			String backgroundTaskName = backgroundTask.getName();
 
 			if (localPublishing && (backgroundTask.getGroupId() == liveGroupId)) {
-				backgroundTaskName = LanguageUtil.get(request, "initial-publication");
+				boolean stagingPrivateLayout = (boolean) backgroundTask.getTaskContextMap().get("privateLayout");
+
+				String stagingPageLayoutDescription = (stagingPrivateLayout) ? LanguageUtil.get(request, "private-pages") : LanguageUtil.get(request, "public-pages");
+
+				backgroundTaskName = String.format("%s (%s)", LanguageUtil.get(request, "initial-publication"), stagingPageLayoutDescription);
 			}
 
 			if (backgroundTaskName.equals(StringPool.BLANK)) {
