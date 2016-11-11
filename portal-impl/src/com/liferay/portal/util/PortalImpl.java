@@ -3578,11 +3578,25 @@ public class PortalImpl implements Portal {
 
 		boolean appendI18nPath = true;
 
-		if ((PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 0) ||
-			((PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 1) &&
-			 locale.equals(LocaleUtil.getDefault()))) {
-
+		if (PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 0) {
 			appendI18nPath = false;
+		}
+		else if (PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 1) {
+			if (locale.equals(LocaleUtil.getSiteDefault())) {
+				appendI18nPath = false;
+			}
+		}
+		else if (PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 3) {
+			User user = getUser(request);
+
+			if (user == null) {
+				if (locale.equals(LocaleUtil.getSiteDefault())) {
+					appendI18nPath = false;
+				}
+			}
+			else if (locale.equals(user.getLocale())) {
+				appendI18nPath = false;
+			}
 		}
 
 		String localizedFriendlyURL = contextPath;
