@@ -111,7 +111,7 @@ public class FriendlyURLServlet extends HttpServlet {
 		Redirect redirect = null;
 
 		try {
-			redirect = _getRedirect(request, pathInfo);
+			redirect = getRedirect(request, pathInfo);
 
 			if (request.getAttribute(WebKeys.LAST_PATH) == null) {
 				request.setAttribute(
@@ -203,51 +203,7 @@ public class FriendlyURLServlet extends HttpServlet {
 		return requestURI.substring(_pathInfoOffset, pos);
 	}
 
-	/**
-	 * @deprecated As of 7.0.0, with no direct replacement
-	 */
-	@Deprecated
-	protected Object[] getRedirect(
-			HttpServletRequest request, String path, String mainPath,
-			Map<String, String[]> params)
-		throws Exception {
-
-		Redirect redirect = _getRedirect(request, path);
-
-		return new Object[] {redirect.getPath(), redirect.isForceRedirect()};
-	}
-
-	protected Locale setAlternativeLayoutFriendlyURL(
-		HttpServletRequest request, Layout layout, String friendlyURL) {
-
-		List<LayoutFriendlyURL> layoutFriendlyURLs =
-			LayoutFriendlyURLLocalServiceUtil.getLayoutFriendlyURLs(
-				layout.getPlid(), friendlyURL, 0, 1);
-
-		if (layoutFriendlyURLs.isEmpty()) {
-			return null;
-		}
-
-		LayoutFriendlyURL layoutFriendlyURL = layoutFriendlyURLs.get(0);
-
-		Locale locale = LocaleUtil.fromLanguageId(
-			layoutFriendlyURL.getLanguageId());
-
-		String alternativeLayoutFriendlyURL =
-			PortalUtil.getLocalizedFriendlyURL(request, layout, locale, locale);
-
-		SessionMessages.add(
-			request, "alternativeLayoutFriendlyURL",
-			alternativeLayoutFriendlyURL);
-
-		PortalMessages.add(
-			request, PortalMessages.KEY_JSP_PATH,
-			"/html/common/themes/layout_friendly_url_redirect.jsp");
-
-		return locale;
-	}
-
-	private Redirect _getRedirect(HttpServletRequest request, String path)
+	protected Redirect getRedirect(HttpServletRequest request, String path)
 		throws PortalException {
 
 		if (path.length() <= 1) {
@@ -429,15 +385,51 @@ public class FriendlyURLServlet extends HttpServlet {
 		return new Redirect(actualURL);
 	}
 
-	private static final Log _log = LogFactoryUtil.getLog(
-		FriendlyURLServlet.class);
+	/**
+	 * @deprecated As of 7.0.0, with no direct replacement
+	 */
+	@Deprecated
+	protected Object[] getRedirect(
+			HttpServletRequest request, String path, String mainPath,
+			Map<String, String[]> params)
+		throws Exception {
 
-	private String _friendlyURLPathPrefix;
-	private int _pathInfoOffset;
-	private boolean _private;
-	private boolean _user;
+		Redirect redirect = getRedirect(request, path);
 
-	private class Redirect {
+		return new Object[] {redirect.getPath(), redirect.isForceRedirect()};
+	}
+
+	protected Locale setAlternativeLayoutFriendlyURL(
+		HttpServletRequest request, Layout layout, String friendlyURL) {
+
+		List<LayoutFriendlyURL> layoutFriendlyURLs =
+			LayoutFriendlyURLLocalServiceUtil.getLayoutFriendlyURLs(
+				layout.getPlid(), friendlyURL, 0, 1);
+
+		if (layoutFriendlyURLs.isEmpty()) {
+			return null;
+		}
+
+		LayoutFriendlyURL layoutFriendlyURL = layoutFriendlyURLs.get(0);
+
+		Locale locale = LocaleUtil.fromLanguageId(
+			layoutFriendlyURL.getLanguageId());
+
+		String alternativeLayoutFriendlyURL =
+			PortalUtil.getLocalizedFriendlyURL(request, layout, locale, locale);
+
+		SessionMessages.add(
+			request, "alternativeLayoutFriendlyURL",
+			alternativeLayoutFriendlyURL);
+
+		PortalMessages.add(
+			request, PortalMessages.KEY_JSP_PATH,
+			"/html/common/themes/layout_friendly_url_redirect.jsp");
+
+		return locale;
+	}
+
+	protected static class Redirect {
 
 		public Redirect() {
 			this(Portal.PATH_MAIN);
@@ -490,5 +482,13 @@ public class FriendlyURLServlet extends HttpServlet {
 		private final boolean _permanentRedirect;
 
 	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		FriendlyURLServlet.class);
+
+	private String _friendlyURLPathPrefix;
+	private int _pathInfoOffset;
+	private boolean _private;
+	private boolean _user;
 
 }
