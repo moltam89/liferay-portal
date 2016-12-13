@@ -106,22 +106,12 @@ public class FriendlyURLServlet extends HttpServlet {
 
 		// Do not set the entire full main path. See LEP-456.
 
-		String redirect = Portal.PATH_MAIN;
-
 		String pathInfo = getPathInfo(request);
 
-		boolean forceRedirect = false;
-		boolean forcePermanentRedirect = false;
+		Redirect redirect = null;
 
 		try {
-			Object[] redirectArray = _getRedirect(request, pathInfo);
-
-			redirect = (String)redirectArray[0];
-			forceRedirect = (Boolean)redirectArray[1];
-
-			if (forceRedirect) {
-				forcePermanentRedirect = (Boolean)redirectArray[2];
-			}
+			redirect = _getRedirect(request, pathInfo);
 
 			if (request.getAttribute(WebKeys.LAST_PATH) == null) {
 				request.setAttribute(
@@ -143,31 +133,31 @@ public class FriendlyURLServlet extends HttpServlet {
 			}
 		}
 
-		if (Validator.isNull(redirect)) {
-			redirect = Portal.PATH_MAIN;
+		if (redirect == null) {
+			redirect = new Redirect();
 		}
 
 		if (_log.isDebugEnabled()) {
-			_log.debug("Redirect " + redirect);
+			_log.debug("Redirect " + redirect.getPath());
 		}
 
-		if ((redirect.charAt(0) == CharPool.SLASH) && !forceRedirect) {
+		if (redirect.isValidForward()) {
 			ServletContext servletContext = getServletContext();
 
 			RequestDispatcher requestDispatcher =
-				servletContext.getRequestDispatcher(redirect);
+				servletContext.getRequestDispatcher(redirect.getPath());
 
 			if (requestDispatcher != null) {
 				requestDispatcher.forward(request, response);
 			}
 		}
 		else {
-			if (forcePermanentRedirect) {
-				response.setHeader("Location", redirect);
+			if (redirect.isPermanentRedirect()) {
+				response.setHeader("Location", redirect.getPath());
 				response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
 			}
 			else {
-				response.sendRedirect(redirect);
+				response.sendRedirect(redirect.getPath());
 			}
 		}
 	}
@@ -222,7 +212,9 @@ public class FriendlyURLServlet extends HttpServlet {
 			Map<String, String[]> params)
 		throws Exception {
 
-		return _getRedirect(request, path);
+		Redirect redirect = _getRedirect(request, path);
+
+		return new Object[] {redirect.getPath(), redirect.isForceRedirect()};
 	}
 
 	protected Locale setAlternativeLayoutFriendlyURL(
@@ -255,11 +247,11 @@ public class FriendlyURLServlet extends HttpServlet {
 		return locale;
 	}
 
-	private Object[] _getRedirect(HttpServletRequest request, String path)
+	private Redirect _getRedirect(HttpServletRequest request, String path)
 		throws PortalException {
 
 		if (path.length() <= 1) {
-			return new Object[] {Portal.PATH_MAIN, Boolean.FALSE};
+			return new Redirect();
 		}
 
 		// Group friendly URL
@@ -408,9 +400,8 @@ public class FriendlyURLServlet extends HttpServlet {
 						forcePermanentRedirect = Boolean.FALSE;
 					}
 
-					return new Object[] {
-						redirect, Boolean.TRUE, forcePermanentRedirect
-					};
+					return new Redirect(
+						redirect, Boolean.TRUE, forcePermanentRedirect);
 				}
 			}
 		}
@@ -424,7 +415,7 @@ public class FriendlyURLServlet extends HttpServlet {
 					String redirect = PortalUtil.getLayoutActualURL(
 						layout, Portal.PATH_MAIN);
 
-					return new Object[] {redirect, Boolean.FALSE};
+					return new Redirect(redirect);
 				}
 			}
 
@@ -435,7 +426,7 @@ public class FriendlyURLServlet extends HttpServlet {
 			group.getGroupId(), _private, Portal.PATH_MAIN, friendlyURL, params,
 			requestContext);
 
-		return new Object[] {actualURL, Boolean.FALSE};
+		return new Redirect(actualURL);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -445,5 +436,59 @@ public class FriendlyURLServlet extends HttpServlet {
 	private int _pathInfoOffset;
 	private boolean _private;
 	private boolean _user;
+
+	private class Redirect {
+
+		public Redirect() {
+			this(Portal.PATH_MAIN);
+		}
+
+		public Redirect(String path) {
+			this(path, false, false);
+		}
+
+		public Redirect(
+			String path, boolean forceRedirect, boolean permanentRedirect) {
+
+			_path = path;
+			_forceRedirect = forceRedirect;
+			_permanentRedirect = permanentRedirect;
+		}
+
+		public String getPath() {
+			if (Validator.isNull(_path)) {
+				return Portal.PATH_MAIN;
+			}
+
+			return _path;
+		}
+
+		public boolean isForceRedirect() {
+			return _forceRedirect;
+		}
+
+		public boolean isPermanentRedirect() {
+			return _permanentRedirect;
+		}
+
+		public boolean isValidForward() {
+			String path = getPath();
+
+			if (path.charAt(0) != CharPool.SLASH) {
+				return false;
+			}
+
+			if (isForceRedirect()) {
+				return false;
+			}
+
+			return true;
+		}
+
+		private final boolean _forceRedirect;
+		private final String _path;
+		private final boolean _permanentRedirect;
+
+	}
 
 }
