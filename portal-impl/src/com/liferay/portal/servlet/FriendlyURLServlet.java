@@ -16,6 +16,7 @@ package com.liferay.portal.servlet;
 
 import com.liferay.portal.kernel.exception.NoSuchGroupException;
 import com.liferay.portal.kernel.exception.NoSuchLayoutException;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -141,16 +142,16 @@ public class FriendlyURLServlet extends HttpServlet {
 				request.setAttribute(WebKeys.LAST_PATH, lastPath);
 			}
 		}
-		catch (Exception e) {
+		catch (PortalException pe) {
 			if (_log.isWarnEnabled()) {
-				_log.warn(e);
+				_log.warn(pe);
 			}
 
-			if ((e instanceof NoSuchGroupException) ||
-				(e instanceof NoSuchLayoutException)) {
+			if ((pe instanceof NoSuchGroupException) ||
+				(pe instanceof NoSuchLayoutException)) {
 
 				PortalUtil.sendError(
-					HttpServletResponse.SC_NOT_FOUND, e, request, response);
+					HttpServletResponse.SC_NOT_FOUND, pe, request, response);
 
 				return;
 			}
@@ -224,8 +225,7 @@ public class FriendlyURLServlet extends HttpServlet {
 	}
 
 	protected Locale setAlternativeLayoutFriendlyURL(
-			HttpServletRequest request, Layout layout, String friendlyURL)
-		throws Exception {
+			HttpServletRequest request, Layout layout, String friendlyURL) {
 
 		List<LayoutFriendlyURL> layoutFriendlyURLs =
 			LayoutFriendlyURLLocalServiceUtil.getLayoutFriendlyURLs(
@@ -255,7 +255,7 @@ public class FriendlyURLServlet extends HttpServlet {
 	}
 
 	private Object[] _getRedirect(HttpServletRequest request, String path)
-		throws Exception {
+		throws PortalException {
 
 		if (path.length() <= 1) {
 			return new Object[] {Portal.PATH_MAIN, Boolean.FALSE};
