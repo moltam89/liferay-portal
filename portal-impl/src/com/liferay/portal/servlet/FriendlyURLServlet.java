@@ -55,6 +55,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -445,6 +446,29 @@ public class FriendlyURLServlet extends HttpServlet {
 			_path = path;
 			_forceRedirect = forceRedirect;
 			_permanentRedirect = permanentRedirect;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+
+			if (!(obj instanceof Redirect)) {
+				return false;
+			}
+
+			Redirect redirect = (Redirect)obj;
+
+			if (Objects.equals(getPath(), redirect.getPath()) &&
+				(isForceRedirect() == redirect.isForceRedirect() &&
+				 isPermanentRedirect() == redirect.isPermanentRedirect())) {
+
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 
 		public String getPath() {
