@@ -189,8 +189,7 @@ public class FriendlyURLServlet extends HttpServlet {
 	protected LastPath getLastPath(
 		HttpServletRequest request, String pathInfo) {
 
-		String lifecycle = ParamUtil.getString(
-			request, "p_p_lifecycle");
+		String lifecycle = ParamUtil.getString(request, "p_p_lifecycle");
 
 		if (lifecycle.equals("1")) {
 			return new LastPath(_friendlyURLPathPrefix, pathInfo);
@@ -198,8 +197,7 @@ public class FriendlyURLServlet extends HttpServlet {
 		else {
 			return new LastPath(
 				_friendlyURLPathPrefix, pathInfo,
-				HttpUtil.parameterMapToString(
-					request.getParameterMap()));
+				HttpUtil.parameterMapToString(request.getParameterMap()));
 		}
 	}
 
@@ -228,7 +226,7 @@ public class FriendlyURLServlet extends HttpServlet {
 	}
 
 	protected Locale setAlternativeLayoutFriendlyURL(
-			HttpServletRequest request, Layout layout, String friendlyURL) {
+		HttpServletRequest request, Layout layout, String friendlyURL) {
 
 		List<LayoutFriendlyURL> layoutFriendlyURLs =
 			LayoutFriendlyURLLocalServiceUtil.getLayoutFriendlyURLs(
