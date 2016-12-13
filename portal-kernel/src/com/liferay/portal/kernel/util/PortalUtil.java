@@ -1249,8 +1249,8 @@ public class PortalUtil {
 	}
 
 	public static String getLocalizedFriendlyURL(
-			HttpServletRequest request, Layout layout, Locale locale,
-			Locale originalLocale) {
+		HttpServletRequest request, Layout layout, Locale locale,
+		Locale originalLocale) {
 
 		return getPortal().getLocalizedFriendlyURL(
 			request, layout, locale, originalLocale);
