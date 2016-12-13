@@ -831,8 +831,7 @@ public interface Portal {
 
 	public String getLocalizedFriendlyURL(
 			HttpServletRequest request, Layout layout, Locale locale,
-			Locale originalLocale)
-		throws Exception;
+			Locale originalLocale);
 
 	public String getMailId(String mx, String popPortletPrefix, Object... ids);
 

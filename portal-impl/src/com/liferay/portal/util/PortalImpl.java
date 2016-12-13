@@ -3495,8 +3495,7 @@ public class PortalImpl implements Portal {
 	@Override
 	public String getLocalizedFriendlyURL(
 			HttpServletRequest request, Layout layout, Locale locale,
-			Locale originalLocale)
-		throws Exception {
+			Locale originalLocale) {
 
 		String contextPath = getPathContext();
 
