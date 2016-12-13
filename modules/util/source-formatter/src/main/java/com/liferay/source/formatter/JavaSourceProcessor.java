@@ -4168,8 +4168,12 @@ public class JavaSourceProcessor extends BaseSourceProcessor {
 		// Find suppressions file in portal-impl/src/
 
 		if (portalSource) {
-			suppressionsFiles.add(
-				getFile("portal-impl/src/" + fileName, PORTAL_MAX_DIR_LEVEL));
+			File suppressionsFile = getFile(
+				"portal-impl/src/" + fileName, PORTAL_MAX_DIR_LEVEL);
+
+			if (suppressionsFile != null) {
+				suppressionsFiles.add(suppressionsFile);
+			}
 		}
 
 		// Find suppressions files in any parent directory

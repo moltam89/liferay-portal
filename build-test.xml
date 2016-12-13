@@ -2562,24 +2562,18 @@ ${tomcat-gc-log}
 		</sequential>
 	</macrodef>
 
-	<macrodef name="set-portal-impl-portal-ext-properties">
-		<sequential>
-			<generate-jdbc-properties properties.file="portal-impl/src/portal-ext.properties">
-				<post-action>
-					<echo file="@{properties.file}" append="true"><![CDATA[
-javascript.single.page.application.timeout=300000]]></echo>
-				</post-action>
-			</generate-jdbc-properties>
-		</sequential>
-	</macrodef>
-
 	<macrodef name="set-portal-impl-portal-test-ext-properties">
 		<sequential>
 			<generate-jdbc-properties properties.file="portal-impl/test/portal-test-ext.properties">
 				<post-action>
 					<echo file="@{properties.file}" append="true"><![CDATA[
 module.framework.base.dir=${liferay.home}/osgi
-sprite.root.dir=/tmp/sprite]]></echo>
+
+sprite.root.dir=/tmp/sprite
+
+memory.scheduler.org.quartz.threadPool.threadCount=1
+
+persisted.scheduler.org.quartz.threadPool.threadCount=1]]></echo>
 				</post-action>
 			</generate-jdbc-properties>
 		</sequential>
@@ -5303,8 +5297,8 @@ go]]></replacevalue>
 					int passCount = totalCount - failCount;
 
 					lines.add(summaryLocation, "\t</summary>");
-					lines.add(summaryLocation, "\t\t<property name=\"FAILED\" value=\"" + Integer.toString(failCount) + "\" />");
-					lines.add(summaryLocation, "\t\t<property name=\"PASSED\" value=\"" + Integer.toString(passCount) + "\" />");
+					lines.add(summaryLocation, "\t\t<property name=\"failed\" value=\"" + Integer.toString(failCount) + "\" />");
+					lines.add(summaryLocation, "\t\t<property name=\"passed\" value=\"" + Integer.toString(passCount) + "\" />");
 					lines.add(summaryLocation, "\t<summary>");
 
 					FileWriter fileWriter = new FileWriter(jenkinsResultsXMLSuiteFile);
@@ -5677,6 +5671,10 @@ setup.wizard.enabled=false
 mail.session.jndi.name=
 
 sprite.root.dir=/tmp/sprite
+
+memory.scheduler.org.quartz.threadPool.threadCount=1
+
+persisted.scheduler.org.quartz.threadPool.threadCount=1
 
 axis.servlet.hosts.allowed=
 
@@ -7484,7 +7482,7 @@ ANT_OPTS=${env.ANT_OPTS}</echo>
 					<elseif>
 						<equals arg1="${app.server.type}" arg2="weblogic" />
 						<then>
-							<ant antfile="build-dist.xml" inheritAll="false" target="unzip-weblogic" />
+							<ant antfile="build-dist.xml" inheritAll="false" target="unzip-weblogic-custom" />
 						</then>
 					</elseif>
 				</if>
@@ -9058,10 +9056,6 @@ jdbc.default.password=${database.mysql.password}</echo>
 		</if>
 
 		<antcall target="clean-up-web-xml" />
-	</target>
-
-	<target name="set-portal-impl-portal-ext-properties">
-		<set-portal-impl-portal-ext-properties />
 	</target>
 
 	<target name="set-portal-impl-portal-test-ext-properties">

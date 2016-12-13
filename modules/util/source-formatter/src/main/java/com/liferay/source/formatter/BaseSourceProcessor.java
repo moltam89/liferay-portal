@@ -516,14 +516,16 @@ public abstract class BaseSourceProcessor implements SourceProcessor {
 		if (_portalLanguageProperties == null) {
 			Properties portalLanguageProperties = new Properties();
 
-			File portalLanguagePropertiesFile = new File(
-				getFile("portal-impl", PORTAL_MAX_DIR_LEVEL),
-				"src/content/Language.properties");
+			File portalLanguagePropertiesFile = getFile(
+				"portal-impl/src/content/Language.properties",
+				PORTAL_MAX_DIR_LEVEL);
 
-			InputStream inputStream = new FileInputStream(
-				portalLanguagePropertiesFile);
+			if (portalLanguagePropertiesFile != null) {
+				InputStream inputStream = new FileInputStream(
+					portalLanguagePropertiesFile);
 
-			portalLanguageProperties.load(inputStream);
+				portalLanguageProperties.load(inputStream);
+			}
 
 			_portalLanguageProperties = portalLanguageProperties;
 		}
