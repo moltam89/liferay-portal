@@ -124,22 +124,8 @@ public class FriendlyURLServlet extends HttpServlet {
 			}
 
 			if (request.getAttribute(WebKeys.LAST_PATH) == null) {
-				LastPath lastPath = null;
-
-				String lifecycle = ParamUtil.getString(
-					request, "p_p_lifecycle");
-
-				if (lifecycle.equals("1")) {
-					lastPath = new LastPath(_friendlyURLPathPrefix, pathInfo);
-				}
-				else {
-					lastPath = new LastPath(
-						_friendlyURLPathPrefix, pathInfo,
-						HttpUtil.parameterMapToString(
-							request.getParameterMap()));
-				}
-
-				request.setAttribute(WebKeys.LAST_PATH, lastPath);
+				request.setAttribute(
+					WebKeys.LAST_PATH, getLastPath(request, pathInfo));
 			}
 		}
 		catch (PortalException pe) {
@@ -200,6 +186,21 @@ public class FriendlyURLServlet extends HttpServlet {
 		return friendlyURL;
 	}
 
+	protected LastPath getLastPath(
+		HttpServletRequest request, String pathInfo) {
+
+		String lifecycle = ParamUtil.getString(request, "p_p_lifecycle");
+
+		if (lifecycle.equals("1")) {
+			return new LastPath(_friendlyURLPathPrefix, pathInfo);
+		}
+		else {
+			return new LastPath(
+				_friendlyURLPathPrefix, pathInfo,
+				HttpUtil.parameterMapToString(request.getParameterMap()));
+		}
+	}
+
 	protected String getPathInfo(HttpServletRequest request) {
 		String requestURI = request.getRequestURI();
 
@@ -225,7 +226,7 @@ public class FriendlyURLServlet extends HttpServlet {
 	}
 
 	protected Locale setAlternativeLayoutFriendlyURL(
-			HttpServletRequest request, Layout layout, String friendlyURL) {
+		HttpServletRequest request, Layout layout, String friendlyURL) {
 
 		List<LayoutFriendlyURL> layoutFriendlyURLs =
 			LayoutFriendlyURLLocalServiceUtil.getLayoutFriendlyURLs(
