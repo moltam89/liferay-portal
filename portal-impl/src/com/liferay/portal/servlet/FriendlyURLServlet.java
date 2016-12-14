@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.struts.LastPath;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -461,8 +462,8 @@ public class FriendlyURLServlet extends HttpServlet {
 			Redirect redirect = (Redirect)obj;
 
 			if (Objects.equals(getPath(), redirect.getPath()) &&
-				(isForceRedirect() == redirect.isForceRedirect() &&
-				 isPermanentRedirect() == redirect.isPermanentRedirect())) {
+				(isForceRedirect() == redirect.isForceRedirect()) &&
+				(isPermanentRedirect() == redirect.isPermanentRedirect())) {
 
 				return true;
 			}
@@ -477,6 +478,16 @@ public class FriendlyURLServlet extends HttpServlet {
 			}
 
 			return _path;
+		}
+
+		@Override
+		public int hashCode() {
+			int hash = HashUtil.hash(0, _path);
+
+			hash = HashUtil.hash(hash, _forceRedirect);
+			hash = HashUtil.hash(hash, _permanentRedirect);
+
+			return hash;
 		}
 
 		public boolean isForceRedirect() {
