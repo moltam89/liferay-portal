@@ -194,16 +194,14 @@ public class GroupSearchProvider {
 		return groupParams;
 	}
 
-	protected long getParentGroupId(PortletRequest portletRequest)
-		throws PortalException {
-
+	protected long getParentGroupId(PortletRequest portletRequest) {
 		Group group = null;
 
 		long groupId = ParamUtil.getLong(
 			portletRequest, "groupId", GroupConstants.DEFAULT_PARENT_GROUP_ID);
 
 		if (groupId > 0) {
-			group = _groupService.getGroup(groupId);
+			group = _groupLocalService.fetchGroup(groupId);
 		}
 
 		if (group != null) {
@@ -240,6 +238,10 @@ public class GroupSearchProvider {
 		_groupLocalService = groupLocalService;
 	}
 
+	/**
+	 * @deprecated As of 2.2.0, with no direct replacement
+	 */
+	@Deprecated
 	@Reference(unbind = "-")
 	protected void setGroupService(GroupService groupService) {
 		_groupService = groupService;

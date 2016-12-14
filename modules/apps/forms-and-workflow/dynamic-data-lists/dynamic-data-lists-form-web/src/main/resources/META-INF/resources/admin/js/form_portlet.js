@@ -90,20 +90,6 @@ AUI.add(
 
 				NAME: 'liferay-ddl-portlet',
 
-				openDDMDataProvider: function(dataProviderURL) {
-					Liferay.Util.openWindow(
-						{
-							dialog: {
-								cssClass: 'dynamic-data-mapping-data-providers-modal',
-								destroyOnHide: true
-							},
-							id: 'ddmDataProvider',
-							title: Liferay.Language.get('data-providers'),
-							uri: dataProviderURL
-						}
-					);
-				},
-
 				prototype: {
 					initializer: function() {
 						var instance = this;
@@ -154,7 +140,7 @@ AUI.add(
 							instance.after('autosave', instance._afterAutosave),
 							formBuilder._layoutBuilder.after('layout-builder:moveEnd', A.bind(instance._afterFormBuilderLayoutBuilderMoveEnd, instance)),
 							formBuilder._layoutBuilder.after('layout-builder:moveStart', A.bind(instance._afterFormBuilderLayoutBuilderMoveStart, instance)),
-							instance.one('.btn-cancel').on('click', A.bind('_onCancel', instance)),
+							instance.one('.back-url-link').on('click', A.bind('_onBack', instance)),
 							instance.one('#preview').on('click', A.bind('_onPreviewButtonClick', instance)),
 							instance.one('#publish').on('click', A.bind('_onPublishButtonClick', instance)),
 							instance.one('#save').on('click', A.bind('_onSaveButtonClick', instance)),
@@ -254,9 +240,9 @@ AUI.add(
 
 						return {
 							definition: definition,
-							description: instance.get('description'),
+							description: instance.get('description').trim(),
 							layout: layout,
-							name: instance.get('name'),
+							name: instance.get('name').trim(),
 							rules: rules
 						};
 					},
@@ -279,7 +265,7 @@ AUI.add(
 						var dialog = Liferay.Util.Window.getWindow(
 							{
 								dialog: {
-									bodyContent: Liferay.Language.get('are-you-sure-you-want-to-cancel'),
+									bodyContent: Liferay.Language.get('any-unsaved-changes-will-be-lost-are-you-sure-you-want-to-leave'),
 									destroyOnHide: true,
 									height: 200,
 									resizable: false,
@@ -287,7 +273,7 @@ AUI.add(
 										footer: [
 											{
 												cssClass: 'btn-lg btn-primary',
-												label: Liferay.Language.get('yes-cancel'),
+												label: Liferay.Language.get('leave'),
 												on: {
 													click: function() {
 														confirm.call(instance, dialog);
@@ -296,7 +282,7 @@ AUI.add(
 											},
 											{
 												cssClass: 'btn-lg btn-link',
-												label: Liferay.Language.get('no-continue'),
+												label: Liferay.Language.get('stay'),
 												on: {
 													click: function() {
 														cancel.call(instance, dialog);
@@ -305,7 +291,7 @@ AUI.add(
 											}
 										]
 									},
-									width: 500
+									width: 600
 								},
 								title: Liferay.Language.get('confirm')
 							}
@@ -551,7 +537,7 @@ AUI.add(
 						);
 					},
 
-					_onCancel: function(event) {
+					_onBack: function(event) {
 						var instance = this;
 
 						if (!instance._isSameState(instance.getState(), instance.initialState)) {
