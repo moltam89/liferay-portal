@@ -109,15 +109,16 @@ public class KBArticleExportImportPortletPreferencesProcessor
 				"resourcePrimKey", String.valueOf(resourcePrimKey));
 		}
 		catch (ReadOnlyException roe) {
-			StringBundler sb = new StringBundler(5);
+			StringBundler sb = new StringBundler(8);
 
 			sb.append("Unable to save converted portlet preference ");
 			sb.append("resourcePrimKey=");
 			sb.append(resourcePrimKey);
 			sb.append(" (the root article)  ");
-			sb.append("while importing portlet KB Article.");
-
-			// the message should probably contain the portletId as well
+			sb.append("while importing KB Article portlet. ");
+			sb.append("(portletId=");
+			sb.append(portletDataContext.getPortletId());
+			sb.append(")");
 
 			throw new PortletDataException(sb.toString(), roe);
 		}

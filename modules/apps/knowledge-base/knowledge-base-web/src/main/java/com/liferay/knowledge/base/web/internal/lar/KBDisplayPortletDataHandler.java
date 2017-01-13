@@ -18,8 +18,10 @@ import com.liferay.exportimport.kernel.lar.BasePortletDataHandler;
 import com.liferay.exportimport.kernel.lar.DataLevel;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerControl;
 import com.liferay.knowledge.base.constants.KBPortletKeys;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
+import com.liferay.portal.kernel.util.StringPool;
 
 import javax.portlet.PortletPreferences;
 
@@ -48,6 +50,7 @@ public class KBDisplayPortletDataHandler extends BasePortletDataHandler {
 	protected void activate() {
 		setDataLevel(DataLevel.PORTLET_INSTANCE);
 		setDataPortletPreferences("resourceClassNameId", "resourcePrimKey");
+		setExportControls(new PortletDataHandlerControl[0]);
 	}
 
 	@Override
@@ -56,13 +59,8 @@ public class KBDisplayPortletDataHandler extends BasePortletDataHandler {
 			PortletPreferences portletPreferences)
 		throws Exception {
 
-		/*if (portletPreferences == null) {
-			return portletPreferences;
-		}
-
-		portletPreferences.setValue("articleId", StringPool.BLANK);
-		portletPreferences.setValue("ddmTemplateKey", StringPool.BLANK);
-		portletPreferences.setValue("groupId", StringPool.BLANK);*/
+		portletPreferences.setValue("resourceClassNameId", StringPool.BLANK);
+		portletPreferences.setValue("resourcePrimKey", StringPool.BLANK);
 
 		return portletPreferences;
 	}
