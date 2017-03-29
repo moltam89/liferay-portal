@@ -194,6 +194,8 @@ public class DLFileEntryLocalServiceImpl
 
 		long fileEntryId = counterLocalService.increment();
 
+		serviceContext.setAttribute("fileEntryId", fileEntryId);
+
 		DLFileEntry dlFileEntry = dlFileEntryPersistence.create(fileEntryId);
 
 		dlFileEntry.setUuid(serviceContext.getUuid());
