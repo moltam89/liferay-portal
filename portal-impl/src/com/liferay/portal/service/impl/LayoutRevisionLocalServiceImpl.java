@@ -537,6 +537,7 @@ public class LayoutRevisionLocalServiceImpl
 
 		if (status == WorkflowConstants.STATUS_APPROVED) {
 			layoutRevision.setHead(true);
+			layoutRevision.setMajor(true);
 		}
 		else {
 			layoutRevision.setHead(false);
