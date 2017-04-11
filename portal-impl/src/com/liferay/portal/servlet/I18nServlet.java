@@ -18,16 +18,20 @@ import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.util.CharPool;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
+import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.util.PortalInstances;
 import com.liferay.portal.util.PropsValues;
 
 import java.io.IOException;
@@ -42,6 +46,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -83,6 +88,37 @@ public class I18nServlet extends HttpServlet {
 		}
 
 		_languageIds = Collections.unmodifiableMap(languageIds);
+	}
+
+	@Override
+	public void init(ServletConfig servletConfig) throws ServletException {
+		super.init(servletConfig);
+
+		boolean privateValue = GetterUtil.getBoolean(
+			servletConfig.getInitParameter("private"));
+
+		String proxyPath = PortalUtil.getPathProxy();
+
+		String friendlyURLPathPrefix = null;
+
+		boolean user = GetterUtil.getBoolean(
+			servletConfig.getInitParameter("user"));
+
+		if (privateValue) {
+			if (user) {
+				friendlyURLPathPrefix =
+					PortalUtil.getPathFriendlyURLPrivateUser();
+			}
+			else {
+				friendlyURLPathPrefix =
+					PortalUtil.getPathFriendlyURLPrivateGroup();
+			}
+		}
+		else {
+			friendlyURLPathPrefix = PortalUtil.getPathFriendlyURLPublic();
+		}
+
+		_pathInfoOffset = friendlyURLPathPrefix.length() - proxyPath.length();
 	}
 
 	@Override
@@ -133,8 +169,33 @@ public class I18nServlet extends HttpServlet {
 		}
 	}
 
+	protected Group getGroup(HttpServletRequest request, String requestURI) {
+		long companyId = PortalInstances.getCompanyId(request);
+
+		String pathInfo = getPathInfo(requestURI);
+
+		String friendlyURL = StringPool.BLANK;
+
+		if (pathInfo.length() > 1) {
+			friendlyURL = pathInfo;
+
+			int pos = pathInfo.indexOf(CharPool.SLASH, 1);
+
+			if (pos != -1) {
+				friendlyURL = pathInfo.substring(0, pos);
+			}
+		}
+
+		Group group = GroupLocalServiceUtil.fetchFriendlyURLGroup(
+			companyId, friendlyURL);
+
+		return group;
+	}
+
 	protected I18nData getI18nData(HttpServletRequest request) {
 		String path = GetterUtil.getString(request.getPathInfo());
+
+		Group group = getGroup(request, path);
 
 		if (Validator.isNull(path)) {
 			path = "/";
@@ -161,10 +222,14 @@ public class I18nServlet extends HttpServlet {
 		String i18nLanguageCode = i18nLanguageId;
 
 		if ((locale == null) || Validator.isNull(locale.getCountry())) {
+			if (group != null) {
+				locale = LanguageUtil.getLocale(
+					group.getGroupId(), i18nLanguageCode);
+			}
 
-			// Locales must contain the country code
-
-			locale = LanguageUtil.getLocale(i18nLanguageCode);
+			if ((group == null) || (locale == null)) {
+				locale = LanguageUtil.getLocale(i18nLanguageCode);
+			}
 		}
 
 		if (locale != null) {
@@ -195,6 +260,20 @@ public class I18nServlet extends HttpServlet {
 		return new I18nData(
 			StringPool.SLASH + languageId, locale.getLanguage(), languageId,
 			StringPool.SLASH);
+	}
+
+	protected String getPathInfo(String requestURI) {
+		if (requestURI.length() < _pathInfoOffset) {
+			return StringPool.BLANK;
+		}
+
+		int pos = requestURI.indexOf(Portal.JSESSIONID);
+
+		if (pos == -1) {
+			return requestURI.substring(_pathInfoOffset);
+		}
+
+		return requestURI.substring(_pathInfoOffset, pos);
 	}
 
 	protected class I18nData {
@@ -268,5 +347,7 @@ public class I18nServlet extends HttpServlet {
 	private static final Log _log = LogFactoryUtil.getLog(I18nServlet.class);
 
 	private static Map<String, String> _languageIds;
+
+	private int _pathInfoOffset;
 
 }

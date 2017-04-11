@@ -724,6 +724,9 @@ public interface Portal {
 	public String getI18nPathLanguageId(
 		Locale locale, String defaultI18nPathLanguageId);
 
+	public String getI18nPathLanguageId(
+		Locale locale, String defaultI18nPathLanguageId, long groupId);
+
 	/**
 	 * @deprecated As of 7.0.0, with no direct replacement
 	 */

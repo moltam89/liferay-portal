@@ -1054,6 +1054,13 @@ public class PortalUtil {
 			locale, defaultI18nPathLanguageId);
 	}
 
+	public static String getI18nPathLanguageId(
+		Locale locale, String defaultI18nPathLanguageId, long groupId) {
+
+		return getPortal().getI18nPathLanguageId(
+			locale, defaultI18nPathLanguageId, groupId);
+	}
+
 	/**
 	 * @deprecated As of 7.0.0, with no direct replacement
 	 */

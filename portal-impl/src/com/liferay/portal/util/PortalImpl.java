@@ -2612,14 +2612,28 @@ public class PortalImpl implements Portal {
 	public String getI18nPathLanguageId(
 		Locale locale, String defaultI18nPathLanguageId) {
 
+		return getI18nPathLanguageId(locale, defaultI18nPathLanguageId, 0);
+	}
+
+	@Override
+	public String getI18nPathLanguageId(
+		Locale locale, String defaultI18nPathLanguageId, long groupId) {
+
 		String i18nPathLanguageId = defaultI18nPathLanguageId;
 
 		if (!LanguageUtil.isDuplicateLanguageCode(locale.getLanguage())) {
 			i18nPathLanguageId = locale.getLanguage();
 		}
 		else {
-			Locale priorityLocale = LanguageUtil.getLocale(
-				locale.getLanguage());
+			Locale priorityLocale = null;
+
+			if (groupId > 0) {
+				priorityLocale = LanguageUtil.getLocale(
+					groupId, locale.getLanguage());
+			}
+			else {
+				priorityLocale = LanguageUtil.getLocale(locale.getLanguage());
+			}
 
 			if (locale.equals(priorityLocale)) {
 				i18nPathLanguageId = locale.getLanguage();
@@ -7438,6 +7452,10 @@ public class PortalImpl implements Portal {
 	}
 
 	protected String buildI18NPath(Locale locale) {
+		return buildI18NPath(locale, 0);
+	}
+
+	protected String buildI18NPath(Locale locale, long groupId) {
 		String languageId = LocaleUtil.toLanguageId(locale);
 
 		if (Validator.isNull(languageId)) {
@@ -7445,8 +7463,15 @@ public class PortalImpl implements Portal {
 		}
 
 		if (LanguageUtil.isDuplicateLanguageCode(locale.getLanguage())) {
-			Locale priorityLocale = LanguageUtil.getLocale(
-				locale.getLanguage());
+			Locale priorityLocale = null;
+
+			if (groupId > 0) {
+				priorityLocale = LanguageUtil.getLocale(
+					groupId, locale.getLanguage());
+			}
+			else {
+				priorityLocale = LanguageUtil.getLocale(locale.getLanguage());
+			}
 
 			if (locale.equals(priorityLocale)) {
 				languageId = locale.getLanguage();
@@ -8181,7 +8206,7 @@ public class PortalImpl implements Portal {
 			(PropsValues.LOCALE_PREPEND_FRIENDLY_URL_STYLE == 2)) {
 
 			i18nLanguageId = locale.toString();
-			i18nPath = buildI18NPath(locale);
+			i18nPath = buildI18NPath(locale, themeDisplay.getScopeGroupId());
 		}
 
 		themeDisplay.setI18nLanguageId(i18nLanguageId);

@@ -150,16 +150,7 @@ public class I18nFilter extends BasePortalFilter {
 			return null;
 		}
 
-		String i18nPathLanguageId = PortalUtil.getI18nPathLanguageId(
-			locale, i18nLanguageId);
-
-		String i18nPath = StringPool.SLASH.concat(i18nPathLanguageId);
-
-		if (requestURI.contains(i18nPath.concat(StringPool.SLASH))) {
-			return null;
-		}
-
-		String redirect = contextPath + i18nPath + requestURI;
+		long companyId = PortalUtil.getCompanyId(request);
 
 		int[] groupFriendlyURLIndex = PortalUtil.getGroupFriendlyURLIndex(
 			requestURI);
@@ -177,10 +168,27 @@ public class I18nFilter extends BasePortalFilter {
 				friendlyURLStart, friendlyURLEnd);
 		}
 
-		long companyId = PortalUtil.getCompanyId(request);
-
 		Group friendlyURLGroup = GroupLocalServiceUtil.fetchFriendlyURLGroup(
 			companyId, groupFriendlyURL);
+
+		String i18nPathLanguageId;
+
+		if (friendlyURLGroup != null) {
+			i18nPathLanguageId = PortalUtil.getI18nPathLanguageId(
+				locale, i18nLanguageId, friendlyURLGroup.getGroupId());
+		}
+		else {
+			i18nPathLanguageId = PortalUtil.getI18nPathLanguageId(
+				locale, i18nLanguageId);
+		}
+
+		String i18nPath = StringPool.SLASH.concat(i18nPathLanguageId);
+
+		if (requestURI.contains(i18nPath.concat(StringPool.SLASH))) {
+			return null;
+		}
+
+		String redirect = contextPath + i18nPath + requestURI;
 
 		if ((friendlyURLGroup != null) &&
 			!LanguageUtil.isAvailableLocale(
