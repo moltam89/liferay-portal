@@ -196,7 +196,7 @@ public class JournalArticleStagedModelDataHandler
 			return referenceAttributes;
 		}
 
-		boolean preloaded = false;
+		boolean preloaded = isPreloadedArticle(defaultUserId, article);
 
 		if (defaultUserId == article.getUserId()) {
 			preloaded = true;
@@ -945,6 +945,27 @@ public class JournalArticleStagedModelDataHandler
 
 		return _journalArticleLocalService.fetchArticle(
 			groupId, articleId, version);
+	}
+
+	protected boolean isPreloadedArticle(
+		long defaultUserId, JournalArticle article) {
+
+		if (defaultUserId == article.getUserId()) {
+			return true;
+		}
+
+		JournalArticle preLoadedJournalArticle =
+			_journalArticleLocalService.fetchArticle(
+				article.getGroupId(), article.getArticleId(),
+				JournalArticleConstants.VERSION_DEFAULT);
+
+		if ((preLoadedJournalArticle != null) &&
+			(defaultUserId == preLoadedJournalArticle.getUserId())) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	@Reference(unbind = "-")
