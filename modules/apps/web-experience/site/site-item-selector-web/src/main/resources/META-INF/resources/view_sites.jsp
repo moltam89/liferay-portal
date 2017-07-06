@@ -76,11 +76,13 @@ GroupSearch groupSearch = siteItemSelectorViewDisplayContext.getGroupSearch();
 
 			Map<String, Object> data = new HashMap<String, Object>();
 
+            String groupUrl = groupURLProvider.getGroupURL(group, liferayPortletRequest);
+
 			data.put("groupdescriptivename", group.getDescriptiveName(locale));
 			data.put("groupid", group.getGroupId());
 			data.put("grouptarget", target);
 			data.put("grouptype", LanguageUtil.get(resourceBundle, group.getTypeLabel()));
-			data.put("url", groupURLProvider.getGroupURL(group, liferayPortletRequest));
+			data.put("url", groupUrl);
 			data.put("uuid", group.getUuid());
 
 			String childGroupsHREF = null;
@@ -104,7 +106,7 @@ GroupSearch groupSearch = siteItemSelectorViewDisplayContext.getGroupSearch();
 						colspan="<%= 2 %>"
 					>
 						<h5>
-							<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:;">
+							<aui:a cssClass="selector-button" data="<%= data %>" href="<%= groupUrl %>">
 								<%= HtmlUtil.escape(siteItemSelectorViewDisplayContext.getGroupName(group)) %>
 							</aui:a>
 						</h5>
@@ -144,6 +146,7 @@ GroupSearch groupSearch = siteItemSelectorViewDisplayContext.getGroupSearch();
 										rowChecker="<%= searchContainer.getRowChecker() %>"
 										showCheckbox="<%= false %>"
 										title="<%= siteItemSelectorViewDisplayContext.getGroupName(group) %>"
+										url="<%= groupUrl %>"
 									>
 										<c:if test="<%= siteItemSelectorViewDisplayContext.isShowChildSitesLink() %>">
 											<liferay-frontend:vertical-card-footer>
@@ -163,6 +166,7 @@ GroupSearch groupSearch = siteItemSelectorViewDisplayContext.getGroupSearch();
 										rowChecker="<%= searchContainer.getRowChecker() %>"
 										showCheckbox="<%= false %>"
 										title="<%= siteItemSelectorViewDisplayContext.getGroupName(group) %>"
+										url="<%= groupUrl %>"
 									>
 										<liferay-frontend:vertical-card-footer>
 											<c:if test="<%= siteItemSelectorViewDisplayContext.isShowChildSitesLink() %>">
@@ -182,7 +186,7 @@ GroupSearch groupSearch = siteItemSelectorViewDisplayContext.getGroupSearch();
 						name="name"
 						truncate="<%= true %>"
 					>
-						<aui:a cssClass="selector-button" data="<%= data %>" href="javascript:;">
+						<aui:a cssClass="selector-button" data="<%= data %>" href="<%= groupUrl %>">
 							<%= HtmlUtil.escape(siteItemSelectorViewDisplayContext.getGroupName(group)) %>
 						</aui:a>
 					</liferay-ui:search-container-column-text>
