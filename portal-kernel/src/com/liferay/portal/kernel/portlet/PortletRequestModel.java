@@ -744,14 +744,17 @@ public class PortletRequestModel implements Serializable {
 
 		_attributes = new HashMap<>();
 
-		Enumeration<String> enumeration = _portletRequest.getAttributeNames();
+		if (_portletRequest != null) {
+			Enumeration<String> enumeration =
+				_portletRequest.getAttributeNames();
 
-		while (enumeration.hasMoreElements()) {
-			String name = enumeration.nextElement();
+			while (enumeration.hasMoreElements()) {
+				String name = enumeration.nextElement();
 
-			Object value = _portletRequest.getAttribute(name);
+				Object value = _portletRequest.getAttribute(name);
 
-			_attributes.put(name, value);
+				_attributes.put(name, value);
+			}
 		}
 	}
 
@@ -760,7 +763,11 @@ public class PortletRequestModel implements Serializable {
 			return;
 		}
 
-		_parameters = new HashMap<>(_portletRequest.getParameterMap());
+		_parameters = new HashMap<>();
+
+		if (_portletRequest != null) {
+			_parameters = new HashMap<>(_portletRequest.getParameterMap());
+		}
 	}
 
 	private void _initPortletSessionAttributes() {
@@ -768,18 +775,24 @@ public class PortletRequestModel implements Serializable {
 			return;
 		}
 
-		PortletSession portletSession = _portletRequest.getPortletSession();
+		_portletScopeSessioAttributes = new HashMap<>();
+		_applicationScopeSessionAttributes = new HashMap<>();
 
-		try {
-			_portletScopeSessioAttributes = portletSession.getAttributeMap(
-				PortletSession.PORTLET_SCOPE);
+		if (_portletRequest != null) {
+			PortletSession portletSession = _portletRequest.getPortletSession();
 
-			_applicationScopeSessionAttributes = portletSession.getAttributeMap(
-				PortletSession.APPLICATION_SCOPE);
-		}
-		catch (IllegalStateException ise) {
-			if (_log.isWarnEnabled()) {
-				_log.warn(ise.getMessage());
+			try {
+				_portletScopeSessioAttributes = portletSession.getAttributeMap(
+					PortletSession.PORTLET_SCOPE);
+
+				_applicationScopeSessionAttributes =
+					portletSession.getAttributeMap(
+						PortletSession.APPLICATION_SCOPE);
+			}
+			catch (IllegalStateException ise) {
+				if (_log.isWarnEnabled()) {
+					_log.warn(ise.getMessage());
+				}
 			}
 		}
 	}
