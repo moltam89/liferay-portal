@@ -656,7 +656,7 @@ public class LiferayRepository
 		// instead of the live site's group id
 
 		if (stagingGroup != null) {
-			groupId = stagingGroup.getClassPK();
+			groupId = stagingGroup.getGroupId();
 		}
 
 		List<Object> dlFoldersAndDLFileEntriesAndDLFileShortcuts =
