@@ -32,6 +32,7 @@ import com.liferay.dynamic.data.mapping.kernel.DDMFormValues;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.lock.Lock;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
@@ -46,6 +47,7 @@ import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.RepositoryLocalService;
 import com.liferay.portal.kernel.service.RepositoryService;
 import com.liferay.portal.kernel.service.ResourceLocalService;
@@ -644,9 +646,22 @@ public class LiferayRepository
 			status, PrincipalThreadLocal.getUserId(), true, start, end,
 			(OrderByComparator<Object>)obc);
 
+		long groupId = getGroupId();
+
+		Group currentGroup = GroupLocalServiceUtil.getGroup(groupId);
+
+		Group stagingGroup = currentGroup.getStagingGroup();
+
+		// if the staging is activated, then use the stage site's group Id
+		// instead of the live site's group id
+
+		if (stagingGroup != null) {
+			groupId = stagingGroup.getGroupId();
+		}
+
 		List<Object> dlFoldersAndDLFileEntriesAndDLFileShortcuts =
 			dlFolderService.getFoldersAndFileEntriesAndFileShortcuts(
-				getGroupId(), toFolderId(folderId), mimeTypes,
+					groupId, toFolderId(folderId), mimeTypes,
 				includeMountFolders, queryDefinition);
 
 		return RepositoryModelUtil.toRepositoryEntries(
