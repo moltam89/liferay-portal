@@ -38,6 +38,7 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerRegistryUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Conjunction;
 import com.liferay.portal.kernel.dao.orm.Criterion;
@@ -50,6 +51,7 @@ import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileShortcut;
@@ -58,6 +60,7 @@ import com.liferay.portal.kernel.service.RepositoryLocalService;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.repository.liferayrepository.LiferayRepositoryDefiner;
 import com.liferay.portal.repository.temporaryrepository.TemporaryFileEntryRepositoryDefiner;
@@ -66,6 +69,7 @@ import com.liferay.portlet.documentlibrary.constants.DLConstants;
 import com.liferay.portlet.documentlibrary.service.permission.DLPermission;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.portlet.PortletPreferences;
 
@@ -229,6 +233,45 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences, String data)
 		throws Exception {
+
+		Group liveGroup = _staging.getLiveGroup(
+			portletDataContext.getScopeGroupId());
+
+		UnicodeProperties liveGroupProps =
+			liveGroup.getTypeSettingsProperties();
+
+		Set<String> propertyKeys = liveGroupProps.keySet();
+
+		String isDLPortletStagingEnabledProperyKey = StringPool.BLANK;
+		String isDLPortletStagingEnabledProperyValue = StringPool.BLANK;
+
+		String isRemoteStagedPropertyName = "stagedRemotely";
+		String isRemoteStagedPropertyValue = StringPool.BLANK;
+
+		for (String key : propertyKeys) {
+			if (key.contains(portletId)) {
+				isDLPortletStagingEnabledProperyKey = key;
+				break;
+			}
+		}
+
+		if (!StringPool.BLANK.equals(isDLPortletStagingEnabledProperyKey)) {
+			isDLPortletStagingEnabledProperyValue = liveGroupProps.get(
+				isDLPortletStagingEnabledProperyKey);
+		}
+
+		isRemoteStagedPropertyValue = liveGroupProps.get(
+			isRemoteStagedPropertyName);
+
+		//if media items disabled in local stage config,
+		//then use the live site's ID instead of the staged site ID
+
+		if (Boolean.FALSE.toString().equals(
+				isDLPortletStagingEnabledProperyValue) &&
+			Boolean.FALSE.toString().equals(isRemoteStagedPropertyValue)) {
+
+			portletDataContext.setScopeGroupId(liveGroup.getGroupId());
+		}
 
 		portletDataContext.importPortletPermissions(DLPermission.RESOURCE_NAME);
 
@@ -692,5 +735,8 @@ public class DLPortletDataHandler extends BasePortletDataHandler {
 	private Portal _portal;
 
 	private RepositoryLocalService _repositoryLocalService;
+
+	@Reference
+	private Staging _staging;
 
 }
