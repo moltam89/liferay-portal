@@ -56,6 +56,7 @@ import com.liferay.exportimport.kernel.lar.UserIdStrategy;
 import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleManager;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
+import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.exportimport.lar.DeletionSystemEventImporter;
 import com.liferay.exportimport.lar.LayoutCache;
 import com.liferay.exportimport.lar.PermissionImporter;
@@ -328,6 +329,19 @@ public class PortletImportController implements ImportController {
 
 		if (Validator.isNull(portletData)) {
 			return null;
+		}
+
+		Group liveGroup = _staging.getLiveGroup(
+			portletDataContext.getScopeGroupId());
+
+		boolean groupRemoteStaged = liveGroup.isStagedRemotely();
+		boolean portletStaged = liveGroup.isStagedPortlet(
+			portletDataContext.getPortletId());
+
+		long originalScopeGroupId = portletDataContext.getScopeGroupId();
+
+		if (!groupRemoteStaged && !portletStaged) {
+			portletDataContext.setScopeGroupId(liveGroup.getGroupId());
 		}
 
 		portletPreferences = portletDataHandler.importData(
@@ -1573,6 +1587,10 @@ public class PortletImportController implements ImportController {
 
 	private PortletItemLocalService _portletItemLocalService;
 	private PortletPreferencesLocalService _portletPreferencesLocalService;
+
+	@Reference
+	private Staging _staging;
+
 	private UserLocalService _userLocalService;
 
 }
