@@ -6531,14 +6531,21 @@ public class JournalArticleLocalServiceImpl
 
 		for (JournalArticle article : articles) {
 			long groupId = article.getGroupId();
+
+			int status = article.getStatus();
+
+			if (article.getStatus() != WorkflowConstants.STATUS_IN_TRASH) {
+				status = WorkflowConstants.STATUS_ANY;
+			}
+
 			String articleId = article.getArticleId();
 			double version = article.getVersion();
 
 			if (!journalArticleLocalService.isLatestVersion(
-					groupId, articleId, version)) {
+					groupId, articleId, version, status)) {
 
 				article = journalArticleLocalService.getLatestArticle(
-					groupId, articleId);
+					groupId, articleId, status);
 			}
 
 			if (!latestArticles.contains(article)) {
