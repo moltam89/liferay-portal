@@ -27,6 +27,7 @@ import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleConstants;
 import com.liferay.exportimport.kernel.lifecycle.ExportImportLifecycleManagerUtil;
+import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.comment.CommentManagerUtil;
 import com.liferay.portal.kernel.comment.DiscussionStagingHandler;
 import com.liferay.portal.kernel.exception.NoSuchModelException;
@@ -34,18 +35,27 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LocalizedModel;
+//import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.model.ResourcedModel;
 import com.liferay.portal.kernel.model.StagedGroupedModel;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.model.TrashedModel;
 import com.liferay.portal.kernel.model.WorkflowedModel;
+import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
+import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
+import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
+import com.liferay.portal.kernel.service.PortletPreferencesLocalServiceUtil;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.TransientValue;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.ratings.kernel.model.RatingsEntry;
@@ -57,6 +67,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.portlet.PortletPreferences;
 
 /**
  * @author Mate Thurzo
@@ -367,6 +379,8 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 			importAssetTags(portletDataContext, stagedModel);
 
 			importReferenceStagedModels(portletDataContext, stagedModel);
+
+			_updatePortletDataContextScopeGroupId(portletDataContext);
 
 			doImportStagedModel(portletDataContext, stagedModel);
 
@@ -914,6 +928,113 @@ public abstract class BaseStagedModelDataHandler<T extends StagedModel>
 
 		return true;
 	}
+
+	private long _getScopeGroupId(Layout layout, String portletId) {
+		if (layout == null) {
+			return 0;
+		}
+
+		if (Validator.isNull(portletId)) {
+			return layout.getGroupId();
+		}
+
+		try {
+			PortletPreferences portletSetup = null;
+
+			portletSetup =
+				PortletPreferencesFactoryUtil.getStrictLayoutPortletSetup(
+					layout, portletId);
+
+			String scopeType = GetterUtil.getString(
+				portletSetup.getValue("lfrScopeType", null));
+
+			if (Validator.isNull(scopeType)) {
+				return layout.getGroupId();
+			}
+
+			if (scopeType.equals("company")) {
+				Group companyGroup = GroupLocalServiceUtil.getCompanyGroup(
+					layout.getCompanyId());
+
+				return companyGroup.getGroupId();
+			}
+
+			String scopeLayoutUuid = GetterUtil.getString(
+				portletSetup.getValue("lfrScopeLayoutUuid", null));
+
+			Layout scopeLayout =
+				LayoutLocalServiceUtil.getLayoutByUuidAndGroupId(
+					scopeLayoutUuid, layout.getGroupId(),
+					layout.isPrivateLayout());
+
+			Group scopeGroup = scopeLayout.getScopeGroup();
+
+			return scopeGroup.getGroupId();
+		}
+		catch (Exception e) {
+			return layout.getGroupId();
+		}
+	}
+
+	private void _updatePortletDataContextScopeGroupId(
+			PortletDataContext portletDataContext)
+		throws PortalException {
+
+		Group group = StagingUtil.getLiveGroup(
+			portletDataContext.getScopeGroupId());
+
+		String portletId = portletDataContext.getPortletId();
+		long scopeGroupId = 0L;
+		long plId = 0L;
+
+		if ((portletDataContext.getScopeLayoutUuid() != null) &&
+			StringUtil.equalsIgnoreCase(
+				_LAYOUT_SCOPETYPE, portletDataContext.getScopeType())) {
+
+			plId = portletDataContext.getPlid();
+		}
+
+		Layout layout = null;
+
+		if (plId > 0) {
+			layout = LayoutLocalServiceUtil.getLayout(plId);
+		}
+
+		if ((portletId != null) && (group != null) &&
+			(group.isStaged() || group.isStagingGroup())) {
+
+			Group liveGroup = group;
+
+			if (group.isStagingGroup()) {
+				liveGroup = group.getLiveGroup();
+			}
+
+			if (liveGroup.isStaged() && !liveGroup.isStagedPortlet(portletId)) {
+				if (layout != null) {
+					Layout liveGroupLayout =
+						LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+							layout.getUuid(), liveGroup.getGroupId(),
+							layout.isPrivateLayout());
+
+					if ((liveGroupLayout != null) &&
+						liveGroupLayout.hasScopeGroup()) {
+
+						scopeGroupId = _getScopeGroupId(
+							liveGroupLayout, portletId);
+					}
+				}
+				else {
+					scopeGroupId = liveGroup.getGroupId();
+				}
+			}
+
+			if (scopeGroupId > 0) {
+				portletDataContext.setScopeGroupId(scopeGroupId);
+			}
+		}
+	}
+
+	private static final String _LAYOUT_SCOPETYPE = "layout";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		BaseStagedModelDataHandler.class);

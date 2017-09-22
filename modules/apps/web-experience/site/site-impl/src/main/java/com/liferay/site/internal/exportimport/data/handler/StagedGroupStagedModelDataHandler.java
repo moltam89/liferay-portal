@@ -529,11 +529,13 @@ public class StagedGroupStagedModelDataHandler
 
 			long plid = LayoutConstants.DEFAULT_PLID;
 
-			if (layout != null) {
-				if (SitesUtil.isLayoutModifiedSinceLastMerge(layout)) {
-					continue;
-				}
+			if ((layoutId != 0) ||
+				((layout != null) &&
+				 SitesUtil.isLayoutModifiedSinceLastMerge(layout))) {
 
+				continue;
+			}
+			else if (layout != null) {
 				plid = layout.getPlid();
 			}
 
