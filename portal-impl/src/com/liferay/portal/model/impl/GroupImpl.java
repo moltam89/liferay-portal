@@ -275,7 +275,9 @@ public class GroupImpl extends GroupBaseImpl {
 
 			Group liveGroup = getLiveGroup();
 
-			name = liveGroup.getDescriptiveName(locale);
+			name =
+				liveGroup.getDescriptiveName(locale) + "(" +
+					LanguageUtil.get(locale, "staging") + ")";
 		}
 
 		return name;
