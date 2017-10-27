@@ -23,6 +23,8 @@ PortletURL portletURL = renderResponse.createRenderURL();
 
 portletURL.setParameter("mvcRenderCommandName", "exportImport");
 portletURL.setParameter("portletResource", portletResource);
+
+String disallowedCharacters = PropsUtil.get(PropsKeys.DL_CHAR_BLACKLIST);
 %>
 
 <aui:nav-bar cssClass="navbar-collapse-absolute" markupView="lexicon">
@@ -89,7 +91,33 @@ portletURL.setParameter("portletResource", portletResource);
 				<div class="container-fluid-1280">
 					<aui:fieldset-group markupView="lexicon">
 						<aui:fieldset>
-							<aui:input label="export-the-selected-data-to-the-given-lar-file-name" name="exportFileName" required="<%= true %>" showRequiredLabel="<%= false %>" size="50" value='<%= StringUtil.replace(selPortlet.getDisplayName(), ' ', '_') + "-" + Time.getShortTimestamp() + ".portlet.lar" %>' />
+							<aui:input label="export-the-selected-data-to-the-given-lar-file-name" name="exportFileName" required="<%= true %>" showRequiredLabel="<%= false %>" size="50" value='<%= StringUtil.replace(selPortlet.getDisplayName(), ' ', '_') + "-" + Time.getShortTimestamp() + ".portlet.lar" %>'>
+
+								<aui:validator errorMessage='<%= LanguageUtil.get(request, "the-following-are-invalid-characters") + disallowedCharacters %>' name="custom">
+									function(val, fieldNode, ruleValue) {
+										var disallowedChars = '<%= disallowedCharacters %>';
+		
+										var disallowedCharsInArray = disallowedChars.split(",");
+		
+										//If the array contains "", then it means it was a \
+										var backslashIndex = disallowedCharsInArray.indexOf("");
+		
+										if (backslashIndex !== -1) {
+												disallowedCharsInArray[backslashIndex] = "\\";
+										}
+		
+										var index, len;
+										for (index = 0, len = disallowedCharsInArray.length; index < len; ++index) {
+											if (val.indexOf(disallowedCharsInArray[index]) !== -1) {
+												return false;
+											}
+										}
+		
+										return true;
+									}
+								</aui:validator>
+
+							</aui:input>
 						</aui:fieldset>
 
 						<%
