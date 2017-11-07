@@ -57,10 +57,19 @@ currentURLObj.setParameter("historyKey", renderResponse.getNamespace() + "sites"
 		modelVar="group"
 		rowIdProperty="friendlyURL"
 	>
+
+		<%
+		String stagedDescriptiveName = HtmlUtil.escape(group.getDescriptiveName(locale));
+
+		if (group.isStaged() && !group.isStagedRemotely() && group.isStagingGroup()) {
+			stagedDescriptiveName += "(" + LanguageUtil.get(request, "staging") + ")";
+		}
+		%>
+
 		<liferay-ui:search-container-column-text
 			cssClass="table-cell-content"
 			name="name"
-			value="<%= HtmlUtil.escape(group.getDescriptiveName(locale)) %>"
+			value="<%= stagedDescriptiveName %>"
 		/>
 
 		<%

@@ -420,16 +420,24 @@ String organizationRoleSyncEntitiesEventName = liferayPortletResponse.getNamespa
 					/>
 				</liferay-ui:search-container-column-text>
 
+				<%
+				Group group = userGroupRole.getGroup();
+
+				String stagedDescriptiveName = HtmlUtil.escape(group.getDescriptiveName(locale));
+
+				if (group.isStaged() && !group.isStagedRemotely() && group.isStagingGroup()) {
+					stagedDescriptiveName += "(" + LanguageUtil.get(request, "staging") + ")";
+				}
+				%>
+
 				<liferay-ui:search-container-column-text
 					cssClass="table-cell-content"
 					name="site"
-					value="<%= HtmlUtil.escape(userGroupRole.getGroup().getDescriptiveName(locale)) %>"
+					value="<%= stagedDescriptiveName %>"
 				/>
 
 				<%
 				boolean membershipProtected = false;
-
-				Group group = userGroupRole.getGroup();
 
 				Role role = userGroupRole.getRole();
 
@@ -587,6 +595,17 @@ String organizationRoleSyncEntitiesEventName = liferayPortletResponse.getNamespa
 			keyProperty="roleId"
 			modelVar="userGroupGroupRole"
 		>
+
+			<%
+			Group group = userGroupGroupRole.getGroup();
+
+			String stagedDescriptiveName = HtmlUtil.escape(group.getDescriptiveName(locale));
+
+			if (group.isStaged() && !group.isStagedRemotely() && group.isStagingGroup()) {
+				stagedDescriptiveName += "(" + LanguageUtil.get(request, "staging") + ")";
+			}
+			%>
+
 			<liferay-ui:search-container-column-text
 				cssClass="table-cell-content"
 				name="title"
@@ -601,7 +620,7 @@ String organizationRoleSyncEntitiesEventName = liferayPortletResponse.getNamespa
 			<liferay-ui:search-container-column-text
 				cssClass="table-cell-content"
 				name="site"
-				value="<%= HtmlUtil.escape(userGroupGroupRole.getGroup().getDescriptiveName(locale)) %>"
+				value="<%= stagedDescriptiveName %>"
 			/>
 
 			<liferay-ui:search-container-column-text
