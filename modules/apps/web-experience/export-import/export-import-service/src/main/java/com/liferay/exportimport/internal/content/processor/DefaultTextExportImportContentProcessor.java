@@ -254,6 +254,24 @@ public class DefaultTextExportImportContentProcessor
 		return map;
 	}
 
+	protected String getExportedDLReferencesPath(String content, String path) {
+		String originURL = StringPool.BLANK;
+
+		String beginStr = "[$dl-reference=" + path;
+
+		int beginPos = content.indexOf(beginStr);
+
+		int endPos = content.indexOf("$]");
+
+		if ((beginPos > 0) && (endPos > 0)) {
+			beginPos = beginPos + beginStr.length();
+
+			originURL = content.substring(beginPos, endPos);
+		}
+
+		return originURL;
+	}
+
 	protected FileEntry getFileEntry(Map<String, String[]> map) {
 		if (MapUtil.isEmpty(map)) {
 			return null;
@@ -393,7 +411,20 @@ public class DefaultTextExportImportContentProcessor
 
 				String path = ExportImportPathUtil.getModelPath(fileEntry);
 
-				sb.replace(beginPos, endPos, "[$dl-reference=" + path + "$]");
+				if (!fileEntry.isInTrash()) {
+					sb.replace(
+						beginPos, endPos, "[$dl-reference=" + path + "$]");
+				}
+				else {
+					String originURL = DLUtil.getPreviewURL(
+						fileEntry, fileEntry.getFileVersion(), null,
+						StringPool.BLANK, false, false);
+
+					sb.replace(
+						beginPos, endPos,
+						StringBundler.concat(
+							"[$dl-reference=", path, originURL, "$]"));
+				}
 
 				deleteTimestampParameters(sb, beginPos);
 			}
@@ -929,7 +960,10 @@ public class DefaultTextExportImportContentProcessor
 					groupId, className, classPK);
 			}
 
-			if (!content.contains("[$dl-reference=" + path + "$]")) {
+			if (!content.contains(
+					StringBundler.concat("[$dl-reference=", path,
+					getExportedDLReferencesPath(content, path), "$]"))) {
+
 				continue;
 			}
 
@@ -977,6 +1011,18 @@ public class DefaultTextExportImportContentProcessor
 					_log.warn(pe.getMessage());
 				}
 
+				String exportedDLReferencesPath = getExportedDLReferencesPath(
+					content, path);
+
+				String referencesPath = content.substring(
+					content.indexOf("[$dl-reference=" + path),
+					content.indexOf("$]"));
+
+				content = StringUtil.replace(
+					content, referencesPath, exportedDLReferencesPath);
+
+				content = StringUtil.replace(content, "$]", StringPool.BLANK);
+
 				continue;
 			}
 
@@ -987,6 +1033,12 @@ public class DefaultTextExportImportContentProcessor
 			if (url.contains(StringPool.QUESTION)) {
 				content = StringUtil.replace(content, "$]?", "$]&");
 			}
+
+			String exportedDLReferencesPath = getExportedDLReferencesPath(
+				content, path);
+
+			content = StringUtil.replace(
+				content, exportedDLReferencesPath, StringPool.BLANK);
 
 			content = StringUtil.replace(
 				content, "[$dl-reference=" + path + "$]", url);
