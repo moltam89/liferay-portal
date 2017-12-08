@@ -1069,6 +1069,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 		try {
 			Group scopeGroup = null;
+			long newScopeGroupID = 0L;
 
 			if (scopeLayoutType.equals("company")) {
 				scopeGroup = _groupLocalService.getCompanyGroup(
@@ -1099,10 +1100,38 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 						Group oldScopeGroup = oldLayout.getScopeGroup();
 
 						if (group.isStagingGroup()) {
-							scopeGroup.setLiveGroupId(
-								oldScopeGroup.getGroupId());
 
-							_groupLocalService.updateGroup(scopeGroup);
+							//layout scoped staging group
+							//with portlet not staged
+
+							if (!group.isStagedPortlet(
+									portletDataContext.getPortletId())) {
+
+								newScopeGroupID = group.getLiveGroupId();
+
+								Layout scopeLiveLayout =
+									_layoutLocalService.
+										getLayoutByUuidAndGroupId(
+											scopeLayoutUuid, newScopeGroupID,
+											portletDataContext.
+												isPrivateLayout());
+
+								if (scopeLiveLayout != null) {
+									Group scopeLiveGroup =
+										_groupLocalService.checkScopeGroup(
+											scopeLiveLayout,
+											portletDataContext.getUserId(null));
+
+									newScopeGroupID =
+										scopeLiveGroup.getGroupId();
+								}
+							}
+							else {
+								scopeGroup.setLiveGroupId(
+									oldScopeGroup.getGroupId());
+
+								_groupLocalService.updateGroup(scopeGroup);
+							}
 						}
 						else {
 							oldScopeGroup.setLiveGroupId(
@@ -1118,9 +1147,28 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 					}
 				}
 			}
+			else {
+				//if the portlet is not staged and not layout scoped
+				long scopeGroupID = portletDataContext.getScopeGroupId();
+
+				scopeGroup = _groupLocalService.getGroup(scopeGroupID);
+
+				if ((scopeGroup != null) && scopeGroup.isStagingGroup()) {
+					if (!scopeGroup.isStagedPortlet(
+							portletDataContext.getPortletId())) {
+
+						newScopeGroupID = scopeGroup.getLiveGroupId();
+					}
+				}
+			}
 
 			if (scopeGroup != null) {
-				portletDataContext.setScopeGroupId(scopeGroup.getGroupId());
+				if (newScopeGroupID != 0L) {
+					portletDataContext.setScopeGroupId(newScopeGroupID);
+				}
+				else {
+					portletDataContext.setScopeGroupId(scopeGroup.getGroupId());
+				}
 
 				Map<Long, Long> groupIds =
 					(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
