@@ -16,6 +16,7 @@ package com.liferay.exportimport.kernel.lar;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Portlet;
@@ -143,7 +144,9 @@ public interface ExportImportHelper {
 	public List<Portlet> getDataSiteLevelPortlets(
 			long companyId, boolean excludeDataAlwaysStaged)
 		throws Exception;
-
+	
+	public void setPortletScope(
+			PortletDataContext portletDataContext, Element portletElement);
 	/**
 	 * @deprecated As of 7.0.0, moved to {@link
 	 *             ExportImportDateUtil#getDateRange(PortletRequest, long,
