@@ -554,7 +554,8 @@ public class StagedGroupStagedModelDataHandler
 			// portlet permissions. The import of the portlet data assumes that
 			// portlet preferences already exist.
 
-			setPortletScope(portletDataContext, portletElement);
+			_exportImportHelper.setPortletScope(
+				portletDataContext, portletElement);
 
 			long portletPreferencesGroupId = portletDataContext.getGroupId();
 
@@ -662,12 +663,6 @@ public class StagedGroupStagedModelDataHandler
 			_portletImportController.importServicePortletPreferences(
 				portletDataContext, serviceElement);
 		}
-	}
-
-	protected void setPortletScope(
-		PortletDataContext portletDataContext, Element portletElement) {
-
-		_exportImportHelper.setPortletScope(portletDataContext, portletElement);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

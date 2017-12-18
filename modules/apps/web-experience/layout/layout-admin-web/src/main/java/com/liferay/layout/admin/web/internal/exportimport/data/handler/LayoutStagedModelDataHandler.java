@@ -1278,7 +1278,8 @@ public class LayoutStagedModelDataHandler
 			// portlet permissions. The import of the portlet data assumes that
 			// portlet preferences already exist.
 
-			setPortletScope(portletDataContext, portletElement);
+			_exportImportHelper.setPortletScope(
+				portletDataContext, portletElement);
 
 			long portletPreferencesGroupId = portletDataContext.getGroupId();
 
@@ -1682,12 +1683,6 @@ public class LayoutStagedModelDataHandler
 		PortletLocalService portletLocalService) {
 
 		_portletLocalService = portletLocalService;
-	}
-
-	protected void setPortletScope(
-		PortletDataContext portletDataContext, Element portletElement) {
-
-		_exportImportHelper.setPortletScope(portletDataContext, portletElement);
 	}
 
 	@Reference(unbind = "-")
