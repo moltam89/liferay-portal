@@ -16,6 +16,7 @@ package com.liferay.exportimport.kernel.lar;
 
 import aQute.bnd.annotation.ProviderType;
 
+import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.Portlet;
@@ -577,6 +578,11 @@ public class ExportImportHelperUtil {
 
 		return _exportImportHelper.replaceImportLinksToLayouts(
 			portletDataContext, content, importReferencedContent);
+	}
+	
+	public static void setPortletScope(PortletDataContext portletDataContext,
+			Element portletElement){
+		 _exportImportHelper.setPortletScope(portletDataContext, portletElement);
 	}
 
 	/**
