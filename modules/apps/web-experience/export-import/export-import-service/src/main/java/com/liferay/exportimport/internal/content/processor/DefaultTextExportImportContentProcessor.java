@@ -368,7 +368,7 @@ public class DefaultTextExportImportContentProcessor
 			endPos = MapUtil.getInteger(dlReferenceParameters, "endPos");
 
 			try {
-				if (exportReferencedContent) {
+				if (exportReferencedContent && !fileEntry.isInTrash()) {
 					StagedModelDataHandlerUtil.exportReferenceStagedModel(
 						portletDataContext, stagedModel, fileEntry,
 						PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
@@ -377,14 +377,37 @@ public class DefaultTextExportImportContentProcessor
 					Element entityElement =
 						portletDataContext.getExportDataElement(stagedModel);
 
+					String referenceType =
+						PortletDataContext.REFERENCE_TYPE_DEPENDENCY;
+
+					if (fileEntry.isInTrash()) {
+						referenceType =
+							PortletDataContext.
+								REFERENCE_TYPE_DEPENDENCY_DISPOSABLE;
+					}
+
 					portletDataContext.addReferenceElement(
-						stagedModel, entityElement, fileEntry,
-						PortletDataContext.REFERENCE_TYPE_DEPENDENCY, true);
+						stagedModel, entityElement, fileEntry, referenceType,
+						true);
 				}
 
 				String path = ExportImportPathUtil.getModelPath(fileEntry);
 
-				sb.replace(beginPos, endPos, "[$dl-reference=" + path + "$]");
+				if (!fileEntry.isInTrash()) {
+					sb.replace(
+						beginPos, endPos, "[$dl-reference=" + path + "$]");
+				}
+				else {
+					String appendedURL = DLUtil.getPreviewURL(
+						fileEntry, fileEntry.getFileVersion(), null,
+						StringPool.BLANK, false, false);
+
+					sb.replace(
+						beginPos, endPos,
+						StringBundler.concat(
+							"[$dl-reference=", path, "$][#dl-reference=",
+							appendedURL, "#]"));
+				}
 
 				deleteTimestampParameters(sb, beginPos);
 			}
@@ -954,6 +977,14 @@ public class DefaultTextExportImportContentProcessor
 			long fileEntryId = MapUtil.getLong(
 				dlFileEntryIds, classPK, classPK);
 
+			int beginPos = content.indexOf("[$dl-reference=" + path);
+
+			int endPos = -1;
+
+			if (beginPos > 0) {
+				endPos = content.indexOf("$]", beginPos);
+			}
+
 			FileEntry importedFileEntry = null;
 
 			try {
@@ -968,6 +999,21 @@ public class DefaultTextExportImportContentProcessor
 					_log.warn(pe.getMessage());
 				}
 
+				if (content.startsWith("[#dl-reference=", endPos + 2)) {
+					int prefixPos = endPos + 2;
+
+					int postfixPos = content.indexOf("#]", prefixPos);
+
+					String alternativeURL = content.substring(
+						prefixPos + "[#dl-reference=".length(), postfixPos);
+
+					String combinedURL = content.substring(
+						beginPos, postfixPos + 2);
+
+					content = StringUtil.replaceFirst(
+						content, combinedURL, alternativeURL, beginPos);
+				}
+
 				continue;
 			}
 
@@ -979,8 +1025,20 @@ public class DefaultTextExportImportContentProcessor
 				content = StringUtil.replace(content, "$]?", "$]&");
 			}
 
-			content = StringUtil.replace(
-				content, "[$dl-reference=" + path + "$]", url);
+			if (content.startsWith("[#dl-reference=", endPos + 2)) {
+				int prefixPos = endPos + 2;
+
+				int postfixPos = content.indexOf("#]", prefixPos);
+
+				String redundantDLURL = content.substring(
+					prefixPos, postfixPos + 2);
+
+				content = StringUtil.replaceFirst(
+					content, redundantDLURL, StringPool.BLANK, beginPos);
+			}
+
+			content = StringUtil.replaceFirst(
+				content, "[$dl-reference=" + path + "$]", url, beginPos);
 		}
 
 		return content;
