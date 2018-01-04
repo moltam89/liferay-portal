@@ -378,13 +378,7 @@ public class DefaultTextExportImportContentProcessor
 						portletDataContext.getExportDataElement(stagedModel);
 
 					String referenceType =
-						PortletDataContext.REFERENCE_TYPE_DEPENDENCY;
-
-					if (fileEntry.isInTrash()) {
-						referenceType =
-							PortletDataContext.
-								REFERENCE_TYPE_DEPENDENCY_DISPOSABLE;
-					}
+						PortletDataContext.REFERENCE_TYPE_DEPENDENCY_DISPOSABLE;
 
 					portletDataContext.addReferenceElement(
 						stagedModel, entityElement, fileEntry, referenceType,
