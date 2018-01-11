@@ -344,6 +344,10 @@ public class LayoutStagedModelDataHandler
 
 		existingLayout = fetchMissingReference(uuid, groupId, privateLayout);
 
+		if (existingLayout == null) {
+			return;
+		}
+
 		Map<Long, Layout> layouts =
 			(Map<Long, Layout>)portletDataContext.getNewPrimaryKeysMap(
 				Layout.class + ".layout");

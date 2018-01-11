@@ -226,6 +226,10 @@ public class DLFileEntryTypeStagedModelDataHandler
 		existingFileEntryType = fetchExistingFileEntryType(
 			uuid, groupId, fileEntryTypeKey, preloaded);
 
+		if (existingFileEntryType == null) {
+			return;
+		}
+
 		Map<Long, Long> fileEntryTypeIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				DLFileEntryType.class);

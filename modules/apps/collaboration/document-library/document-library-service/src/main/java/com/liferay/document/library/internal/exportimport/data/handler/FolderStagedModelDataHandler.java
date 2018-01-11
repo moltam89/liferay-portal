@@ -200,6 +200,10 @@ public class FolderStagedModelDataHandler
 
 		Folder existingFolder = fetchMissingReference(uuid, groupId);
 
+		if (existingFolder == null) {
+			return;
+		}
+
 		Map<Long, Long> folderIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				Folder.class);
