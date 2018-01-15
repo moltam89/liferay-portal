@@ -607,6 +607,39 @@ public class DefaultExportImportContentProcessorTest {
 	}
 
 	@Test
+	public void testImportLayoutReferencesOnSameSite() throws Exception {
+		String content = replaceParameters(
+			getContent("layout_references.txt"), _fileEntry);
+
+		_portletDataContextImport.setGroupId(_stagingGroup.getGroupId());
+		_portletDataContextImport.setScopeGroupId(_stagingGroup.getGroupId());
+
+		_exportImportContentProcessor.validateContentReferences(
+			_stagingGroup.getGroupId(), content);
+
+		content = _exportImportContentProcessor.replaceExportContentReferences(
+			_portletDataContextExport, _referrerStagedModel, content, true,
+			false);
+		content = _exportImportContentProcessor.replaceImportContentReferences(
+			_portletDataContextImport, _referrerStagedModel, content);
+
+		Assert.assertFalse(
+			content, content.contains("data_handler_group_friendly_url"));
+		Assert.assertFalse(
+			content, content.contains("data_handler_path_context"));
+		Assert.assertFalse(
+			content,
+			content.contains("data_handler_private_group_servlet_mapping"));
+		Assert.assertFalse(
+			content,
+			content.contains("data_handler_private_user_servlet_mapping"));
+		Assert.assertFalse(
+			content, content.contains("data_handler_public_servlet_mapping"));
+		Assert.assertFalse(
+			content, content.contains("data_handler_site_admin_url"));
+	}
+
+	@Test
 	public void testImportLinksToLayouts() throws Exception {
 		String content = replaceLinksToLayoutsParameters(
 			getContent("layout_links.txt"), _stagingPrivateLayout,
