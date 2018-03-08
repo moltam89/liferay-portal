@@ -17,8 +17,10 @@ package com.liferay.layout.prototype.internal.exportimport.data.handler;
 import com.liferay.exportimport.data.handler.base.BaseStagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.exportimport.kernel.lar.UserIdStrategy;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
@@ -31,7 +33,9 @@ import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.xml.Element;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -177,6 +181,8 @@ public class LayoutPrototypeStagedModelDataHandler
 		boolean privateLayout = portletDataContext.isPrivateLayout();
 		long scopeGroupId = portletDataContext.getScopeGroupId();
 
+		updateLayoutPrototypeParameters(portletDataContext.getParameterMap());
+
 		List<Layout> layouts = _layoutLocalService.getLayouts(
 			layoutPrototype.getGroupId(), true,
 			LayoutConstants.DEFAULT_PARENT_LAYOUT_ID);
@@ -207,6 +213,8 @@ public class LayoutPrototypeStagedModelDataHandler
 		long groupId = portletDataContext.getGroupId();
 		boolean privateLayout = portletDataContext.isPrivateLayout();
 		long scopeGroupId = portletDataContext.getScopeGroupId();
+
+		updateLayoutPrototypeParameters(portletDataContext.getParameterMap());
 
 		try {
 			portletDataContext.setGroupId(importedGroupId);
@@ -246,6 +254,52 @@ public class LayoutPrototypeStagedModelDataHandler
 		LayoutPrototypeLocalService layoutPrototypeLocalService) {
 
 		_layoutPrototypeLocalService = layoutPrototypeLocalService;
+	}
+
+	private Map<String, String[]> updateLayoutPrototypeParameters(
+		Map<String, String[]> parameterMap) {
+
+		parameterMap.put(
+			PortletDataHandlerKeys.DATA_STRATEGY,
+			new String[] {PortletDataHandlerKeys.DATA_STRATEGY_MIRROR});
+		parameterMap.put(
+			PortletDataHandlerKeys.DELETE_MISSING_LAYOUTS,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.DELETE_PORTLET_DATA,
+			new String[] {Boolean.FALSE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.LAYOUTS_IMPORT_MODE,
+			new String[] {
+				PortletDataHandlerKeys.
+					LAYOUTS_IMPORT_MODE_CREATED_FROM_PROTOTYPE
+			});
+		parameterMap.put(
+			PortletDataHandlerKeys.PERFORM_DIRECT_BINARY_IMPORT,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PERMISSIONS,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_CONFIGURATION,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_CONFIGURATION_ALL,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_DATA,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_DATA_ALL,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.PORTLET_SETUP_ALL,
+			new String[] {Boolean.TRUE.toString()});
+		parameterMap.put(
+			PortletDataHandlerKeys.USER_ID_STRATEGY,
+			new String[] {UserIdStrategy.CURRENT_USER_ID});
+
+		return parameterMap;
 	}
 
 	private GroupLocalService _groupLocalService;
