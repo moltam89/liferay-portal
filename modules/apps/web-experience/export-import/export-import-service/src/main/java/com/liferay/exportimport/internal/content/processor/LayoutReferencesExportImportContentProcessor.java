@@ -442,6 +442,11 @@ public class LayoutReferencesExportImportContentProcessor
 				}
 				else {
 					urlSB.append(urlGroup.getUuid());
+					
+					urlSB.append(StringPool.AT);
+					urlSB.append(StringPool.AT);
+					
+					urlSB.append(urlGroup.getFriendlyURL());
 				}
 
 				urlSB.append(StringPool.AT);
@@ -615,11 +620,30 @@ public class LayoutReferencesExportImportContentProcessor
 			}
 
 			String groupUuid = content.substring(groupUuidPos + 1, endIndex);
+			
+			String optionalGroupFriendlyUrl = null;
+			
+			if (content.substring(endIndex + 1, endIndex + 2).equals(StringPool.AT)) {
+				int groupFriendlyUrlEndIndex = content.indexOf(StringPool.AT, endIndex + 2);
+				
+				optionalGroupFriendlyUrl = content.substring(endIndex + 2, groupFriendlyUrlEndIndex);
+			}
 
 			Group groupFriendlyUrlGroup =
 				_groupLocalService.fetchGroupByUuidAndCompanyId(
 					groupUuid, portletDataContext.getCompanyId());
 
+			if (groupFriendlyUrlGroup == null && optionalGroupFriendlyUrl != null) {
+				groupFriendlyUrlGroup = _groupLocalService.fetchFriendlyURLGroup(
+					portletDataContext.getCompanyId(), optionalGroupFriendlyUrl);								
+			}
+			
+			if (optionalGroupFriendlyUrl != null) {
+				content = StringUtil.replaceFirst(
+					content, StringPool.AT + optionalGroupFriendlyUrl + StringPool.AT,
+					StringPool.BLANK, groupFriendlyUrlPos);
+			}
+			
 			if ((groupFriendlyUrlGroup == null) ||
 				groupUuid.startsWith(StringPool.SLASH)) {
 
