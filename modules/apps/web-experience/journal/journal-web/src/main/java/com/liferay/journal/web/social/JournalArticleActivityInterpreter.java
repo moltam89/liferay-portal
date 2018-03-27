@@ -17,16 +17,20 @@ package com.liferay.journal.web.social;
 import com.liferay.journal.constants.JournalActivityKeys;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.JournalArticleLocalService;
+import com.liferay.journal.service.JournalContentSearchLocalService;
 import com.liferay.journal.web.util.JournalResourceBundleLoader;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionHelper;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.permission.LayoutPermission;
+import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.Validator;
@@ -34,6 +38,9 @@ import com.liferay.social.kernel.model.BaseSocialActivityInterpreter;
 import com.liferay.social.kernel.model.SocialActivity;
 import com.liferay.social.kernel.model.SocialActivityConstants;
 import com.liferay.social.kernel.model.SocialActivityInterpreter;
+
+import java.util.List;
+import java.util.Objects;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -54,6 +61,30 @@ public class JournalArticleActivityInterpreter
 		return _CLASS_NAMES;
 	}
 
+	protected String getHitLayoutURL(
+			JournalArticle article, boolean privateLayout,
+			String noSuchEntryRedirect, ThemeDisplay themeDisplay)
+		throws PortalException {
+
+		List<Long> hitLayoutIds =
+			_journalContentSearchLocalService.getLayoutIds(
+				article.getGroupId(), privateLayout, article.getArticleId());
+
+		for (Long hitLayoutId : hitLayoutIds) {
+			Layout hitLayout = _layoutLocalService.getLayout(
+				article.getGroupId(), privateLayout, hitLayoutId.longValue());
+
+			if (_layoutPermission.contains(
+					themeDisplay.getPermissionChecker(), hitLayout,
+					ActionKeys.VIEW)) {
+
+				return _portal.getLayoutURL(hitLayout, themeDisplay);
+			}
+		}
+
+		return noSuchEntryRedirect;
+	}
+
 	@Override
 	protected String getPath(
 			SocialActivity activity, ServiceContext serviceContext)
@@ -64,16 +95,23 @@ public class JournalArticleActivityInterpreter
 
 		Layout layout = article.getLayout();
 
-		if (layout != null) {
-			String groupFriendlyURL = _portal.getGroupFriendlyURL(
-				layout.getLayoutSet(), serviceContext.getThemeDisplay());
+		ThemeDisplay themeDisplay = serviceContext.getThemeDisplay();
 
-			return groupFriendlyURL.concat(
-				JournalArticleConstants.CANONICAL_URL_SEPARATOR).concat(
-					article.getUrlTitle());
+		if (layout == null) {
+			layout = themeDisplay.getLayout();
 		}
 
-		return null;
+		String currentURL = serviceContext.getCurrentURL();
+
+		String hitLayoutURL = getHitLayoutURL(
+			article, layout.isPrivateLayout(), currentURL, themeDisplay);
+
+		if (Objects.equals(hitLayoutURL, currentURL)) {
+			hitLayoutURL = getHitLayoutURL(
+				article, !layout.isPrivateLayout(), currentURL, themeDisplay);
+		}
+
+		return hitLayoutURL;
 	}
 
 	@Override
@@ -159,6 +197,25 @@ public class JournalArticleActivityInterpreter
 		_journalArticleLocalService = journalArticleLocalService;
 	}
 
+	@Reference(unbind = "-")
+	protected void setJournalContentSearchLocalService(
+		JournalContentSearchLocalService journalContentSearchLocalService) {
+
+		_journalContentSearchLocalService = journalContentSearchLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setLayoutLocalService(
+		LayoutLocalService layoutLocalService) {
+
+		_layoutLocalService = layoutLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setLayoutPermission(LayoutPermission layoutPermission) {
+		_layoutPermission = layoutPermission;
+	}
+
 	private static final String[] _CLASS_NAMES =
 		{JournalArticle.class.getName()};
 
@@ -170,13 +227,20 @@ public class JournalArticleActivityInterpreter
 	private ModelResourcePermission<JournalArticle>
 		_journalArticleModelResourcePermission;
 
+	private JournalContentSearchLocalService _journalContentSearchLocalService;
+
 	@Reference(
 		target = "(model.class.name=com.liferay.journal.model.JournalFolder)"
 	)
 	private ModelResourcePermission<JournalFolder>
 		_journalFolderModelResourcePermission;
 
+	private LayoutLocalService _layoutLocalService;
+	private LayoutPermission _layoutPermission;
+
 	@Reference
 	private Portal _portal;
+
+	private ThemeDisplay _themeDisplay;
 
 }
