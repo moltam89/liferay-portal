@@ -442,11 +442,13 @@ public class LayoutReferencesExportImportContentProcessor
 				}
 				else {
 					urlSB.append(urlGroup.getUuid());
-					
-					urlSB.append(StringPool.AT);
-					urlSB.append(StringPool.AT);
-					
-					urlSB.append(urlGroup.getFriendlyURL());
+
+					if (!urlGroup.isControlPanel()) {
+						urlSB.append(StringPool.AT);
+						urlSB.append(StringPool.AT);
+
+						urlSB.append(urlGroup.getFriendlyURL());
+					}
 				}
 
 				urlSB.append(StringPool.AT);
@@ -620,30 +622,41 @@ public class LayoutReferencesExportImportContentProcessor
 			}
 
 			String groupUuid = content.substring(groupUuidPos + 1, endIndex);
-			
+
+			int optionalGroupFriendlyUrlPos = endIndex + 1;
 			String optionalGroupFriendlyUrl = null;
-			
-			if (content.substring(endIndex + 1, endIndex + 2).equals(StringPool.AT)) {
-				int groupFriendlyUrlEndIndex = content.indexOf(StringPool.AT, endIndex + 2);
-				
-				optionalGroupFriendlyUrl = content.substring(endIndex + 2, groupFriendlyUrlEndIndex);
+
+			if (content.charAt(optionalGroupFriendlyUrlPos) == CharPool.AT) {
+				int optionalGroupFriendlyUrlEndIndex = content.indexOf(
+					StringPool.AT, optionalGroupFriendlyUrlPos + 1);
+
+				if (optionalGroupFriendlyUrlEndIndex > -1) {
+					optionalGroupFriendlyUrl = content.substring(
+						optionalGroupFriendlyUrlPos + 1,
+						optionalGroupFriendlyUrlEndIndex);
+				}
 			}
 
 			Group groupFriendlyUrlGroup =
 				_groupLocalService.fetchGroupByUuidAndCompanyId(
 					groupUuid, portletDataContext.getCompanyId());
 
-			if (groupFriendlyUrlGroup == null && optionalGroupFriendlyUrl != null) {
-				groupFriendlyUrlGroup = _groupLocalService.fetchFriendlyURLGroup(
-					portletDataContext.getCompanyId(), optionalGroupFriendlyUrl);								
+			if ((groupFriendlyUrlGroup == null) &&
+				(optionalGroupFriendlyUrl != null)) {
+
+				groupFriendlyUrlGroup =
+					_groupLocalService.fetchFriendlyURLGroup(
+						portletDataContext.getCompanyId(),
+						optionalGroupFriendlyUrl);
 			}
-			
+
 			if (optionalGroupFriendlyUrl != null) {
 				content = StringUtil.replaceFirst(
-					content, StringPool.AT + optionalGroupFriendlyUrl + StringPool.AT,
-					StringPool.BLANK, groupFriendlyUrlPos);
+					content,
+					StringPool.AT + optionalGroupFriendlyUrl + StringPool.AT,
+					StringPool.BLANK, optionalGroupFriendlyUrlPos);
 			}
-			
+
 			if ((groupFriendlyUrlGroup == null) ||
 				groupUuid.startsWith(StringPool.SLASH)) {
 
