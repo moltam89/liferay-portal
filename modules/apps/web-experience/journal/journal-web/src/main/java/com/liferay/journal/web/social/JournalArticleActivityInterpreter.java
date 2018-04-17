@@ -14,14 +14,19 @@
 
 package com.liferay.journal.web.social;
 
+import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
+import com.liferay.asset.kernel.model.AssetRenderer;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.journal.constants.JournalActivityKeys;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.JournalArticleLocalService;
+import com.liferay.journal.web.asset.JournalArticleAssetRenderer;
 import com.liferay.journal.web.util.JournalResourceBundleLoader;
-import com.liferay.portal.kernel.model.Layout;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
@@ -62,18 +67,23 @@ public class JournalArticleActivityInterpreter
 		JournalArticle article = _journalArticleLocalService.getLatestArticle(
 			activity.getClassPK());
 
-		Layout layout = article.getLayout();
+		AssetRendererFactory<JournalArticle> assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClass(
+				JournalArticle.class);
 
-		if (layout != null) {
-			String groupFriendlyURL = _portal.getGroupFriendlyURL(
-				layout.getLayoutSet(), serviceContext.getThemeDisplay());
+		AssetRenderer<JournalArticle> assetRenderer =
+			assetRendererFactory.getAssetRenderer(
+				JournalArticleAssetRenderer.getClassPK(article));
 
-			return groupFriendlyURL.concat(
-				JournalArticleConstants.CANONICAL_URL_SEPARATOR).concat(
-					article.getUrlTitle());
-		}
+		LiferayPortletRequest request =
+			serviceContext.getLiferayPortletRequest();
+		LiferayPortletResponse response =
+			serviceContext.getLiferayPortletResponse();
 
-		return null;
+		String url = assetRenderer.getURLViewInContext(
+			request, response, StringPool.BLANK);
+
+		return url;
 	}
 
 	@Override
