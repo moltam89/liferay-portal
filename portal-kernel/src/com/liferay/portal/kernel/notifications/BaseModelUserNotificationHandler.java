@@ -126,8 +126,7 @@ public abstract class BaseModelUserNotificationHandler
 
 		String entryURLDomain = HttpUtil.getDomain(entryURL);
 
-		if (!StringPool.BLANK.equals(entryURLDomain)){
-
+		if (Validator.isNotNull(entryURLDomain)) {
 			String portalURL = serviceContext.getPortalURL();
 
 			String portalURLDomain = HttpUtil.getDomain(portalURL);
@@ -136,7 +135,6 @@ public abstract class BaseModelUserNotificationHandler
 				entryURL = StringUtil.replaceFirst(
 					entryURL, entryURLDomain, portalURLDomain);
 			}
-
 		}
 
 		return entryURL;
