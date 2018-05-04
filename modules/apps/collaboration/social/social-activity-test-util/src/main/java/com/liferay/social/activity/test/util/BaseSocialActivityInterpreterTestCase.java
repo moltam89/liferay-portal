@@ -17,6 +17,7 @@ package com.liferay.social.activity.test.util;
 import com.liferay.portal.events.ServicePreAction;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
@@ -24,8 +25,10 @@ import com.liferay.portal.kernel.test.util.GroupTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.JavaConstants;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portlet.PortletRequestImpl;
 import com.liferay.registry.Registry;
 import com.liferay.registry.RegistryUtil;
 import com.liferay.registry.ServiceTracker;
@@ -94,6 +97,16 @@ public abstract class BaseSocialActivityInterpreterTestCase {
 			request, new MockHttpServletResponse());
 
 		request.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
+
+		MockLiferayPortletRequest portletRequest =
+			new MockLiferayPortletRequest();
+
+		portletRequest.setAttribute(WebKeys.THEME_DISPLAY, themeDisplay);
+
+		portletRequest.setAttribute(WebKeys.PORTLET_ID, "0");
+
+		request.setAttribute(
+			JavaConstants.JAVAX_PORTLET_REQUEST, portletRequest);
 
 		serviceContext = ServiceContextFactory.getInstance(request);
 	}
@@ -281,5 +294,28 @@ public abstract class BaseSocialActivityInterpreterTestCase {
 	protected TrashHelper trashHelper;
 
 	private static ServiceTracker<TrashHelper, TrashHelper> _serviceTracker;
+
+	private static class MockLiferayPortletRequest
+		extends PortletRequestImpl implements LiferayPortletRequest {
+
+		@Override
+		public Object getAttribute(String name) {
+			return _mockHttpServletRequest.getAttribute(name);
+		}
+
+		@Override
+		public String getLifecycle() {
+			return null;
+		}
+
+		@Override
+		public void setAttribute(String name, Object obj) {
+			_mockHttpServletRequest.setAttribute(name, obj);
+		}
+
+		private final MockHttpServletRequest _mockHttpServletRequest =
+			new MockHttpServletRequest();
+
+	}
 
 }
