@@ -241,6 +241,12 @@ public class ExportImportHelperUtil {
 		return _exportImportHelper.getLayoutIds(portletRequest, targetGroupId);
 	}
 
+	public static Layout getLayoutOrDefaultLayout(long plid)
+		throws PortalException {
+
+		return _exportImportHelper.getLayoutOrDefaultLayout(plid);
+	}
+
 	public static ZipWriter getLayoutSetZipWriter(long groupId) {
 		return _exportImportHelper.getLayoutSetZipWriter(groupId);
 	}

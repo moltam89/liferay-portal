@@ -243,6 +243,15 @@ public interface ExportImportHelper {
 			PortletRequest portletRequest, long targetGroupId)
 		throws PortalException;
 
+	/**
+	 * Returns the layout with the primary key or a default layout
+	 *
+	 * @param plid the primary key of the layout
+	 * @return the layout
+	 * @throws PortalException if a layout with the primary key could not be found
+	 */
+	public Layout getLayoutOrDefaultLayout(long plid) throws PortalException;
+
 	public ZipWriter getLayoutSetZipWriter(long groupId);
 
 	/**
