@@ -25,6 +25,8 @@ import com.liferay.portal.kernel.util.StringUtil;
 
 import java.io.Serializable;
 
+import java.util.Date;
+
 /**
  * @author Brian Wing Shun Chan
  * @author Shuyang Zhou
@@ -83,7 +85,15 @@ public class FinderPath {
 			int index = i * 2;
 
 			keys[index] = StringPool.PERIOD;
-			keys[index + 1] = StringUtil.toHexString(arguments[i]);
+
+			if (arguments[i] instanceof Date) {
+				Date date = (Date)arguments[i];
+
+				keys[index + 1] = StringUtil.toHexString(date.getTime());
+			}
+			else {
+				keys[index + 1] = StringUtil.toHexString(arguments[i]);
+			}
 		}
 
 		return StringUtil.toHexString(_getCacheKey(keys));
@@ -102,7 +112,15 @@ public class FinderPath {
 			int index = i * 2 + 1;
 
 			keys[index] = StringPool.PERIOD;
-			keys[index + 1] = StringUtil.toHexString(arguments[i]);
+
+			if (arguments[i] instanceof Date) {
+				Date date = (Date)arguments[i];
+
+				keys[index + 1] = StringUtil.toHexString(date.getTime());
+			}
+			else {
+				keys[index + 1] = StringUtil.toHexString(arguments[i]);
+			}
 		}
 
 		return _getCacheKey(keys);
@@ -125,7 +143,15 @@ public class FinderPath {
 			int index = i * 2 + 1;
 
 			keys[index] = StringPool.PERIOD;
-			keys[index + 1] = StringUtil.toHexString(arguments[i]);
+
+			if (arguments[i] instanceof Date) {
+				Date date = (Date)arguments[i];
+
+				keys[index + 1] = StringUtil.toHexString(date.getTime());
+			}
+			else {
+				keys[index + 1] = StringUtil.toHexString(arguments[i]);
+			}
 		}
 
 		return _getCacheKey(keys);
