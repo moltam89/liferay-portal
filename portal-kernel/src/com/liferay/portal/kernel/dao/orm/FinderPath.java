@@ -86,14 +86,8 @@ public class FinderPath {
 
 			keys[index] = StringPool.PERIOD;
 
-			if (arguments[i] instanceof Date) {
-				Date date = (Date)arguments[i];
-
-				keys[index + 1] = StringUtil.toHexString(date.getTime());
-			}
-			else {
-				keys[index + 1] = StringUtil.toHexString(arguments[i]);
-			}
+			keys[index + 1] = StringUtil.toHexString(
+				_normalizeArgument(arguments[i]));
 		}
 
 		return StringUtil.toHexString(_getCacheKey(keys));
@@ -113,14 +107,8 @@ public class FinderPath {
 
 			keys[index] = StringPool.PERIOD;
 
-			if (arguments[i] instanceof Date) {
-				Date date = (Date)arguments[i];
-
-				keys[index + 1] = StringUtil.toHexString(date.getTime());
-			}
-			else {
-				keys[index + 1] = StringUtil.toHexString(arguments[i]);
-			}
+			keys[index + 1] = StringUtil.toHexString(
+				_normalizeArgument(arguments[i]));
 		}
 
 		return _getCacheKey(keys);
@@ -144,14 +132,8 @@ public class FinderPath {
 
 			keys[index] = StringPool.PERIOD;
 
-			if (arguments[i] instanceof Date) {
-				Date date = (Date)arguments[i];
-
-				keys[index + 1] = StringUtil.toHexString(date.getTime());
-			}
-			else {
-				keys[index + 1] = StringUtil.toHexString(arguments[i]);
-			}
+			keys[index + 1] = StringUtil.toHexString(
+				_normalizeArgument(arguments[i]));
 		}
 
 		return _getCacheKey(keys);
@@ -212,6 +194,15 @@ public class FinderPath {
 	private void _initLocalCacheKeyPrefix() {
 		_localCacheKeyPrefix = _cacheName.concat(StringPool.PERIOD).concat(
 			_cacheKeyPrefix);
+	}
+
+	private Object _normalizeArgument(Object argument) {
+		if (argument instanceof Date) {
+			return ((Date)argument).getTime();
+		}
+		else {
+			return argument;
+		}
 	}
 
 	private static final String _ARGS_SEPARATOR = "_A_";
