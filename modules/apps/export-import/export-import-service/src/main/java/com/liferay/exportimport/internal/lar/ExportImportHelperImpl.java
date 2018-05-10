@@ -520,14 +520,9 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 	@Override
 	public ZipWriter getLayoutSetZipWriter(long groupId) {
-		StringBundler sb = new StringBundler(4);
+		String fileName = getZipWriterFileName(String.valueOf(groupId));
 
-		sb.append(groupId);
-		sb.append(StringPool.DASH);
-		sb.append(Time.getTimestamp());
-		sb.append(".lar");
-
-		return getZipWriter(sb.toString());
+		return getZipWriter(fileName);
 	}
 
 	/**
@@ -693,14 +688,9 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 	@Override
 	public ZipWriter getPortletZipWriter(String portletId) {
-		StringBundler sb = new StringBundler(4);
+		String fileName = getZipWriterFileName(portletId);
 
-		sb.append(portletId);
-		sb.append(StringPool.DASH);
-		sb.append(Time.getTimestamp());
-		sb.append(".lar");
-
-		return getZipWriter(sb.toString());
+		return getZipWriter(fileName);
 	}
 
 	@Override
@@ -1667,6 +1657,17 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 			new File(
 				SystemProperties.get(SystemProperties.TMP_DIR) +
 					StringPool.SLASH + fileName));
+	}
+
+	protected String getZipWriterFileName(String id) {
+		StringBundler sb = new StringBundler(4);
+
+		sb.append(id);
+		sb.append(StringPool.DASH);
+		sb.append(Time.getTimestamp());
+		sb.append(".lar");
+
+		return sb.toString();
 	}
 
 	protected boolean populateLayoutsJSON(
