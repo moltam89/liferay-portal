@@ -20,18 +20,26 @@ import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.journal.constants.JournalActivityKeys;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
-import com.liferay.journal.model.JournalArticleConstants;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.JournalArticleLocalService;
+import com.liferay.journal.web.asset.JournalArticleAssetRenderer;
 import com.liferay.journal.web.util.JournalResourceBundleLoader;
-import com.liferay.portal.kernel.model.Layout;
+import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.model.Portlet;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.portlet.ControlPanelEntry;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
+import com.liferay.portal.kernel.portlet.PortletProvider;
+import com.liferay.portal.kernel.portlet.PortletProviderUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
+import com.liferay.portal.kernel.security.permission.PermissionCheckerFactoryUtil;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermissionHelper;
+import com.liferay.portal.kernel.service.PortletLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleLoader;
 import com.liferay.portal.kernel.util.Validator;
@@ -64,43 +72,39 @@ public class JournalArticleActivityInterpreter
 			SocialActivity activity, ServiceContext serviceContext)
 		throws Exception {
 
-		AssetRendererFactory journalArticleAssetRendererFactory =
-			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClass(
-				JournalArticle.class);
-
-		AssetRenderer journalArticleAssetRenderer =
-			journalArticleAssetRendererFactory.getAssetRenderer(
-				activity.getClassPK());
-
-		LiferayPortletRequest liferayPortletRequest =
-			serviceContext.getLiferayPortletRequest();
-
-		LiferayPortletResponse liferayPortletResponse =
-			serviceContext.getLiferayPortletResponse();
-
-		if ((liferayPortletRequest != null) &&
-			(liferayPortletResponse != null)) {
-
-			return journalArticleAssetRenderer.getURLViewInContext(
-				serviceContext.getLiferayPortletRequest(),
-				serviceContext.getLiferayPortletResponse(), null);
-		}
-
 		JournalArticle article = _journalArticleLocalService.getLatestArticle(
 			activity.getClassPK());
 
-		Layout layout = article.getLayout();
+		AssetRendererFactory<JournalArticle> assetRendererFactory =
+			AssetRendererFactoryRegistryUtil.getAssetRendererFactoryByClass(
+				JournalArticle.class);
 
-		if (layout != null) {
-			String groupFriendlyURL = _portal.getGroupFriendlyURL(
-				layout.getLayoutSet(), serviceContext.getThemeDisplay());
+		AssetRenderer<JournalArticle> assetRenderer =
+			assetRendererFactory.getAssetRenderer(
+				JournalArticleAssetRenderer.getClassPK(article));
 
-			return groupFriendlyURL.concat(
-				JournalArticleConstants.CANONICAL_URL_SEPARATOR).concat(
-				article.getUrlTitle());
+		LiferayPortletRequest request =
+			serviceContext.getLiferayPortletRequest();
+		LiferayPortletResponse response =
+			serviceContext.getLiferayPortletResponse();
+		String portletId = PortletProviderUtil.getPortletId(
+			JournalArticle.class.getName(), PortletProvider.Action.EDIT);
+
+		boolean userHasAccessRightToControlPanel =
+			_checkIfUserHasAccessRightToContolPanel(
+				activity, serviceContext, article, portletId);
+
+		String defaultArticleURL = StringPool.BLANK;
+
+		if (userHasAccessRightToControlPanel) {
+			defaultArticleURL = _portal.getControlPanelFullURL(
+				article.getGroupId(), portletId, null);
 		}
 
-		return null;
+		String url = assetRenderer.getURLViewInContext(
+			request, response, defaultArticleURL);
+
+		return url;
 	}
 
 	@Override
@@ -186,6 +190,46 @@ public class JournalArticleActivityInterpreter
 		_journalArticleLocalService = journalArticleLocalService;
 	}
 
+	@Reference(unbind = "-")
+	protected void setPortletLocalService(
+		PortletLocalService portletLocalService) {
+
+		_portletLocalService = portletLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setUserLocalService(UserLocalService userLocalService) {
+		_userLocalService = userLocalService;
+	}
+
+	private boolean _checkIfUserHasAccessRightToContolPanel(
+			SocialActivity activity, ServiceContext serviceContext,
+			JournalArticle article, String portletId)
+		throws Exception {
+
+		long userId = activity.getUserId();
+
+		User user = _userLocalService.fetchUserById(userId);
+
+		long companyId = article.getCompanyId();
+
+		Portlet journalPortlet = _portletLocalService.fetchPortletById(
+			companyId, portletId);
+
+		PermissionChecker permissionChecker =
+			PermissionCheckerFactoryUtil.create(user);
+
+		ControlPanelEntry controlPanelEntry =
+			journalPortlet.getControlPanelEntryInstance();
+
+		boolean userHasAccessRightToControlPanel =
+			controlPanelEntry.hasAccessPermission(
+				permissionChecker, serviceContext.getScopeGroup(),
+				journalPortlet);
+
+		return userHasAccessRightToControlPanel;
+	}
+
 	private static final String[] _CLASS_NAMES =
 		{JournalArticle.class.getName()};
 
@@ -205,5 +249,8 @@ public class JournalArticleActivityInterpreter
 
 	@Reference
 	private Portal _portal;
+
+	private PortletLocalService _portletLocalService;
+	private UserLocalService _userLocalService;
 
 }
