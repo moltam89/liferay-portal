@@ -187,9 +187,6 @@ public class KBArticleStagedModelDataHandler
 			kbArticleResourcePrimKeys, kbArticle.getParentResourcePrimKey(),
 			kbArticle.getParentResourcePrimKey());
 
-		long kbFolderClassNameId = _portal.getClassNameId(
-			KBFolderConstants.getClassName());
-
 		if (kbArticle.getParentResourcePrimKey() !=
 				KBFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
 
