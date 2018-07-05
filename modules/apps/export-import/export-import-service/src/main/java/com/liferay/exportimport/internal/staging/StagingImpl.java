@@ -2353,8 +2353,11 @@ public class StagingImpl implements Staging {
 		Map<String, String[]> parameterMap =
 			(Map<String, String[]>)settingsMap.get("parameterMap");
 
-		String backgroundTaskName = MapUtil.getString(
-			parameterMap, "name", exportImportConfiguration.getName());
+		String backgroundTaskName = exportImportConfiguration.getName();
+
+		if (Validator.isNull(backgroundTaskName)) {
+			MapUtil.getString(parameterMap, "name");
+		}
 
 		Map<String, Serializable> taskContextMap = new HashMap<>();
 
@@ -3491,8 +3494,11 @@ public class StagingImpl implements Staging {
 		Map<String, String[]> parameterMap =
 			(Map<String, String[]>)settingsMap.get("parameterMap");
 
-		String backgroundTaskName = MapUtil.getString(
-			parameterMap, "name", exportImportConfiguration.getName());
+		String backgroundTaskName = exportImportConfiguration.getName();
+
+		if (Validator.isNull(backgroundTaskName)) {
+			backgroundTaskName = MapUtil.getString(parameterMap, "name");
+		}
 
 		Map<String, Serializable> taskContextMap = new HashMap<>();
 
