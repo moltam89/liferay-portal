@@ -2984,6 +2984,7 @@ public class StagingImpl implements Staging {
 
 		ScheduleInformation scheduleInformation = getScheduleInformation(
 			portletRequest, targetGroupId, false);
+
 		String name = ParamUtil.getString(portletRequest, "name");
 
 		if (!Validator.isBlank(name)) {
@@ -3085,6 +3086,7 @@ public class StagingImpl implements Staging {
 
 		ScheduleInformation scheduleInformation = getScheduleInformation(
 			portletRequest, groupId, true);
+
 		String name = ParamUtil.getString(portletRequest, "name");
 
 		if (!Validator.isBlank(name)) {
