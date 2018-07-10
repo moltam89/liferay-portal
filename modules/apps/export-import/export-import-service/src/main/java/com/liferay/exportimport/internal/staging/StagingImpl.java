@@ -2986,6 +2986,10 @@ public class StagingImpl implements Staging {
 			portletRequest, targetGroupId, false);
 		String name = ParamUtil.getString(portletRequest, "name");
 
+		if (!Validator.isBlank(name)) {
+			parameterMap.put("name", new String[] {name});
+		}
+
 		_layoutService.schedulePublishToLive(
 			sourceGroupId, targetGroupId, privateLayout, layoutIds,
 			parameterMap, scheduleInformation.getGroupName(),
@@ -3082,6 +3086,10 @@ public class StagingImpl implements Staging {
 		ScheduleInformation scheduleInformation = getScheduleInformation(
 			portletRequest, groupId, true);
 		String name = ParamUtil.getString(portletRequest, "name");
+
+		if (!Validator.isBlank(name)) {
+			parameterMap.put("name", new String[] {name});
+		}
 
 		_layoutService.schedulePublishToRemote(
 			groupId, privateLayout, layoutIdMap, parameterMap, remoteAddress,
