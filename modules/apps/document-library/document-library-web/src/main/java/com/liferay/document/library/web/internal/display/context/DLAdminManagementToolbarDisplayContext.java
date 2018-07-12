@@ -105,7 +105,10 @@ public class DLAdminManagementToolbarDisplayContext {
 
 				boolean stagedActions = false;
 
-				if (!scopeGroup.isStaged() || scopeGroup.isStagingGroup() ||
+				if ((!scopeGroup.hasRemoteStagingGroup() &&
+					 !scopeGroup.isStaged()) ||
+					scopeGroup.isStagedRemotely() ||
+					scopeGroup.isStagingGroup() ||
 					!scopeGroup.isStagedPortlet(
 						DLPortletKeys.DOCUMENT_LIBRARY)) {
 
