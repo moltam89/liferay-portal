@@ -18,6 +18,7 @@ import com.liferay.asset.kernel.AssetRendererFactoryRegistryUtil;
 import com.liferay.asset.kernel.model.AssetCategory;
 import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.model.AssetRenderer;
+import com.liferay.asset.kernel.model.AssetRendererFactory;
 import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
@@ -256,8 +257,15 @@ public class AssetPublisherExportImportPortletPreferencesProcessor
 		for (AssetEntry assetEntry : assetEntries) {
 			AssetRenderer<?> assetRenderer = assetEntry.getAssetRenderer();
 
+			AssetRendererFactory assetRendererFactory =
+				assetRenderer.getAssetRendererFactory();
+
+			Group group = _groupLocalService.getGroup(assetEntry.getGroupId());
+			String portletId = assetRendererFactory.getPortletId();
+
 			if ((assetRenderer == null) ||
-				!(assetRenderer.getAssetObject() instanceof StagedModel)) {
+				!(assetRenderer.getAssetObject() instanceof StagedModel) ||
+				!group.isStagedPortlet(portletId)) {
 
 				continue;
 			}
