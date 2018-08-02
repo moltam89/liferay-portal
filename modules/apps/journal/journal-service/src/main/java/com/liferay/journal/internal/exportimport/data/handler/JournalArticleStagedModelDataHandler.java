@@ -477,10 +477,10 @@ public class JournalArticleStagedModelDataHandler
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				Group.class);
 
-		long groupId = GetterUtil.getLong(
+		long sourceGroupId = GetterUtil.getLong(
 			referenceElement.attributeValue("group-id"));
 
-		groupId = MapUtil.getLong(groupIds, groupId);
+		long groupId = MapUtil.getLong(groupIds, sourceGroupId);
 
 		String articleArticleId = referenceElement.attributeValue("article-id");
 		boolean preloaded = GetterUtil.getBoolean(
@@ -490,6 +490,12 @@ public class JournalArticleStagedModelDataHandler
 
 		if (!preloaded) {
 			existingArticle = fetchMissingReference(uuid, groupId);
+
+			if ((groupId == portletDataContext.getScopeGroupId()) &&
+				(sourceGroupId != portletDataContext.getSourceGroupId())) {
+
+				groupIds.put(sourceGroupId, existingArticle.getGroupId());
+			}
 		}
 		else {
 			existingArticle = fetchExistingArticle(
