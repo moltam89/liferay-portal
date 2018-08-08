@@ -183,6 +183,10 @@ public class DDMStructureStagedModelDataHandler
 		boolean preloaded = GetterUtil.getBoolean(
 			referenceElement.attributeValue("preloaded"));
 
+		if (!preloaded) {
+			return super.validateMissingReference(uuid, groupId);
+		}
+
 		DDMStructure existingStructure = fetchExistingStructureWithParentGroups(
 			uuid, groupId, classNameId, structureKey, preloaded);
 
@@ -248,10 +252,10 @@ public class DDMStructureStagedModelDataHandler
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				Group.class);
 
-		long groupId = GetterUtil.getLong(
+		long sourceGroupId = GetterUtil.getLong(
 			referenceElement.attributeValue("group-id"));
 
-		groupId = MapUtil.getLong(groupIds, groupId);
+		long groupId = MapUtil.getLong(groupIds, sourceGroupId);
 
 		long classNameId = _portal.getClassNameId(
 			referenceElement.attributeValue("referenced-class-name"));
@@ -259,8 +263,21 @@ public class DDMStructureStagedModelDataHandler
 		boolean preloaded = GetterUtil.getBoolean(
 			referenceElement.attributeValue("preloaded"));
 
-		DDMStructure existingStructure = fetchExistingStructureWithParentGroups(
-			uuid, groupId, classNameId, structureKey, preloaded);
+		DDMStructure existingStructure;
+
+		if (!preloaded) {
+			existingStructure = fetchMissingReference(uuid, groupId);
+
+			if ((groupId == portletDataContext.getScopeGroupId()) &&
+				(sourceGroupId != portletDataContext.getSourceGroupId())) {
+
+				groupIds.put(sourceGroupId, existingStructure.getGroupId());
+			}
+		}
+		else {
+			existingStructure = fetchExistingStructureWithParentGroups(
+				uuid, groupId, classNameId, structureKey, preloaded);
+		}
 
 		Map<Long, Long> structureIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(

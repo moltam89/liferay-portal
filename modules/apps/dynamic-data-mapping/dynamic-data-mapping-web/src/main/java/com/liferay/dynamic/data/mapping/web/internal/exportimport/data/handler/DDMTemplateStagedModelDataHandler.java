@@ -169,6 +169,10 @@ public class DDMTemplateStagedModelDataHandler
 		boolean preloaded = GetterUtil.getBoolean(
 			referenceElement.attributeValue("preloaded"));
 
+		if (!preloaded) {
+			return super.validateMissingReference(uuid, groupId);
+		}
+
 		DDMTemplate existingTemplate = fetchExistingTemplateWithParentGroups(
 			uuid, groupId, classNameId, templateKey, preloaded);
 
@@ -294,10 +298,10 @@ public class DDMTemplateStagedModelDataHandler
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				Group.class);
 
-		long groupId = GetterUtil.getLong(
+		long sourceGroupId = GetterUtil.getLong(
 			referenceElement.attributeValue("group-id"));
 
-		groupId = MapUtil.getLong(groupIds, groupId);
+		long groupId = MapUtil.getLong(groupIds, sourceGroupId);
 
 		long classNameId = _portal.getClassNameId(
 			referenceElement.attributeValue("referenced-class-name"));
@@ -305,8 +309,21 @@ public class DDMTemplateStagedModelDataHandler
 		boolean preloaded = GetterUtil.getBoolean(
 			referenceElement.attributeValue("preloaded"));
 
-		DDMTemplate existingTemplate = fetchExistingTemplateWithParentGroups(
-			uuid, groupId, classNameId, templateKey, preloaded);
+		DDMTemplate existingTemplate;
+
+		if (!preloaded) {
+			existingTemplate = fetchMissingReference(uuid, groupId);
+
+			if ((groupId == portletDataContext.getScopeGroupId()) &&
+				(sourceGroupId != portletDataContext.getSourceGroupId())) {
+
+				groupIds.put(sourceGroupId, existingTemplate.getGroupId());
+			}
+		}
+		else {
+			existingTemplate = fetchExistingTemplateWithParentGroups(
+				uuid, groupId, classNameId, templateKey, preloaded);
+		}
 
 		Map<Long, Long> templateIds =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
