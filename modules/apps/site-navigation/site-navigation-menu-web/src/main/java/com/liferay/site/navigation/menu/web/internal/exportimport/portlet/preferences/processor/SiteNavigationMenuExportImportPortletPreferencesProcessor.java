@@ -16,14 +16,20 @@ package com.liferay.site.navigation.menu.web.internal.exportimport.portlet.prefe
 
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.portlet.preferences.processor.Capability;
 import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessor;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.site.navigation.menu.web.internal.constants.SiteNavigationMenuPortletKeys;
+import com.liferay.site.navigation.model.SiteNavigationMenu;
+import com.liferay.site.navigation.service.SiteNavigationMenuLocalService;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.portlet.PortletPreferences;
+import javax.portlet.ReadOnlyException;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -55,6 +61,44 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
 
+		String portletId = portletDataContext.getPortletId();
+
+		String navmenuid = portletPreferences.getValue(
+			"siteNavigationMenuId", null);
+		long scopeGroupId = portletDataContext.getScopeGroupId();
+
+		try {
+			if (navmenuid != null) {
+				SiteNavigationMenu navmenu =
+					_siteNavigationMenuLocalService.getSiteNavigationMenu(
+						Long.parseLong(navmenuid));
+
+				if (navmenu != null) {
+					String navmenuuuid = navmenu.getUuid();
+
+					SiteNavigationMenu navmenuToExport =
+						_siteNavigationMenuLocalService.
+							getSiteNavigationMenuByUuidAndGroupId(
+								navmenuuuid, scopeGroupId);
+
+					StagedModelDataHandlerUtil.exportReferenceStagedModel(
+						portletDataContext, portletId, navmenuToExport);
+				}
+
+				return portletPreferences;
+			}
+		}
+		catch (NumberFormatException nfe) {
+			PortletDataException pde = new PortletDataException(nfe);
+
+			throw pde;
+		}
+		catch (PortalException pe) {
+			PortletDataException pde = new PortletDataException(pe);
+
+			throw pde;
+		}
+
 		return null;
 	}
 
@@ -64,6 +108,34 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
 
+		String navmenuid = portletPreferences.getValue(
+			"siteNavigationMenuid", null);
+
+		try {
+			if (navmenuid != null) {
+				Map<Long, Long> navMenuIds =
+					(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+						SiteNavigationMenu.class);
+
+				Long properId = navMenuIds.get(navmenuid);
+
+				portletPreferences.setValue(
+					"siteNavigationMenuId", String.valueOf(properId));
+
+				return portletPreferences;
+			}
+		}
+		catch (NumberFormatException nfe) {
+			PortletDataException pde = new PortletDataException(nfe);
+
+			throw pde;
+		}
+		catch (ReadOnlyException roe) {
+			PortletDataException pde = new PortletDataException(roe);
+
+			throw pde;
+		}
+
 		return null;
 	}
 
@@ -72,5 +144,8 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 
 	@Reference(target = "(name=PortletDisplayTemplateImporter)")
 	private Capability _importCapability;
+
+	@Reference(unbind = "-")
+	private SiteNavigationMenuLocalService _siteNavigationMenuLocalService;
 
 }
