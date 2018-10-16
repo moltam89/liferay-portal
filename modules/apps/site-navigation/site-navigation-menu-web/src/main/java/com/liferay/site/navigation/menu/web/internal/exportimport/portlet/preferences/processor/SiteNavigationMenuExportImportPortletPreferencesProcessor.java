@@ -20,6 +20,7 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.portlet.preferences.processor.Capability;
 import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessor;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.site.navigation.menu.web.internal.constants.SiteNavigationMenuPortletKeys;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
@@ -71,7 +72,7 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 			if (navmenuid != null) {
 				SiteNavigationMenu navmenu =
 					_siteNavigationMenuLocalService.getSiteNavigationMenu(
-						Long.parseLong(navmenuid));
+						GetterUtil.getLong(navmenuid));
 
 				if (navmenu != null) {
 					String navmenuuuid = navmenu.getUuid();
@@ -87,11 +88,6 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 
 				return portletPreferences;
 			}
-		}
-		catch (NumberFormatException nfe) {
-			PortletDataException pde = new PortletDataException(nfe);
-
-			throw pde;
 		}
 		catch (PortalException pe) {
 			PortletDataException pde = new PortletDataException(pe);
@@ -124,11 +120,6 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 
 				return portletPreferences;
 			}
-		}
-		catch (NumberFormatException nfe) {
-			PortletDataException pde = new PortletDataException(nfe);
-
-			throw pde;
 		}
 		catch (ReadOnlyException roe) {
 			PortletDataException pde = new PortletDataException(roe);
