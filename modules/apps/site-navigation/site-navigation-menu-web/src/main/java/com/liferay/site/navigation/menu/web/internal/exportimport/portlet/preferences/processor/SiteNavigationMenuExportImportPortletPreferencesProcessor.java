@@ -21,7 +21,6 @@ import com.liferay.exportimport.portlet.preferences.processor.Capability;
 import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessor;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.site.navigation.menu.web.internal.constants.SiteNavigationMenuPortletKeys;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
@@ -88,11 +87,9 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 						siteNavigationMenuToExport);
 				}
 			}
-
-			return portletPreferences;
 		}
 
-		return null;
+		return portletPreferences;
 	}
 
 	@Override
@@ -106,22 +103,22 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 
 		try {
 			if (Validator.isNotNull(siteNavigationMenuId)) {
+				StagedModelDataHandlerUtil.importReferenceStagedModel(
+					portletDataContext, SiteNavigationMenu.class,
+					siteNavigationMenuId);
+
 				Map<Long, Long> siteNavigationMenuIds =
 					(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 						SiteNavigationMenu.class);
 
-				Long originalSiteNavigationMenuId = GetterUtil.getLong(
-					siteNavigationMenuId);
+				Long newSiteNavigationMenuId = siteNavigationMenuIds.get(
+					GetterUtil.getLong(siteNavigationMenuId));
 
-				Long newSiteNavigationMenuId = MapUtil.getLong(
-					siteNavigationMenuIds, originalSiteNavigationMenuId,
-					originalSiteNavigationMenuId);
-
-				portletPreferences.setValue(
-					"siteNavigationMenuId",
-					String.valueOf(newSiteNavigationMenuId));
-
-				return portletPreferences;
+				if (newSiteNavigationMenuId != null) {
+					portletPreferences.setValue(
+						"siteNavigationMenuId",
+						String.valueOf(newSiteNavigationMenuId));
+				}
 			}
 		}
 		catch (ReadOnlyException roe) {
@@ -130,7 +127,7 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 			throw pde;
 		}
 
-		return null;
+		return portletPreferences;
 	}
 
 	@Reference(target = "(name=PortletDisplayTemplateExporter)")
