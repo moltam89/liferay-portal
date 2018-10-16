@@ -22,6 +22,8 @@ import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortle
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.site.navigation.menu.web.internal.constants.SiteNavigationMenuPortletKeys;
 import com.liferay.site.navigation.model.SiteNavigationMenu;
 import com.liferay.site.navigation.service.SiteNavigationMenuLocalService;
@@ -68,31 +70,26 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 			"siteNavigationMenuId", null);
 		long scopeGroupId = portletDataContext.getScopeGroupId();
 
-		try {
-			if (navmenuid != null) {
-				SiteNavigationMenu navmenu =
-					_siteNavigationMenuLocalService.getSiteNavigationMenu(
-						GetterUtil.getLong(navmenuid));
+		if (Validator.isNotNull(navmenuid)) {
+			SiteNavigationMenu navmenu =
+				_siteNavigationMenuLocalService.fetchSiteNavigationMenu(
+					GetterUtil.getLong(navmenuid));
 
-				if (navmenu != null) {
-					String navmenuuuid = navmenu.getUuid();
+			if (navmenu != null) {
+				String navmenuuuid = navmenu.getUuid();
 
-					SiteNavigationMenu navmenuToExport =
-						_siteNavigationMenuLocalService.
-							getSiteNavigationMenuByUuidAndGroupId(
-								navmenuuuid, scopeGroupId);
+				SiteNavigationMenu navmenuToExport =
+					_siteNavigationMenuLocalService.
+						fetchSiteNavigationMenuByUuidAndGroupId(
+							navmenuuuid, scopeGroupId);
 
+				if (navmenuToExport != null) {
 					StagedModelDataHandlerUtil.exportReferenceStagedModel(
 						portletDataContext, portletId, navmenuToExport);
 				}
-
-				return portletPreferences;
 			}
-		}
-		catch (PortalException pe) {
-			PortletDataException pde = new PortletDataException(pe);
 
-			throw pde;
+			return portletPreferences;
 		}
 
 		return null;
@@ -108,12 +105,14 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 			"siteNavigationMenuId", null);
 
 		try {
-			if (navmenuid != null) {
+			if (Validator.isNotNull(navmenuid)) {
 				Map<Long, Long> navMenuIds =
 					(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 						SiteNavigationMenu.class);
 
-				Long properId = navMenuIds.get(navmenuid);
+				Long id = GetterUtil.getLong(navmenuid);
+
+				Long properId = MapUtil.getLong(navMenuIds, id, id);
 
 				portletPreferences.setValue(
 					"siteNavigationMenuId", String.valueOf(properId));
