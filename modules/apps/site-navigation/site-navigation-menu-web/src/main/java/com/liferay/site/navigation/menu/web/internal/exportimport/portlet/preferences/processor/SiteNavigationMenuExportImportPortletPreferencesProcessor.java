@@ -19,7 +19,6 @@ import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.portlet.preferences.processor.Capability;
 import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessor;
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.MapUtil;
@@ -66,26 +65,27 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 
 		String portletId = portletDataContext.getPortletId();
 
-		String navmenuid = portletPreferences.getValue(
+		String siteNavigationMenuId = portletPreferences.getValue(
 			"siteNavigationMenuId", null);
 		long scopeGroupId = portletDataContext.getScopeGroupId();
 
-		if (Validator.isNotNull(navmenuid)) {
-			SiteNavigationMenu navmenu =
+		if (Validator.isNotNull(siteNavigationMenuId)) {
+			SiteNavigationMenu siteNavigationMenu =
 				_siteNavigationMenuLocalService.fetchSiteNavigationMenu(
-					GetterUtil.getLong(navmenuid));
+					GetterUtil.getLong(siteNavigationMenuId));
 
-			if (navmenu != null) {
-				String navmenuuuid = navmenu.getUuid();
+			if (siteNavigationMenu != null) {
+				String siteNavigationMenuUuid = siteNavigationMenu.getUuid();
 
-				SiteNavigationMenu navmenuToExport =
+				SiteNavigationMenu siteNavigationMenuToExport =
 					_siteNavigationMenuLocalService.
 						fetchSiteNavigationMenuByUuidAndGroupId(
-							navmenuuuid, scopeGroupId);
+							siteNavigationMenuUuid, scopeGroupId);
 
-				if (navmenuToExport != null) {
+				if (siteNavigationMenuToExport != null) {
 					StagedModelDataHandlerUtil.exportReferenceStagedModel(
-						portletDataContext, portletId, navmenuToExport);
+						portletDataContext, portletId,
+						siteNavigationMenuToExport);
 				}
 			}
 
@@ -101,21 +101,25 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
 
-		String navmenuid = portletPreferences.getValue(
+		String siteNavigationMenuId = portletPreferences.getValue(
 			"siteNavigationMenuId", null);
 
 		try {
-			if (Validator.isNotNull(navmenuid)) {
-				Map<Long, Long> navMenuIds =
+			if (Validator.isNotNull(siteNavigationMenuId)) {
+				Map<Long, Long> siteNavigationMenuIds =
 					(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 						SiteNavigationMenu.class);
 
-				Long id = GetterUtil.getLong(navmenuid);
+				Long originalSiteNavigationMenuId = GetterUtil.getLong(
+					siteNavigationMenuId);
 
-				Long properId = MapUtil.getLong(navMenuIds, id, id);
+				Long newSiteNavigationMenuId = MapUtil.getLong(
+					siteNavigationMenuIds, originalSiteNavigationMenuId,
+					originalSiteNavigationMenuId);
 
 				portletPreferences.setValue(
-					"siteNavigationMenuId", String.valueOf(properId));
+					"siteNavigationMenuId",
+					String.valueOf(newSiteNavigationMenuId));
 
 				return portletPreferences;
 			}
