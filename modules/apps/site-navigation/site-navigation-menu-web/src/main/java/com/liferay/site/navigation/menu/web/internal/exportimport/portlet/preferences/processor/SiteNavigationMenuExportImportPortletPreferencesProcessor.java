@@ -105,7 +105,7 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 		throws PortletDataException {
 
 		String navmenuid = portletPreferences.getValue(
-			"siteNavigationMenuid", null);
+			"siteNavigationMenuId", null);
 
 		try {
 			if (navmenuid != null) {
