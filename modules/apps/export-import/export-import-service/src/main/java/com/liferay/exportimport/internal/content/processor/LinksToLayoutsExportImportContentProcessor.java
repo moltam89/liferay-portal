@@ -159,6 +159,9 @@ public class LinksToLayoutsExportImportContentProcessor
 
 		Matcher matcher = _importLinksToLayoutPattern.matcher(content);
 
+		Matcher templateMatcher = _importLinksToLayoutTemplatePattern.matcher(
+			content);
+
 		Map<Long, Long> layoutPlids =
 			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
 				Layout.class);
@@ -219,6 +222,9 @@ public class LinksToLayoutsExportImportContentProcessor
 			newLinksToLayout.add(newLinkToLayout);
 		}
 
+		content = _replaceImportTemplateLinks(
+			portletDataContext, content, templateMatcher);
+
 		content = StringUtil.replace(
 			content, ArrayUtil.toStringArray(oldLinksToLayout.toArray()),
 			ArrayUtil.toStringArray(newLinksToLayout.toArray()));
@@ -268,6 +274,25 @@ public class LinksToLayoutsExportImportContentProcessor
 		}
 	}
 
+	private String _replaceImportTemplateLinks(
+		PortletDataContext portletDataContext, String content,
+		Matcher templateMatcher) {
+
+		while (templateMatcher.find()) {
+			String layoutSetPrototypeId = templateMatcher.group(2);
+
+			long scopeGroupId = portletDataContext.getScopeGroupId();
+
+			String templateIdInXML = "/template-" + layoutSetPrototypeId + "/";
+			String scopeGroupIdInXML = "/" + scopeGroupId + "/";
+
+			content = StringUtil.replace(
+				content, templateIdInXML, scopeGroupIdInXML);
+		}
+
+		return content;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		LinksToLayoutsExportImportContentProcessor.class);
 
@@ -275,6 +300,8 @@ public class LinksToLayoutsExportImportContentProcessor
 		"\\[([\\d]+)@(private(-group|-user)?|public)(@([\\d]+))?\\]");
 	private static final Pattern _importLinksToLayoutPattern = Pattern.compile(
 		"\\[([\\d]+)@(private(-group|-user)?|public)@([\\d]+)(@([\\d]+))?\\]");
+	private static final Pattern _importLinksToLayoutTemplatePattern =
+		Pattern.compile("\\/(template-)([\\d]+)\\/");
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
