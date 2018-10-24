@@ -3426,7 +3426,9 @@ public class GadgetPersistenceImpl extends BasePersistenceImpl<Gadget>
 			}
 		}
 
-		if (!gadgetModelImpl.hasSetModifiedDate()) {
+		if (!gadgetModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(gadgetModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				gadget.setModifiedDate(now);
 			}

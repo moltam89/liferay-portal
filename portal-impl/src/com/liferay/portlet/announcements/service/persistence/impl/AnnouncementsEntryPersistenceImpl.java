@@ -7168,7 +7168,9 @@ public class AnnouncementsEntryPersistenceImpl extends BasePersistenceImpl<Annou
 			}
 		}
 
-		if (!announcementsEntryModelImpl.hasSetModifiedDate()) {
+		if (!announcementsEntryModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(announcementsEntryModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				announcementsEntry.setModifiedDate(now);
 			}

@@ -4850,7 +4850,9 @@ public class AddressPersistenceImpl extends BasePersistenceImpl<Address>
 			}
 		}
 
-		if (!addressModelImpl.hasSetModifiedDate()) {
+		if (!addressModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(addressModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				address.setModifiedDate(now);
 			}

@@ -41,6 +41,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.impl.LayoutSetBranchImpl;
 import com.liferay.portal.model.impl.LayoutSetBranchModelImpl;
 
@@ -3450,7 +3451,9 @@ public class LayoutSetBranchPersistenceImpl extends BasePersistenceImpl<LayoutSe
 			}
 		}
 
-		if (!layoutSetBranchModelImpl.hasSetModifiedDate()) {
+		if (!layoutSetBranchModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(layoutSetBranchModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				layoutSetBranch.setModifiedDate(now);
 			}

@@ -6288,7 +6288,9 @@ public class DLFileShortcutPersistenceImpl extends BasePersistenceImpl<DLFileSho
 			}
 		}
 
-		if (!dlFileShortcutModelImpl.hasSetModifiedDate()) {
+		if (!dlFileShortcutModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(dlFileShortcutModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				dlFileShortcut.setModifiedDate(now);
 			}

@@ -4222,7 +4222,9 @@ public class WebsitePersistenceImpl extends BasePersistenceImpl<Website>
 			}
 		}
 
-		if (!websiteModelImpl.hasSetModifiedDate()) {
+		if (!websiteModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(websiteModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				website.setModifiedDate(now);
 			}

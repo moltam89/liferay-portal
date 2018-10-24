@@ -3735,7 +3735,9 @@ public class PasswordPolicyPersistenceImpl extends BasePersistenceImpl<PasswordP
 			}
 		}
 
-		if (!passwordPolicyModelImpl.hasSetModifiedDate()) {
+		if (!passwordPolicyModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(passwordPolicyModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				passwordPolicy.setModifiedDate(now);
 			}

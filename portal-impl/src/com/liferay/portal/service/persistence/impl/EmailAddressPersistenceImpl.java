@@ -4240,7 +4240,9 @@ public class EmailAddressPersistenceImpl extends BasePersistenceImpl<EmailAddres
 			}
 		}
 
-		if (!emailAddressModelImpl.hasSetModifiedDate()) {
+		if (!emailAddressModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(emailAddressModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				emailAddress.setModifiedDate(now);
 			}

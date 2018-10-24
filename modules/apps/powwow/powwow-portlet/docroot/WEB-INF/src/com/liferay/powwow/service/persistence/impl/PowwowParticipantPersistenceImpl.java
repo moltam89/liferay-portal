@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import com.liferay.powwow.exception.NoSuchParticipantException;
 import com.liferay.powwow.model.PowwowParticipant;
@@ -1975,7 +1976,9 @@ public class PowwowParticipantPersistenceImpl extends BasePersistenceImpl<Powwow
 			}
 		}
 
-		if (!powwowParticipantModelImpl.hasSetModifiedDate()) {
+		if (!powwowParticipantModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(powwowParticipantModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				powwowParticipant.setModifiedDate(now);
 			}

@@ -4199,7 +4199,9 @@ public class PhonePersistenceImpl extends BasePersistenceImpl<Phone>
 			}
 		}
 
-		if (!phoneModelImpl.hasSetModifiedDate()) {
+		if (!phoneModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(phoneModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				phone.setModifiedDate(now);
 			}

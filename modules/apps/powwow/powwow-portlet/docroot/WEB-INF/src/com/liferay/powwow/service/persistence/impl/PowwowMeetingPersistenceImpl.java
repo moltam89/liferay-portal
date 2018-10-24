@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.service.persistence.CompanyProviderWrapper;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import com.liferay.powwow.exception.NoSuchMeetingException;
 import com.liferay.powwow.model.PowwowMeeting;
@@ -3287,7 +3288,9 @@ public class PowwowMeetingPersistenceImpl extends BasePersistenceImpl<PowwowMeet
 			}
 		}
 
-		if (!powwowMeetingModelImpl.hasSetModifiedDate()) {
+		if (!powwowMeetingModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(powwowMeetingModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				powwowMeeting.setModifiedDate(now);
 			}

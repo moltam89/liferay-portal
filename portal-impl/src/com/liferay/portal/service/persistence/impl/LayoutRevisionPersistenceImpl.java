@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.impl.LayoutRevisionImpl;
 import com.liferay.portal.model.impl.LayoutRevisionModelImpl;
 
@@ -8169,7 +8170,9 @@ public class LayoutRevisionPersistenceImpl extends BasePersistenceImpl<LayoutRev
 			}
 		}
 
-		if (!layoutRevisionModelImpl.hasSetModifiedDate()) {
+		if (!layoutRevisionModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(layoutRevisionModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				layoutRevision.setModifiedDate(now);
 			}

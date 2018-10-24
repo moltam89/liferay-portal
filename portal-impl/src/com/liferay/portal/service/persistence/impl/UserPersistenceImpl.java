@@ -8494,7 +8494,9 @@ public class UserPersistenceImpl extends BasePersistenceImpl<User>
 			}
 		}
 
-		if (!userModelImpl.hasSetModifiedDate()) {
+		if (!userModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(userModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				user.setModifiedDate(now);
 			}

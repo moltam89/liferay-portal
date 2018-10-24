@@ -6266,7 +6266,9 @@ public class UserGroupPersistenceImpl extends BasePersistenceImpl<UserGroup>
 			}
 		}
 
-		if (!userGroupModelImpl.hasSetModifiedDate()) {
+		if (!userGroupModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(userGroupModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				userGroup.setModifiedDate(now);
 			}

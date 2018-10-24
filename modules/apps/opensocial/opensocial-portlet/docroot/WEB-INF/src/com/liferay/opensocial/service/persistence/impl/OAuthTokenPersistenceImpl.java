@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.io.Serializable;
 
@@ -1393,7 +1394,9 @@ public class OAuthTokenPersistenceImpl extends BasePersistenceImpl<OAuthToken>
 			}
 		}
 
-		if (!oAuthTokenModelImpl.hasSetModifiedDate()) {
+		if (!oAuthTokenModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(oAuthTokenModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				oAuthToken.setModifiedDate(now);
 			}

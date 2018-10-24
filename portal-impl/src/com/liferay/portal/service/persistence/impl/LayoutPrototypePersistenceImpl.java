@@ -4104,7 +4104,9 @@ public class LayoutPrototypePersistenceImpl extends BasePersistenceImpl<LayoutPr
 			}
 		}
 
-		if (!layoutPrototypeModelImpl.hasSetModifiedDate()) {
+		if (!layoutPrototypeModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(layoutPrototypeModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				layoutPrototype.setModifiedDate(now);
 			}

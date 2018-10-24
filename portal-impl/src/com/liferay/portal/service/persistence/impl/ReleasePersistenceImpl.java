@@ -37,6 +37,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.impl.ReleaseImpl;
 import com.liferay.portal.model.impl.ReleaseModelImpl;
 
@@ -595,7 +596,9 @@ public class ReleasePersistenceImpl extends BasePersistenceImpl<Release>
 			}
 		}
 
-		if (!releaseModelImpl.hasSetModifiedDate()) {
+		if (!releaseModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(releaseModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				release.setModifiedDate(now);
 			}

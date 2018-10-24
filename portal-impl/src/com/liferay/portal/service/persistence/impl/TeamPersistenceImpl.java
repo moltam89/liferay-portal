@@ -2885,7 +2885,9 @@ public class TeamPersistenceImpl extends BasePersistenceImpl<Team>
 			}
 		}
 
-		if (!teamModelImpl.hasSetModifiedDate()) {
+		if (!teamModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(teamModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				team.setModifiedDate(now);
 			}

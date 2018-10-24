@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import com.liferay.powwow.exception.NoSuchServerException;
 import com.liferay.powwow.model.PowwowServer;
@@ -915,7 +916,9 @@ public class PowwowServerPersistenceImpl extends BasePersistenceImpl<PowwowServe
 			}
 		}
 
-		if (!powwowServerModelImpl.hasSetModifiedDate()) {
+		if (!powwowServerModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(powwowServerModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				powwowServer.setModifiedDate(now);
 			}

@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.service.persistence.WebDAVPropsPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.impl.WebDAVPropsImpl;
 import com.liferay.portal.model.impl.WebDAVPropsModelImpl;
 
@@ -568,7 +569,9 @@ public class WebDAVPropsPersistenceImpl extends BasePersistenceImpl<WebDAVProps>
 			}
 		}
 
-		if (!webDAVPropsModelImpl.hasSetModifiedDate()) {
+		if (!webDAVPropsModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(webDAVPropsModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				webDAVProps.setModifiedDate(now);
 			}

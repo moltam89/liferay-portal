@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.impl.AccountImpl;
 import com.liferay.portal.model.impl.AccountModelImpl;
 
@@ -322,7 +323,9 @@ public class AccountPersistenceImpl extends BasePersistenceImpl<Account>
 			}
 		}
 
-		if (!accountModelImpl.hasSetModifiedDate()) {
+		if (!accountModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(accountModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				account.setModifiedDate(now);
 			}

@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.impl.WorkflowDefinitionLinkImpl;
 import com.liferay.portal.model.impl.WorkflowDefinitionLinkModelImpl;
 
@@ -2451,7 +2452,10 @@ public class WorkflowDefinitionLinkPersistenceImpl extends BasePersistenceImpl<W
 			}
 		}
 
-		if (!workflowDefinitionLinkModelImpl.hasSetModifiedDate()) {
+		if (!workflowDefinitionLinkModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(
+					workflowDefinitionLinkModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				workflowDefinitionLink.setModifiedDate(now);
 			}

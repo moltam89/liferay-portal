@@ -5203,7 +5203,9 @@ public class AssetVocabularyPersistenceImpl extends BasePersistenceImpl<AssetVoc
 			}
 		}
 
-		if (!assetVocabularyModelImpl.hasSetModifiedDate()) {
+		if (!assetVocabularyModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(assetVocabularyModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				assetVocabulary.setModifiedDate(now);
 			}

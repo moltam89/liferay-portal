@@ -3405,7 +3405,9 @@ public class DLFileEntryTypePersistenceImpl extends BasePersistenceImpl<DLFileEn
 			}
 		}
 
-		if (!dlFileEntryTypeModelImpl.hasSetModifiedDate()) {
+		if (!dlFileEntryTypeModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(dlFileEntryTypeModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				dlFileEntryType.setModifiedDate(now);
 			}

@@ -5613,7 +5613,9 @@ public class LayoutFriendlyURLPersistenceImpl extends BasePersistenceImpl<Layout
 			}
 		}
 
-		if (!layoutFriendlyURLModelImpl.hasSetModifiedDate()) {
+		if (!layoutFriendlyURLModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(layoutFriendlyURLModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				layoutFriendlyURL.setModifiedDate(now);
 			}

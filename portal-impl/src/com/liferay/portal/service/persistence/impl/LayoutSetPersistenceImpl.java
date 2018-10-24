@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.impl.LayoutSetImpl;
 import com.liferay.portal.model.impl.LayoutSetModelImpl;
 
@@ -1928,7 +1929,9 @@ public class LayoutSetPersistenceImpl extends BasePersistenceImpl<LayoutSet>
 			}
 		}
 
-		if (!layoutSetModelImpl.hasSetModifiedDate()) {
+		if (!layoutSetModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(layoutSetModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				layoutSet.setModifiedDate(now);
 			}

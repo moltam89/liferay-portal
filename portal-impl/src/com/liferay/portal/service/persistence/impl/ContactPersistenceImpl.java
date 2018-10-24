@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.service.persistence.ContactPersistence;
 import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.impl.ContactImpl;
 import com.liferay.portal.model.impl.ContactModelImpl;
 
@@ -1848,7 +1849,9 @@ public class ContactPersistenceImpl extends BasePersistenceImpl<Contact>
 			}
 		}
 
-		if (!contactModelImpl.hasSetModifiedDate()) {
+		if (!contactModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(contactModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				contact.setModifiedDate(now);
 			}

@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import com.liferay.portlet.asset.model.impl.AssetCategoryPropertyImpl;
 import com.liferay.portlet.asset.model.impl.AssetCategoryPropertyModelImpl;
@@ -2260,7 +2261,10 @@ public class AssetCategoryPropertyPersistenceImpl extends BasePersistenceImpl<As
 			}
 		}
 
-		if (!assetCategoryPropertyModelImpl.hasSetModifiedDate()) {
+		if (!assetCategoryPropertyModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(
+					assetCategoryPropertyModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				assetCategoryProperty.setModifiedDate(now);
 			}

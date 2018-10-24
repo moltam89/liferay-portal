@@ -12205,7 +12205,9 @@ public class AssetCategoryPersistenceImpl extends BasePersistenceImpl<AssetCateg
 			}
 		}
 
-		if (!assetCategoryModelImpl.hasSetModifiedDate()) {
+		if (!assetCategoryModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(assetCategoryModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				assetCategory.setModifiedDate(now);
 			}

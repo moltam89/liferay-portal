@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import com.liferay.tasks.exception.NoSuchTasksEntryException;
 import com.liferay.tasks.model.TasksEntry;
@@ -10165,7 +10166,9 @@ public class TasksEntryPersistenceImpl extends BasePersistenceImpl<TasksEntry>
 			}
 		}
 
-		if (!tasksEntryModelImpl.hasSetModifiedDate()) {
+		if (!tasksEntryModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(tasksEntryModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				tasksEntry.setModifiedDate(now);
 			}

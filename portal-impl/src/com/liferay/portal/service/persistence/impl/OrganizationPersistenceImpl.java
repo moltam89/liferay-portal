@@ -8250,7 +8250,9 @@ public class OrganizationPersistenceImpl extends BasePersistenceImpl<Organizatio
 			}
 		}
 
-		if (!organizationModelImpl.hasSetModifiedDate()) {
+		if (!organizationModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(organizationModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				organization.setModifiedDate(now);
 			}

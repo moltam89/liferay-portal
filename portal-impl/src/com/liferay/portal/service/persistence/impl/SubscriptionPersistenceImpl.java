@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.impl.SubscriptionImpl;
 import com.liferay.portal.model.impl.SubscriptionModelImpl;
 
@@ -3160,7 +3161,9 @@ public class SubscriptionPersistenceImpl extends BasePersistenceImpl<Subscriptio
 			}
 		}
 
-		if (!subscriptionModelImpl.hasSetModifiedDate()) {
+		if (!subscriptionModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(subscriptionModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				subscription.setModifiedDate(now);
 			}

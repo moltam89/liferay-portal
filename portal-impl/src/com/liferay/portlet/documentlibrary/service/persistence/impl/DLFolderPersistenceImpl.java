@@ -12556,7 +12556,9 @@ public class DLFolderPersistenceImpl extends BasePersistenceImpl<DLFolder>
 			}
 		}
 
-		if (!dlFolderModelImpl.hasSetModifiedDate()) {
+		if (!dlFolderModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(dlFolderModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				dlFolder.setModifiedDate(now);
 			}

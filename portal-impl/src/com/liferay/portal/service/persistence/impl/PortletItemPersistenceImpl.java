@@ -39,6 +39,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.impl.PortletItemImpl;
 import com.liferay.portal.model.impl.PortletItemModelImpl;
 
@@ -1871,7 +1872,9 @@ public class PortletItemPersistenceImpl extends BasePersistenceImpl<PortletItem>
 			}
 		}
 
-		if (!portletItemModelImpl.hasSetModifiedDate()) {
+		if (!portletItemModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(portletItemModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				portletItem.setModifiedDate(now);
 			}

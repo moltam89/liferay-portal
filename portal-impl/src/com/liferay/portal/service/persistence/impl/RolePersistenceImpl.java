@@ -9278,7 +9278,9 @@ public class RolePersistenceImpl extends BasePersistenceImpl<Role>
 			}
 		}
 
-		if (!roleModelImpl.hasSetModifiedDate()) {
+		if (!roleModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(roleModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				role.setModifiedDate(now);
 			}

@@ -47,6 +47,7 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import com.liferay.portlet.asset.model.impl.AssetEntryImpl;
 import com.liferay.portlet.asset.model.impl.AssetEntryModelImpl;
@@ -5323,7 +5324,9 @@ public class AssetEntryPersistenceImpl extends BasePersistenceImpl<AssetEntry>
 			}
 		}
 
-		if (!assetEntryModelImpl.hasSetModifiedDate()) {
+		if (!assetEntryModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(assetEntryModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				assetEntry.setModifiedDate(now);
 			}

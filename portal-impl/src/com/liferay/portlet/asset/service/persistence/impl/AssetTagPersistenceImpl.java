@@ -4527,7 +4527,9 @@ public class AssetTagPersistenceImpl extends BasePersistenceImpl<AssetTag>
 			}
 		}
 
-		if (!assetTagModelImpl.hasSetModifiedDate()) {
+		if (!assetTagModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(assetTagModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				assetTag.setModifiedDate(now);
 			}

@@ -3227,7 +3227,9 @@ public class RatingsEntryPersistenceImpl extends BasePersistenceImpl<RatingsEntr
 			}
 		}
 
-		if (!ratingsEntryModelImpl.hasSetModifiedDate()) {
+		if (!ratingsEntryModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(ratingsEntryModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				ratingsEntry.setModifiedDate(now);
 			}

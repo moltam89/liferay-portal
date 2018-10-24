@@ -6015,7 +6015,9 @@ public class DLFileVersionPersistenceImpl extends BasePersistenceImpl<DLFileVers
 			}
 		}
 
-		if (!dlFileVersionModelImpl.hasSetModifiedDate()) {
+		if (!dlFileVersionModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(dlFileVersionModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				dlFileVersion.setModifiedDate(now);
 			}

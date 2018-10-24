@@ -40,6 +40,7 @@ import com.liferay.portal.kernel.service.persistence.impl.BasePersistenceImpl;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import com.liferay.portlet.exportimport.model.impl.ExportImportConfigurationImpl;
 import com.liferay.portlet.exportimport.model.impl.ExportImportConfigurationModelImpl;
@@ -3068,7 +3069,10 @@ public class ExportImportConfigurationPersistenceImpl
 			}
 		}
 
-		if (!exportImportConfigurationModelImpl.hasSetModifiedDate()) {
+		if (!exportImportConfigurationModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(
+					exportImportConfigurationModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				exportImportConfiguration.setModifiedDate(now);
 			}

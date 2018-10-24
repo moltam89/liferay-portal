@@ -2605,7 +2605,9 @@ public class RepositoryPersistenceImpl extends BasePersistenceImpl<Repository>
 			}
 		}
 
-		if (!repositoryModelImpl.hasSetModifiedDate()) {
+		if (!repositoryModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(repositoryModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				repository.setModifiedDate(now);
 			}

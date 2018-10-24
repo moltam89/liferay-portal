@@ -11945,7 +11945,9 @@ public class LayoutPersistenceImpl extends BasePersistenceImpl<Layout>
 			}
 		}
 
-		if (!layoutModelImpl.hasSetModifiedDate()) {
+		if (!layoutModelImpl.hasSetModifiedDate() &&
+				(!ExportImportThreadLocal.isImportInProcess() ||
+				Validator.isNull(layoutModelImpl.getModifiedDate()))) {
 			if (serviceContext == null) {
 				layout.setModifiedDate(now);
 			}
