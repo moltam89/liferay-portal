@@ -593,7 +593,7 @@ public class ${entity.name}PersistenceImpl extends BasePersistenceImpl<${entity.
 				}
 			}
 
-			if (!${entity.varName}ModelImpl.hasSetModifiedDate()) {
+			if (!${entity.varName}ModelImpl.hasSetModifiedDate() && (!ExportImportThreadLocal.isImportInProcess() || Validator.isNull(${entity.varName}ModelImpl.getModifiedDate()))) {
 				if (serviceContext == null) {
 					${entity.varName}.setModifiedDate(now);
 				}
