@@ -743,6 +743,26 @@ public class DefaultExportImportContentProcessorTest {
 		Assert.assertEquals(expectedContent, importedContent);
 	}
 
+	@Test
+	public void testImportLinksToLayoutsInLayoutSetPrototype()
+		throws Exception {
+
+		String contentInFile = getContent(
+			"layout_links_in_layoutset_prototype.txt");
+
+		String content = replaceLinksToLayoutsParametersInLayoutSetPrototype(
+			contentInFile);
+
+		String importedContent =
+			_exportImportContentProcessor.replaceImportContentReferences(
+				_portletDataContextImport, _referrerStagedModel, content);
+
+		boolean templateIdSuccessfullyReplaced = !importedContent.contains(
+			"template");
+
+		Assert.assertTrue(templateIdSuccessfullyReplaced);
+	}
+
 	@Ignore
 	@Test
 	public void testInvalidLayoutReferencesCauseNoSuchLayoutException()
@@ -1029,6 +1049,25 @@ public class DefaultExportImportContentProcessorTest {
 				String.valueOf(publicLayout.getGroupId()),
 				String.valueOf(privateLayout.getLayoutId()),
 				String.valueOf(publicLayout.getLayoutId())
+			});
+	}
+
+	protected String replaceLinksToLayoutsParametersInLayoutSetPrototype(
+		String content) {
+
+		String portalURL = TestPropsValues.PORTAL_URL;
+
+		String portalURLPlaceholderToReplace = "[$PORTAL_URL$]";
+
+		String templateIdPlaceholderToReplace = "[$ID$]";
+
+		return StringUtil.replace(
+			content,
+			new String[] {
+				portalURLPlaceholderToReplace, templateIdPlaceholderToReplace
+			},
+			new String[] {
+				portalURL, String.valueOf(_stagingGroup.getGroupId())
 			});
 	}
 
