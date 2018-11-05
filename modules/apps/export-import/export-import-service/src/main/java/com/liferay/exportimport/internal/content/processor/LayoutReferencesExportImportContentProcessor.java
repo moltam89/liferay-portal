@@ -650,13 +650,26 @@ public class LayoutReferencesExportImportContentProcessor
 						portletDataContext.getCompanyId(), groupUuid);
 			}
 
-			if (groupFriendlyUrlGroup == null) {
+			if ((groupFriendlyUrlGroup == null) ||
+				groupUuid.contains(_TEMPLATE_NAME_PREFIX)) {
+
 				content = StringUtil.replaceFirst(
 					content, _DATA_HANDLER_GROUP_FRIENDLY_URL,
 					group.getFriendlyURL(), groupFriendlyUrlPos);
 				content = StringUtil.replaceFirst(
 					content, StringPool.AT + groupUuid + StringPool.AT,
 					StringPool.BLANK, groupFriendlyUrlPos);
+
+				if (groupUuid.contains(_TEMPLATE_NAME_PREFIX)) {
+					Map<?, ?> data = portletDataContext.getNewPrimaryKeysMap(
+						_PRIMARY_KEY_MAP_LAYOUT_KEY);
+
+					Layout layout = (Layout)data.get(_LAYOUT_KEY);
+
+					if (layout != null) {
+						content = _replaceTemplateLinkToLayout(content, layout);
+					}
+				}
 
 				continue;
 			}
@@ -941,6 +954,23 @@ public class LayoutReferencesExportImportContentProcessor
 		return false;
 	}
 
+	private String _replaceTemplateLinkToLayout(String content, Layout layout) {
+		boolean layoutIsPrivate = layout.isPrivateLayout();
+
+		if (layoutIsPrivate) {
+			content = StringUtil.replace(
+				content, _DATA_HANDLER_PRIVATE_GROUP_SERVLET_MAPPING,
+				PropsValues.LAYOUT_FRIENDLY_URL_PRIVATE_GROUP_SERVLET_MAPPING);
+		}
+		else {
+			content = StringUtil.replace(
+				content, _DATA_HANDLER_PRIVATE_GROUP_SERVLET_MAPPING,
+				PropsValues.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING);
+		}
+
+		return content;
+	}
+
 	private static final String _DATA_HANDLER_COMPANY_SECURE_URL =
 		"@data_handler_company_secure_url@";
 
@@ -977,12 +1007,17 @@ public class LayoutReferencesExportImportContentProcessor
 	private static final String _DATA_HANDLER_SITE_ADMIN_URL =
 		"@data_handler_site_admin_url@";
 
+	private static final long _LAYOUT_KEY = 3L;
+
 	private static final char[] _LAYOUT_REFERENCE_STOP_CHARS = {
 		CharPool.APOSTROPHE, CharPool.CLOSE_BRACKET, CharPool.CLOSE_CURLY_BRACE,
 		CharPool.CLOSE_PARENTHESIS, CharPool.GREATER_THAN, CharPool.LESS_THAN,
 		CharPool.PIPE, CharPool.POUND, CharPool.QUESTION, CharPool.QUOTE,
 		CharPool.SPACE
 	};
+
+	private static final String _PRIMARY_KEY_MAP_LAYOUT_KEY =
+		"interface com.liferay.portal.kernel.model.Layout.layout";
 
 	private static final String _PRIVATE_GROUP_SERVLET_MAPPING =
 		PropsUtil.get(
@@ -998,6 +1033,8 @@ public class LayoutReferencesExportImportContentProcessor
 		PropsUtil.get(
 			PropsKeys.LAYOUT_FRIENDLY_URL_PUBLIC_SERVLET_MAPPING) +
 				StringPool.SLASH;
+
+	private static final String _TEMPLATE_NAME_PREFIX = "template";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutReferencesExportImportContentProcessor.class);
