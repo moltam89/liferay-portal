@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
@@ -75,6 +76,8 @@ public class ImageImportDDMFormFieldValueTransformer
 
 		for (Locale locale : value.getAvailableLocales()) {
 			String valueString = value.getString(locale);
+
+			valueString = valueString.replace("'",HtmlUtil.escape("'"));
 
 			JSONObject jsonObject = JSONFactoryUtil.createJSONObject(
 				valueString);
