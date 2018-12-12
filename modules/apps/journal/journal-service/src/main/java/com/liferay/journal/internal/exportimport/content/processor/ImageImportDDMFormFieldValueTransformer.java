@@ -87,9 +87,6 @@ public class ImageImportDDMFormFieldValueTransformer
 				continue;
 			}
 
-			String escapedValueString = HtmlUtil.escapeXPathAttribute(
-				valueString);
-
 			String fileEntryJSON = toJSON(
 				importedFileEntry, jsonObject.getString("type"),
 				jsonObject.getString("alt"));
@@ -100,7 +97,7 @@ public class ImageImportDDMFormFieldValueTransformer
 
 			sb.append("//dynamic-element[@type='image']");
 			sb.append("/dynamic-content[contains(text(),");
-			sb.append(escapedValueString);
+			sb.append(HtmlUtil.escapeXPathAttribute(valueString));
 			sb.append(")]");
 
 			XPath xPath = SAXReaderUtil.createXPath(sb.toString());
