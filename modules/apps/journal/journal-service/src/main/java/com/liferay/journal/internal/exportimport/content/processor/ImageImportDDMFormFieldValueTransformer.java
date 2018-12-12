@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.DocumentException;
 import com.liferay.portal.kernel.xml.Element;
@@ -86,6 +87,9 @@ public class ImageImportDDMFormFieldValueTransformer
 				continue;
 			}
 
+			String escapedValueString = HtmlUtil.escapeXPathAttribute(
+				valueString);
+
 			String fileEntryJSON = toJSON(
 				importedFileEntry, jsonObject.getString("type"),
 				jsonObject.getString("alt"));
@@ -95,9 +99,9 @@ public class ImageImportDDMFormFieldValueTransformer
 			StringBundler sb = new StringBundler(4);
 
 			sb.append("//dynamic-element[@type='image']");
-			sb.append("/dynamic-content[contains(text(),'");
-			sb.append(valueString);
-			sb.append("')]");
+			sb.append("/dynamic-content[contains(text(),");
+			sb.append(escapedValueString);
+			sb.append(")]");
 
 			XPath xPath = SAXReaderUtil.createXPath(sb.toString());
 
