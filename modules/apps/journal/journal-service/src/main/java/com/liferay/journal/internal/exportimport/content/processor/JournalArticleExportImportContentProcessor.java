@@ -18,6 +18,7 @@ import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.document.library.kernel.service.DLAppService;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.Value;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.storage.DDMFormFieldValue;
 import com.liferay.dynamic.data.mapping.storage.DDMFormValues;
 import com.liferay.dynamic.data.mapping.storage.Fields;
@@ -138,7 +139,7 @@ public class JournalArticleExportImportContentProcessor
 		JournalArticle article = (JournalArticle)stagedModel;
 
 		DDMStructure ddmStructure = _fetchDDMStructure(
-			portletDataContext, article);
+			portletDataContext, stagedModel, article);
 
 		Fields fields = _getDDMStructureFields(ddmStructure, content);
 
@@ -566,15 +567,63 @@ public class JournalArticleExportImportContentProcessor
 	}
 
 	private DDMStructure _fetchDDMStructure(
-		PortletDataContext portletDataContext, JournalArticle article) {
+			PortletDataContext portletDataContext, StagedModel stagedModel,
+			JournalArticle article)
+		throws PortalException {
 
-		long formerGroupId = article.getGroupId();
+		DDMStructure ddmStructure = null;
 
-		article.setGroupId(portletDataContext.getScopeGroupId());
+		if (ExportImportThreadLocal.isImportInProcess() &&
+			!portletDataContext.isDataStrategyMirror()) {
 
-		DDMStructure ddmStructure = article.getDDMStructure();
+			ddmStructure = _fetchDDMStructureFromStagedModel(
+				portletDataContext, stagedModel, article);
+		}
+		else {
+			long formerGroupId = article.getGroupId();
 
-		article.setGroupId(formerGroupId);
+			article.setGroupId(portletDataContext.getScopeGroupId());
+
+			ddmStructure = article.getDDMStructure();
+
+			article.setGroupId(formerGroupId);
+		}
+
+		return ddmStructure;
+	}
+
+	private DDMStructure _fetchDDMStructureFromStagedModel(
+			PortletDataContext portletDataContext, StagedModel stagedModel,
+			JournalArticle article)
+		throws PortalException {
+
+		Map<Long, Long> ddmStructureIds =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				DDMStructure.class);
+
+		List<Element> referenceElements =
+			portletDataContext.getReferenceElements(
+				stagedModel, DDMStructure.class);
+
+		String articleDDMStructureKey = article.getDDMStructureKey();
+
+		DDMStructure ddmStructure = null;
+
+		for (Element referenceElement : referenceElements) {
+			String referenceElementStructureKey = GetterUtil.getString(
+				referenceElement.attributeValue("structure-key"));
+
+			if (articleDDMStructureKey.equals(referenceElementStructureKey)) {
+				Long classPK = GetterUtil.getLong(
+					referenceElement.attributeValue("class-pk"));
+
+				long ddmStructureId = MapUtil.getLong(
+					ddmStructureIds, classPK, classPK);
+
+				ddmStructure = _ddmStructureLocalService.getDDMStructure(
+					ddmStructureId);
+			}
+		}
 
 		return ddmStructure;
 	}
@@ -613,6 +662,9 @@ public class JournalArticleExportImportContentProcessor
 	)
 	private ExportImportContentProcessor<DDMFormValues>
 		_ddmFormValuesExportImportContentProcessor;
+
+	@Reference
+	private DDMStructureLocalService _ddmStructureLocalService;
 
 	@Reference(target = "(model.class.name=java.lang.String)")
 	private ExportImportContentProcessor<String>
