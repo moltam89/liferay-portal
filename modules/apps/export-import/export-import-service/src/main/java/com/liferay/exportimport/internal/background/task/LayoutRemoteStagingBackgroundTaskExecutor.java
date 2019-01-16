@@ -33,6 +33,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.security.auth.HttpPrincipal;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
@@ -93,6 +94,23 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 		long stagingRequestId = 0L;
 
 		try {
+			Map<String, Serializable> settingsMap =
+				exportImportConfiguration.getSettingsMap();
+
+			long targetGroupId = MapUtil.getLong(settingsMap, "targetGroupId");
+			long sourceGroupId = MapUtil.getLong(settingsMap, "sourceGroupId");
+			String remoteAddress = MapUtil.getString(
+				settingsMap, "remoteAddress");
+			int remotePort = MapUtil.getInteger(settingsMap, "remotePort");
+			String remotePathContext = MapUtil.getString(
+				settingsMap, "remotePathContext");
+			boolean secureConnection = MapUtil.getBoolean(
+				settingsMap, "secureConnection");
+
+			GroupLocalServiceUtil.validateRemote(
+				sourceGroupId, remoteAddress, remotePort, remotePathContext,
+				secureConnection, targetGroupId);
+
 			currentThread.setContextClassLoader(
 				PortalClassLoaderUtil.getClassLoader());
 
@@ -107,10 +125,6 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 					exportImportConfiguration.getExportImportConfigurationId()),
 				exportImportConfiguration);
 
-			Map<String, Serializable> settingsMap =
-				exportImportConfiguration.getSettingsMap();
-
-			long sourceGroupId = MapUtil.getLong(settingsMap, "sourceGroupId");
 			boolean privateLayout = MapUtil.getBoolean(
 				settingsMap, "privateLayout");
 
@@ -118,7 +132,6 @@ public class LayoutRemoteStagingBackgroundTaskExecutor
 
 			Map<Long, Boolean> layoutIdMap =
 				(Map<Long, Boolean>)settingsMap.get("layoutIdMap");
-			long targetGroupId = MapUtil.getLong(settingsMap, "targetGroupId");
 
 			Map<String, Serializable> taskContextMap =
 				backgroundTask.getTaskContextMap();
