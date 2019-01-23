@@ -247,6 +247,10 @@ public class DDMFormValuesExportImportContentProcessor
 				FileEntry fileEntry =
 					_dlAppService.getFileEntryByUuidAndGroupId(uuid, groupId);
 
+				if (fileEntry.isInTrash()) {
+					continue;
+				}
+
 				if (_exportReferencedContent) {
 					StagedModelDataHandlerUtil.exportReferenceStagedModel(
 						_portletDataContext, _stagedModel, fileEntry,
