@@ -1,3 +1,4 @@
 Bundle-Name: Liferay Expando Export Import
 Bundle-SymbolicName: com.liferay.expando.exportimport
-Bundle-Version: 2.0.0
+Bundle-Version: 2.0.1
+-includeresource: @commons-lang3-[0-9]*.jar

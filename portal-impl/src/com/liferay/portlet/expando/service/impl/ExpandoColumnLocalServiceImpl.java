@@ -36,9 +36,14 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.expando.model.impl.ExpandoValueImpl;
 import com.liferay.portlet.expando.service.base.ExpandoColumnLocalServiceBaseImpl;
 
+import java.lang.reflect.Method;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -61,6 +66,10 @@ public class ExpandoColumnLocalServiceImpl
 	public ExpandoColumn addColumn(
 			long tableId, String name, int type, Object defaultData)
 		throws PortalException {
+
+		if (StringPool.BLANK.equals(defaultData) || (defaultData == null)) {
+			defaultData = _getDefaultDataForType(type);
+		}
 
 		// Column
 
@@ -375,6 +384,10 @@ public class ExpandoColumnLocalServiceImpl
 		ExpandoColumn column = expandoColumnPersistence.findByPrimaryKey(
 			columnId);
 
+		if (StringPool.BLANK.equals(defaultData) || (defaultData == null)) {
+			defaultData = _getDefaultDataForType(type);
+		}
+
 		ExpandoValue value = validate(
 			columnId, column.getTableId(), name, type, defaultData);
 
@@ -487,69 +500,157 @@ public class ExpandoColumnLocalServiceImpl
 		value.setColumnId(columnId);
 
 		if (type == ExpandoColumnConstants.BOOLEAN) {
-			value.setBoolean((Boolean)defaultData);
-		}
-		else if (type == ExpandoColumnConstants.BOOLEAN_ARRAY) {
-			value.setBooleanArray((boolean[])defaultData);
+			value.setBoolean((boolean)defaultData);
 		}
 		else if (type == ExpandoColumnConstants.DATE) {
 			value.setDate((Date)defaultData);
 		}
-		else if (type == ExpandoColumnConstants.DATE_ARRAY) {
-			value.setDateArray((Date[])defaultData);
-		}
 		else if (type == ExpandoColumnConstants.DOUBLE) {
-			value.setDouble((Double)defaultData);
-		}
-		else if (type == ExpandoColumnConstants.DOUBLE_ARRAY) {
-			value.setDoubleArray((double[])defaultData);
+			value.setDouble((double)defaultData);
 		}
 		else if (type == ExpandoColumnConstants.FLOAT) {
-			value.setFloat((Float)defaultData);
-		}
-		else if (type == ExpandoColumnConstants.FLOAT_ARRAY) {
-			value.setFloatArray((float[])defaultData);
+			value.setFloat((float)defaultData);
 		}
 		else if (type == ExpandoColumnConstants.INTEGER) {
-			value.setInteger((Integer)defaultData);
-		}
-		else if (type == ExpandoColumnConstants.INTEGER_ARRAY) {
-			value.setIntegerArray((int[])defaultData);
+			value.setInteger((int)defaultData);
 		}
 		else if (type == ExpandoColumnConstants.LONG) {
-			value.setLong((Long)defaultData);
-		}
-		else if (type == ExpandoColumnConstants.LONG_ARRAY) {
-			value.setLongArray((long[])defaultData);
+			value.setLong((long)defaultData);
 		}
 		else if (type == ExpandoColumnConstants.NUMBER) {
 			value.setNumber((Number)defaultData);
 		}
-		else if (type == ExpandoColumnConstants.NUMBER_ARRAY) {
-			value.setNumberArray((Number[])defaultData);
-		}
 		else if (type == ExpandoColumnConstants.SHORT) {
-			value.setShort((Short)defaultData);
-		}
-		else if (type == ExpandoColumnConstants.SHORT_ARRAY) {
-			value.setShortArray((short[])defaultData);
+			value.setShort((short)defaultData);
 		}
 		else if (type == ExpandoColumnConstants.STRING) {
 			value.setString((String)defaultData);
-		}
-		else if (type == ExpandoColumnConstants.STRING_ARRAY) {
-			value.setStringArray((String[])defaultData);
-		}
-		else if (type == ExpandoColumnConstants.STRING_ARRAY_LOCALIZED) {
-			value.setStringArrayMap(
-				(Map<Locale, String[]>)defaultData, LocaleUtil.getDefault());
 		}
 		else if (type == ExpandoColumnConstants.STRING_LOCALIZED) {
 			value.setStringMap(
 				(Map<Locale, String>)defaultData, LocaleUtil.getDefault());
 		}
+		else if (_ARRAY_TYPES.contains(type)) {
+			if (type == ExpandoColumnConstants.BOOLEAN_ARRAY) {
+				value.setBooleanArray((boolean[])defaultData);
+			}
+			else if (type == ExpandoColumnConstants.DATE_ARRAY) {
+				String defaultValuesSeparatedByComma = (String)defaultData;
+
+				String[] defaultValues = defaultValuesSeparatedByComma.split(
+					",");
+
+				Date[] result = new Date[defaultValues.length];
+
+				for (int index = 0; index < result.length; index++) {
+					result[index] = new Date(
+						Long.valueOf(defaultValues[index]));
+				}
+
+				value.setDateArray(result);
+			}
+			else if (type == ExpandoColumnConstants.DOUBLE_ARRAY) {
+				value.setDoubleArray((double[])defaultData);
+			}
+			else if (type == ExpandoColumnConstants.FLOAT_ARRAY) {
+				value.setFloatArray((float[])defaultData);
+			}
+			else if (type == ExpandoColumnConstants.INTEGER_ARRAY) {
+				value.setIntegerArray((int[])defaultData);
+			}
+			else if (type == ExpandoColumnConstants.LONG_ARRAY) {
+				value.setLongArray((long[])defaultData);
+			}
+			else if (type == ExpandoColumnConstants.NUMBER_ARRAY) {
+				value.setNumberArray((Number[])defaultData);
+			}
+			else if (type == ExpandoColumnConstants.SHORT_ARRAY) {
+				value.setShortArray((short[])defaultData);
+			}
+			else if (type == ExpandoColumnConstants.STRING_ARRAY) {
+				value.setStringArray((String[])defaultData);
+			}
+		}
 
 		return value;
 	}
+
+	private Object _getDefaultDataForType(int type) {
+		if (type == ExpandoColumnConstants.BOOLEAN) {
+			return true;
+		}
+		else if (type == ExpandoColumnConstants.BOOLEAN_ARRAY) {
+			return new boolean[] {true};
+		}
+		else if (type == ExpandoColumnConstants.DATE) {
+			return new Date();
+		}
+		else if (type == ExpandoColumnConstants.DATE_ARRAY) {
+			return new Date[] {new Date()};
+		}
+		else if (type == ExpandoColumnConstants.DOUBLE) {
+			return 0.0D;
+		}
+		else if (type == ExpandoColumnConstants.DOUBLE_ARRAY) {
+			return new double[] {0.0D};
+		}
+		else if (type == ExpandoColumnConstants.FLOAT) {
+			return 0.0F;
+		}
+		else if (type == ExpandoColumnConstants.FLOAT_ARRAY) {
+			return new float[] {0.0F};
+		}
+		else if (type == ExpandoColumnConstants.INTEGER) {
+			return 0;
+		}
+		else if (type == ExpandoColumnConstants.INTEGER_ARRAY) {
+			return new int[] {0};
+		}
+		else if (type == ExpandoColumnConstants.LONG) {
+			return 0L;
+		}
+		else if (type == ExpandoColumnConstants.LONG_ARRAY) {
+			return new long[] {0L};
+		}
+		else if (type == ExpandoColumnConstants.NUMBER) {
+			return 0;
+		}
+		else if (type == ExpandoColumnConstants.NUMBER_ARRAY) {
+			return new Number[] {0};
+		}
+		else if (type == ExpandoColumnConstants.SHORT) {
+			return (short)0;
+		}
+		else if (type == ExpandoColumnConstants.SHORT_ARRAY) {
+			return new short[] {0};
+		}
+		else if (type == ExpandoColumnConstants.STRING) {
+			return StringPool.BLANK;
+		}
+		else if (type == ExpandoColumnConstants.STRING_ARRAY) {
+			return new String[] {StringPool.BLANK};
+		}
+		else if (type == ExpandoColumnConstants.STRING_LOCALIZED) {
+			HashMap<Locale, String> result = new HashMap<>();
+			
+			result.put(LocaleUtil.getDefault(), StringPool.BLANK);
+
+			return result;
+		}
+
+		return null;
+	}
+
+	private static final List _ARRAY_TYPES = new ArrayList<>(
+		Arrays.asList(
+			ExpandoColumnConstants.BOOLEAN_ARRAY,
+			ExpandoColumnConstants.DATE_ARRAY,
+			ExpandoColumnConstants.DOUBLE_ARRAY,
+			ExpandoColumnConstants.FLOAT_ARRAY,
+			ExpandoColumnConstants.INTEGER_ARRAY,
+			ExpandoColumnConstants.LONG_ARRAY,
+			ExpandoColumnConstants.NUMBER_ARRAY,
+			ExpandoColumnConstants.SHORT_ARRAY,
+			ExpandoColumnConstants.STRING_ARRAY));
 
 }
