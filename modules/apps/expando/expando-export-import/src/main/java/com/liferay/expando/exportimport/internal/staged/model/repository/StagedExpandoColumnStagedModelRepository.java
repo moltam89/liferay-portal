@@ -15,6 +15,7 @@
 package com.liferay.expando.exportimport.internal.staged.model.repository;
 
 import com.liferay.expando.kernel.model.ExpandoColumn;
+import com.liferay.expando.kernel.model.ExpandoColumnConstants;
 import com.liferay.expando.kernel.model.adapter.StagedExpandoColumn;
 import com.liferay.expando.kernel.model.adapter.StagedExpandoTable;
 import com.liferay.expando.kernel.service.ExpandoColumnLocalService;
@@ -36,9 +37,18 @@ import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.adapter.ModelAdapterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.LocalizationUtil;
 
+import java.lang.reflect.Method;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -60,10 +70,15 @@ public class StagedExpandoColumnStagedModelRepository
 			StagedExpandoColumn stagedExpandoColumn)
 		throws PortalException {
 
+		Object defaultData = stagedExpandoColumn.getDefaultData();
+
+		if (!StringPool.BLANK.equals(defaultData) && (defaultData != null)) {
+			defaultData = _createProperDefaultData(stagedExpandoColumn);
+		}
+
 		ExpandoColumn expandoColumn = _expandoColumnLocalService.addColumn(
 			stagedExpandoColumn.getTableId(), stagedExpandoColumn.getName(),
-			stagedExpandoColumn.getType(),
-			stagedExpandoColumn.getDefaultData());
+			stagedExpandoColumn.getType(), defaultData);
 
 		expandoColumn = _expandoColumnLocalService.updateTypeSettings(
 			expandoColumn.getColumnId(), stagedExpandoColumn.getTypeSettings());
@@ -256,10 +271,15 @@ public class StagedExpandoColumnStagedModelRepository
 			StagedExpandoColumn stagedExpandoColumn)
 		throws PortalException {
 
+		Object defaultData = stagedExpandoColumn.getDefaultData();
+
+		if (!StringPool.BLANK.equals(defaultData) && (defaultData != null)) {
+			defaultData = _createProperDefaultData(stagedExpandoColumn);
+		}
+
 		_expandoColumnLocalService.updateColumn(
 			stagedExpandoColumn.getColumnId(), stagedExpandoColumn.getName(),
-			stagedExpandoColumn.getType(),
-			stagedExpandoColumn.getDefaultData());
+			stagedExpandoColumn.getType(), defaultData);
 
 		ExpandoColumn expandoColumn =
 			_expandoColumnLocalService.updateTypeSettings(
@@ -282,6 +302,163 @@ public class StagedExpandoColumnStagedModelRepository
 			stagedExpandoTableStagedModelRepository;
 	}
 
+	private <T> T _convert(Class<T> casterClass, String arguments)
+		throws PortalException {
+
+		try {
+			Method casterMethod = casterClass.getDeclaredMethod(
+				"valueOf", String.class);
+
+			T convertedValue = (T)casterMethod.invoke(casterClass, arguments);
+
+			return convertedValue;
+		}
+		catch (Exception e) {
+			throw new PortalException(e);
+		}
+	}
+
+	private Object _convertArrays(int type, String defaultData)
+		throws PortalException {
+
+		String defaultValuesSeparatedByComma = (String)defaultData;
+
+		String[] defaultValues = defaultValuesSeparatedByComma.split(",");
+
+		if (type == ExpandoColumnConstants.BOOLEAN_ARRAY) {
+			List<Boolean> resultList = _convertListOfSpecificType(
+				Boolean.class, defaultValues);
+
+			return ArrayUtils.toPrimitive(resultList.toArray(new Boolean[0]));
+		}
+		else if (type == ExpandoColumnConstants.DATE_ARRAY) {
+			Date[] result = new Date[defaultValues.length];
+
+			for (int index = 0; index < result.length; index++) {
+				result[index] = new Date(
+					(Long)_convert(Long.class, defaultValues[index]));
+			}
+
+			return result;
+		}
+		else if (type == ExpandoColumnConstants.DOUBLE_ARRAY) {
+			List<Double> resultList = _convertListOfSpecificType(
+				Double.class, defaultValues);
+
+			return ArrayUtils.toPrimitive(resultList.toArray(new Double[0]));
+		}
+		else if (type == ExpandoColumnConstants.FLOAT_ARRAY) {
+			List<Float> resultList = _convertListOfSpecificType(
+				Float.class, defaultValues);
+
+			return ArrayUtils.toPrimitive(resultList.toArray(new Float[0]));
+		}
+		else if (type == ExpandoColumnConstants.INTEGER_ARRAY) {
+			List<Integer> resultList = _convertListOfSpecificType(
+				Integer.class, defaultValues);
+
+			return ArrayUtils.toPrimitive(resultList.toArray(new Integer[0]));
+		}
+		else if (type == ExpandoColumnConstants.LONG_ARRAY) {
+			List<Long> resultList = _convertListOfSpecificType(
+				Long.class, defaultValues);
+
+			return ArrayUtils.toPrimitive(resultList.toArray(new Long[0]));
+		}
+		else if (type == ExpandoColumnConstants.NUMBER_ARRAY) {
+			Number[] result = new Number[defaultValues.length];
+
+			for (int index = 0; index < result.length; index++) {
+				result[index] = NumberUtils.createNumber(defaultValues[index]);
+			}
+
+			return result;
+		}
+		else if (type == ExpandoColumnConstants.SHORT_ARRAY) {
+			List<Short> resultList = _convertListOfSpecificType(
+				Short.class, defaultValues);
+
+			return ArrayUtils.toPrimitive(resultList.toArray(new Short[0]));
+		}
+		else if (type == ExpandoColumnConstants.STRING_ARRAY) {
+			List<String> resultList = _convertListOfSpecificType(
+				String.class, defaultValues);
+
+			return resultList.toArray(new String[0]);
+		}
+
+		return null;
+	}
+
+	private <T> List<T> _convertListOfSpecificType(
+			Class<T> casterClass, String[] defaultValues)
+		throws PortalException {
+
+		List<T> result = new ArrayList<>();
+
+		for (String element : defaultValues) {
+			result.add(_convert(casterClass, element));
+		}
+
+		return result;
+	}
+
+	private Object _convertPrimitives(int type, String defaultData)
+		throws PortalException {
+
+		if (type == ExpandoColumnConstants.BOOLEAN) {
+			return (Boolean)_convert(Boolean.class, defaultData);
+		}
+		else if (type == ExpandoColumnConstants.DATE) {
+			return new Date((Long)_convert(Long.class, defaultData));
+		}
+		else if (type == ExpandoColumnConstants.DOUBLE) {
+			return (Double)_convert(Double.class, defaultData);
+		}
+		else if (type == ExpandoColumnConstants.FLOAT) {
+			return (Float)_convert(Float.class, defaultData);
+		}
+		else if (type == ExpandoColumnConstants.INTEGER) {
+			return (Integer)_convert(Integer.class, defaultData);
+		}
+		else if (type == ExpandoColumnConstants.LONG) {
+			return (Long)_convert(Long.class, defaultData);
+		}
+		else if (type == ExpandoColumnConstants.NUMBER) {
+			return NumberUtils.createNumber(defaultData);
+		}
+		else if (type == ExpandoColumnConstants.SHORT) {
+			return (Short)_convert(Short.class, defaultData);
+		}
+		else if (type == ExpandoColumnConstants.STRING) {
+			return defaultData;
+		}
+		else if (type == ExpandoColumnConstants.STRING_LOCALIZED) {
+			return LocalizationUtil.getLocalizationMap((String)defaultData);
+		}
+
+		return null;
+	}
+
+	private Object _createProperDefaultData(
+			StagedExpandoColumn stagedExpandoColumn)
+		throws PortalException {
+
+		int type = stagedExpandoColumn.getType();
+		String defaultData = stagedExpandoColumn.getDefaultData();
+
+		Object convertedDefaultData = null;
+
+		if (!_ARRAY_TYPES.contains(type)) {
+			convertedDefaultData = _convertPrimitives(type, defaultData);
+		}
+		else {
+			convertedDefaultData = _convertArrays(type, defaultData);
+		}
+
+		return convertedDefaultData;
+	}
+
 	private String _parseExpandoColumnName(String uuid) {
 		return uuid.substring(uuid.lastIndexOf(StringPool.POUND) + 1);
 	}
@@ -289,6 +466,18 @@ public class StagedExpandoColumnStagedModelRepository
 	private String _parseExpandoTableUuid(String uuid) {
 		return uuid.substring(0, uuid.lastIndexOf(StringPool.POUND));
 	}
+
+	private static final List _ARRAY_TYPES = new ArrayList<>(
+		Arrays.asList(
+			ExpandoColumnConstants.BOOLEAN_ARRAY,
+			ExpandoColumnConstants.DATE_ARRAY,
+			ExpandoColumnConstants.DOUBLE_ARRAY,
+			ExpandoColumnConstants.FLOAT_ARRAY,
+			ExpandoColumnConstants.INTEGER_ARRAY,
+			ExpandoColumnConstants.LONG_ARRAY,
+			ExpandoColumnConstants.NUMBER_ARRAY,
+			ExpandoColumnConstants.SHORT_ARRAY,
+			ExpandoColumnConstants.STRING_ARRAY));
 
 	@Reference
 	private ExpandoColumnLocalService _expandoColumnLocalService;
