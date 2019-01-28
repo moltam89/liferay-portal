@@ -525,10 +525,6 @@ public class StagingImpl implements Staging {
 			long remoteGroupId, boolean remotePrivateLayout)
 		throws PortalException {
 
-		_groupLocalService.validateRemote(
-			sourceGroupId, remoteAddress, remotePort, remotePathContext,
-			secureConnection, remoteGroupId);
-
 		PermissionChecker permissionChecker =
 			PermissionThreadLocal.getPermissionChecker();
 
@@ -3659,6 +3655,8 @@ public class StagingImpl implements Staging {
 		taskContextMap.put("httpPrincipal", httpPrincipal);
 
 		taskContextMap.put("privateLayout", remotePrivateLayout);
+
+		taskContextMap.put("remotePathContext", remotePathContext);
 
 		BackgroundTask backgroundTask =
 			_backgroundTaskManager.addBackgroundTask(
