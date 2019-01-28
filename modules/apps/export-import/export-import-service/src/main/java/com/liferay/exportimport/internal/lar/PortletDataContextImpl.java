@@ -1506,7 +1506,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 	@Override
 	public boolean hasDateRange() {
-		if (_startDate != null) {
+		if ((_endDate != null) && (_startDate != null)) {
 			return true;
 		}
 
