@@ -325,7 +325,7 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 		if (isShowStagingInfo()) {
 			Group group = getGroup();
 
-			if (group.isStagingGroup()) {
+			if (group.isStagingGroup() || group.isStagedRemotely()) {
 				_stagingLabel = "staging";
 			}
 			else if (group.hasStagingGroup()) {
