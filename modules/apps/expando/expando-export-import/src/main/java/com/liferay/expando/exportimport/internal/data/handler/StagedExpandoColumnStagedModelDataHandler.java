@@ -163,6 +163,8 @@ public class StagedExpandoColumnStagedModelDataHandler
 			tableIds, stagedExpandoColumn.getTableId(),
 			stagedExpandoColumn.getTableId());
 
+		stagedExpandoColumn.setTableId(tableId);
+
 		StagedExpandoColumn importedExpandoColumn =
 			(StagedExpandoColumn)stagedExpandoColumn.clone();
 
