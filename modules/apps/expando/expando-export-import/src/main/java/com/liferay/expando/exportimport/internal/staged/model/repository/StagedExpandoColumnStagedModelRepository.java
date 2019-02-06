@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.model.adapter.ModelAdapterUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
+import com.liferay.portal.kernel.util.Validator;
 
 import java.lang.reflect.Method;
 
@@ -70,11 +71,7 @@ public class StagedExpandoColumnStagedModelRepository
 			StagedExpandoColumn stagedExpandoColumn)
 		throws PortalException {
 
-		Object defaultData = stagedExpandoColumn.getDefaultData();
-
-		if (!StringPool.BLANK.equals(defaultData) && (defaultData != null)) {
-			defaultData = _createProperDefaultData(stagedExpandoColumn);
-		}
+		Object defaultData = _getDefaultData(stagedExpandoColumn);
 
 		ExpandoColumn expandoColumn = _expandoColumnLocalService.addColumn(
 			stagedExpandoColumn.getTableId(), stagedExpandoColumn.getName(),
@@ -271,11 +268,7 @@ public class StagedExpandoColumnStagedModelRepository
 			StagedExpandoColumn stagedExpandoColumn)
 		throws PortalException {
 
-		Object defaultData = stagedExpandoColumn.getDefaultData();
-
-		if (!StringPool.BLANK.equals(defaultData) && (defaultData != null)) {
-			defaultData = _createProperDefaultData(stagedExpandoColumn);
-		}
+		Object defaultData = _getDefaultData(stagedExpandoColumn);
 
 		_expandoColumnLocalService.updateColumn(
 			stagedExpandoColumn.getColumnId(), stagedExpandoColumn.getName(),
@@ -440,12 +433,16 @@ public class StagedExpandoColumnStagedModelRepository
 		return null;
 	}
 
-	private Object _createProperDefaultData(
-			StagedExpandoColumn stagedExpandoColumn)
+	private Object _getDefaultData(StagedExpandoColumn stagedExpandoColumn)
 		throws PortalException {
 
-		int type = stagedExpandoColumn.getType();
 		String defaultData = stagedExpandoColumn.getDefaultData();
+
+		if (Validator.isNull(defaultData)) {
+			return null;
+		}
+
+		int type = stagedExpandoColumn.getType();
 
 		Object convertedDefaultData = null;
 

@@ -65,7 +65,7 @@ public class ExpandoColumnLocalServiceImpl
 			long tableId, String name, int type, Object defaultData)
 		throws PortalException {
 
-		if (StringPool.BLANK.equals(defaultData) || (defaultData == null)) {
+		if (Validator.isNull(defaultData)) {
 			defaultData = _getDefaultDataForType(type);
 		}
 
@@ -382,7 +382,7 @@ public class ExpandoColumnLocalServiceImpl
 		ExpandoColumn column = expandoColumnPersistence.findByPrimaryKey(
 			columnId);
 
-		if (StringPool.BLANK.equals(defaultData) || (defaultData == null)) {
+		if (Validator.isNull(defaultData)) {
 			defaultData = _getDefaultDataForType(type);
 		}
 
