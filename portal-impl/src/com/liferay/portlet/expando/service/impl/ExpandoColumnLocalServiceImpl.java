@@ -491,10 +491,6 @@ public class ExpandoColumnLocalServiceImpl
 
 		ExpandoValue value = new ExpandoValueImpl();
 
-		if (defaultData == null) {
-			return value;
-		}
-
 		value.setColumnId(columnId);
 
 		if (type == ExpandoColumnConstants.BOOLEAN) {
