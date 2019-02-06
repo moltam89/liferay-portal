@@ -36,8 +36,6 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.expando.model.impl.ExpandoValueImpl;
 import com.liferay.portlet.expando.service.base.ExpandoColumnLocalServiceBaseImpl;
 
-import java.lang.reflect.Method;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -632,7 +630,7 @@ public class ExpandoColumnLocalServiceImpl
 		}
 		else if (type == ExpandoColumnConstants.STRING_LOCALIZED) {
 			HashMap<Locale, String> result = new HashMap<>();
-			
+
 			result.put(LocaleUtil.getDefault(), StringPool.BLANK);
 
 			return result;
