@@ -482,10 +482,16 @@ public class PortletImportControllerImpl implements PortletImportController {
 		List<Element> portletPreferencesElements = parentElement.elements(
 			"portlet-preferences");
 
+		long originalPlid = portletDataContext.getPlid();
+		String originalPortletId = portletDataContext.getPortletId();
+
 		for (Element portletPreferencesElement : portletPreferencesElements) {
 			String path = portletPreferencesElement.attributeValue("path");
 
 			if (portletDataContext.isPathNotProcessed(path)) {
+				portletDataContext.setPlid(originalPlid);
+				portletDataContext.setPortletId(originalPortletId);
+
 				String xml = null;
 
 				Element element = null;
@@ -573,6 +579,9 @@ public class PortletImportControllerImpl implements PortletImportController {
 					ownerId = portletItem.getPortletItemId();
 				}
 
+				portletDataContext.setPlid(curPlid);
+				portletDataContext.setPortletId(curPortletId);
+
 				if (ownerType == PortletKeys.PREFS_OWNER_TYPE_USER) {
 					String userUuid = element.attributeValue("user-uuid");
 
@@ -655,6 +664,9 @@ public class PortletImportControllerImpl implements PortletImportController {
 					importPortletData);
 			}
 		}
+
+		portletDataContext.setPlid(originalPlid);
+		portletDataContext.setPortletId(originalPortletId);
 
 		if (preserveScopeLayoutId && (layout != null)) {
 			javax.portlet.PortletPreferences jxPortletPreferences =
