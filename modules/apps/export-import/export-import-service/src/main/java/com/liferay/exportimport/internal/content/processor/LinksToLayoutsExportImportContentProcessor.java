@@ -14,6 +14,7 @@
 
 package com.liferay.exportimport.internal.content.processor;
 
+import com.liferay.exportimport.configuration.ExportImportServiceConfiguration;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.kernel.exception.ExportImportContentProcessorException;
 import com.liferay.exportimport.kernel.exception.ExportImportContentValidationException;
@@ -244,6 +245,12 @@ public class LinksToLayoutsExportImportContentProcessor
 				groupId, privateLayout, layoutId);
 
 			if (layout == null) {
+				if (!_exportImportServiceConfiguration.
+						validateLayoutReferences()) {
+
+					continue;
+				}
+
 				ExportImportContentValidationException eicve =
 					new ExportImportContentValidationException(
 						LinksToLayoutsExportImportContentProcessor.class.
@@ -275,6 +282,9 @@ public class LinksToLayoutsExportImportContentProcessor
 		"\\[([\\d]+)@(private(-group|-user)?|public)(@([\\d]+))?\\]");
 	private static final Pattern _importLinksToLayoutPattern = Pattern.compile(
 		"\\[([\\d]+)@(private(-group|-user)?|public)@([\\d]+)(@([\\d]+))?\\]");
+
+	@Reference
+	private ExportImportServiceConfiguration _exportImportServiceConfiguration;
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;

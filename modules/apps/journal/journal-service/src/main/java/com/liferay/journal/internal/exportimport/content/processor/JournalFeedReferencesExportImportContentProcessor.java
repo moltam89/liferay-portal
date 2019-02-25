@@ -14,6 +14,7 @@
 
 package com.liferay.journal.internal.exportimport.content.processor;
 
+import com.liferay.exportimport.configuration.ExportImportServiceConfiguration;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.kernel.exception.ExportImportContentProcessorException;
 import com.liferay.exportimport.kernel.exception.ExportImportContentValidationException;
@@ -363,6 +364,12 @@ public class JournalFeedReferencesExportImportContentProcessor
 	protected void validateJournalFeedReferences(long groupId, String content)
 		throws PortalException {
 
+		if (!_exportImportServiceConfiguration.
+				validateJournalFeedReferences()) {
+
+			return;
+		}
+
 		String[] patterns = {_JOURNAL_FEED_FRIENDLY_URL};
 
 		int beginPos = -1;
@@ -412,6 +419,9 @@ public class JournalFeedReferencesExportImportContentProcessor
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private ExportImportServiceConfiguration _exportImportServiceConfiguration;
 
 	@Reference
 	private GroupLocalService _groupLocalService;

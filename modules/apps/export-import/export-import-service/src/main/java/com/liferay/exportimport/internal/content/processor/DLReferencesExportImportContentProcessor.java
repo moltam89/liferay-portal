@@ -19,6 +19,7 @@ import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.document.library.util.DLURLHelper;
+import com.liferay.exportimport.configuration.ExportImportServiceConfiguration;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.kernel.exception.ExportImportContentProcessorException;
 import com.liferay.exportimport.kernel.exception.ExportImportContentValidationException;
@@ -535,6 +536,10 @@ public class DLReferencesExportImportContentProcessor
 	protected void validateDLReferences(long groupId, String content)
 		throws PortalException {
 
+		if (!_exportImportServiceConfiguration.validateFileEntryReferences()) {
+			return;
+		}
+
 		String pathContext = _portal.getPathContext();
 
 		String[] patterns = {
@@ -695,6 +700,9 @@ public class DLReferencesExportImportContentProcessor
 
 	@Reference
 	private DLURLHelper _dlurlHelper;
+
+	@Reference
+	private ExportImportServiceConfiguration _exportImportServiceConfiguration;
 
 	@Reference
 	private GroupLocalService _groupLocalService;
