@@ -41,6 +41,7 @@ page import="com.liferay.portal.kernel.dao.search.SearchContainer" %><%@
 page import="com.liferay.portal.kernel.exception.NoSuchGroupException" %><%@
 page import="com.liferay.portal.kernel.exception.NoSuchLayoutException" %><%@
 page import="com.liferay.portal.kernel.exception.NoSuchRoleException" %><%@
+page import="com.liferay.portal.kernel.exception.PortalException" %><%@
 page import="com.liferay.portal.kernel.exception.RemoteOptionsException" %><%@
 page import="com.liferay.portal.kernel.language.LanguageUtil" %><%@
 page import="com.liferay.portal.kernel.language.UnicodeLanguageUtil" %><%@
@@ -58,8 +59,10 @@ page import="com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse" %>
 page import="com.liferay.portal.kernel.security.auth.AuthException" %><%@
 page import="com.liferay.portal.kernel.security.auth.RemoteAuthException" %><%@
 page import="com.liferay.portal.kernel.security.permission.ActionKeys" %><%@
+page import="com.liferay.portal.kernel.service.GroupLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.LayoutLocalServiceUtil" %><%@
 page import="com.liferay.portal.kernel.service.permission.GroupPermissionUtil" %><%@
+page import="com.liferay.portal.kernel.servlet.SessionErrors" %><%@
 page import="com.liferay.portal.kernel.servlet.SessionMessages" %><%@
 page import="com.liferay.portal.kernel.util.CalendarFactoryUtil" %><%@
 page import="com.liferay.portal.kernel.util.Constants" %><%@
@@ -71,6 +74,7 @@ page import="com.liferay.portal.kernel.util.ParamUtil" %><%@
 page import="com.liferay.portal.kernel.util.PortalUtil" %><%@
 page import="com.liferay.portal.kernel.util.PortletKeys" %><%@
 page import="com.liferay.portal.kernel.util.StringUtil" %><%@
+page import="com.liferay.portal.kernel.util.UnicodeProperties" %><%@
 page import="com.liferay.portal.kernel.util.Validator" %><%@
 page import="com.liferay.portal.kernel.util.WebKeys" %><%@
 page import="com.liferay.portal.util.PropsValues" %><%@
@@ -110,6 +114,8 @@ page import="javax.portlet.PortletURL" %>
 <%
 PortalPreferences portalPreferences = PortletPreferencesFactoryUtil.getPortalPreferences(liferayPortletRequest);
 
+boolean secureConnection = false;
+
 Calendar calendar = CalendarFactoryUtil.getCalendar(timeZone, locale);
 
 int timeZoneOffset = timeZone.getOffset(calendar.getTimeInMillis());
@@ -119,6 +125,16 @@ PublishTemplatesDisplayContext publishTemplatesDisplayContext = new PublishTempl
 StagingProcessesWebDisplayContext stagingProcessesWebDisplayContext = new StagingProcessesWebDisplayContext(renderResponse, request);
 
 StagingProcessesWebToolbarDisplayContext stagingProcessesWebToolbarDisplayContext = new StagingProcessesWebToolbarDisplayContext(request, pageContext, liferayPortletResponse);
+
+UnicodeProperties groupTypeSettingsProperties = GroupLocalServiceUtil.getGroup(portletGroupId).getTypeSettingsProperties();
+
+long remoteGroupId = GetterUtil.getLong(groupTypeSettingsProperties.getProperty("remoteGroupId"));
+
+int remotePort = GetterUtil.getInteger(groupTypeSettingsProperties.getProperty("remotePort"));
+
+String remoteAddress = groupTypeSettingsProperties.getProperty("remoteAddress");
+
+String remotePathContext = groupTypeSettingsProperties.getProperty("remotePathContext");
 %>
 
 <%@ include file="/init-ext.jsp" %>

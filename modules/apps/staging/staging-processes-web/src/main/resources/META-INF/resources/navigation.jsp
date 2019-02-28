@@ -35,6 +35,15 @@ else {
 }
 
 String searchContainerId = "publishLayoutProcesses";
+
+try {
+	GroupLocalServiceUtil.validateRemote(portletGroupId, remoteAddress, remotePort, remotePathContext, secureConnection, remoteGroupId);
+}
+catch (PortalException e) {
+	if (e instanceof RemoteExportException) {
+		SessionErrors.add(renderRequest, e.getClass(), e);
+	}
+}
 %>
 
 <clay:navigation-bar
