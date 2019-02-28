@@ -24,6 +24,15 @@ String navigation = ParamUtil.getString(request, "navigation", "all");
 String orderByCol = ParamUtil.getString(request, "orderByCol");
 String orderByType = ParamUtil.getString(request, "orderByType");
 String searchContainerId = ParamUtil.getString(request, "searchContainerId");
+
+try {
+	GroupLocalServiceUtil.validateRemote(portletGroupId, remoteAddress, remotePort, remotePathContext, secureConnection, remoteGroupId);
+}
+catch (PortalException e) {
+	if (e instanceof RemoteExportException && (resourceRequest != null)) {
+		SessionErrors.add(resourceRequest, e.getClass(), e);
+	}
+}
 %>
 
 <liferay-ui:success key="localStagingEnabled" message="local-staging-is-successfully-enabled" />
