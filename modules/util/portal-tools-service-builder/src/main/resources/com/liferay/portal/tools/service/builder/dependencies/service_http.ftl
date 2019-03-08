@@ -13,6 +13,10 @@ import com.liferay.portal.kernel.service.http.TunnelUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 
+<#if stringUtil.equals(entity.name, "Group")>
+	import java.net.ConnectException;
+</#if>
+
 /**
  * Provides the HTTP utility for the
  * <code>${apiPackagePath}.service.${entity.name}ServiceUtil</code> service
@@ -139,6 +143,9 @@ public class ${entity.name}ServiceHttp {
 					<#if stringUtil.equals(entity.name, "Group")
 							&& (stringUtil.equals(method.name, "checkRemoteStagingGroup")
 							|| stringUtil.equals(method.name, "getGroupDisplayURL"))>
+						if (!(se.getCause() instanceof ConnectException)) {
+						_log.error(se, se);
+						}
 					<#else>
 						_log.error(se, se);
 					</#if>
