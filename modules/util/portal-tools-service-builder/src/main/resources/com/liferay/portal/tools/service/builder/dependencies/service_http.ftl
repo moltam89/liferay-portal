@@ -136,7 +136,12 @@ public class ${entity.name}ServiceHttp {
 					</#if>
 				}
 				catch (com.liferay.portal.kernel.exception.SystemException se) {
-					_log.error(se, se);
+					<#if stringUtil.equals(entity.name, "Group")
+							&& (stringUtil.equals(method.name, "checkRemoteStagingGroup")
+							|| stringUtil.equals(method.name, "getGroupDisplayURL"))>
+					<#else>
+						_log.error(se, se);
+					</#if>
 
 					throw se;
 				}
