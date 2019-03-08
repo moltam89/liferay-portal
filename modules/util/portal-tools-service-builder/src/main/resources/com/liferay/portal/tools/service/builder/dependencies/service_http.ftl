@@ -140,11 +140,9 @@ public class ${entity.name}ServiceHttp {
 					</#if>
 				}
 				catch (com.liferay.portal.kernel.exception.SystemException se) {
-					<#if stringUtil.equals(entity.name, "Group")
-							&& (stringUtil.equals(method.name, "checkRemoteStagingGroup")
-							|| stringUtil.equals(method.name, "getGroupDisplayURL"))>
+					<#if stringUtil.equals(entity.name, "Group") && (stringUtil.equals(method.name, "checkRemoteStagingGroup") || stringUtil.equals(method.name, "getGroupDisplayURL"))>
 						if (!(se.getCause() instanceof ConnectException)) {
-						_log.error(se, se);
+							_log.error(se, se);
 						}
 					<#else>
 						_log.error(se, se);
