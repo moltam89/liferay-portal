@@ -48,6 +48,7 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
 import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
@@ -740,10 +741,21 @@ public class DDMDisplayContext {
 			String resourceName)
 		throws PortalException {
 
+		if (getClassNameId() > 0) {
+			return PortletPermissionUtil.contains(
+				_ddmWebRequestHelper.getPermissionChecker(),
+				_ddmWebRequestHelper.getLayout(), resourceName,
+				ActionKeys.ADD_PORTLET_DISPLAY_TEMPLATE);
+		}
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		Group group = themeDisplay.getScopeGroup();
+
 		return PortletPermissionUtil.contains(
-			_ddmWebRequestHelper.getPermissionChecker(),
-			_ddmWebRequestHelper.getLayout(), resourceName,
-			ActionKeys.ADD_PORTLET_DISPLAY_TEMPLATE);
+			_ddmWebRequestHelper.getPermissionChecker(), group.getGroupId(),
+			resourceName, ActionKeys.ADD_PORTLET_DISPLAY_TEMPLATE);
 	}
 
 	protected long getClassNameId() {
