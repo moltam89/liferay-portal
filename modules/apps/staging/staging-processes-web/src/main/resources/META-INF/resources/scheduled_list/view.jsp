@@ -16,6 +16,18 @@
 
 <%@ include file="/init.jsp" %>
 
+<%
+try {
+	GroupLocalServiceUtil.validateRemote(portletGroupId, remoteAddress, remotePort, remotePathContext, secureConnection, remoteGroupId);
+}
+catch (PortalException e) {
+	if (e instanceof RemoteExportException) {
+		SessionErrors.add(renderRequest, e.getClass(), e);
+	}
+}
+%>
+
 <div class="container-fluid-1280" id="<portlet:namespace />scheduledProcessesContainer">
+	<%@ include file="/error/error_remote_export_exception.jspf" %>
 	<liferay-util:include page="/scheduled_list/scheduled_publish_processes.jsp" servletContext="<%= application %>" />
 </div>
