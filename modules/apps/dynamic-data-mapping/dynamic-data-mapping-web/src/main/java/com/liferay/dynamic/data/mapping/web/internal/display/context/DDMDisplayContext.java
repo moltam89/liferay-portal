@@ -703,12 +703,12 @@ public class DDMDisplayContext {
 		long resourceClassNameId = PortalUtil.getClassNameId(
 			ddmDisplay.getStructureType());
 
-		if ((classNameId == 0) || (resourceClassNameId == 0)) {
-			return true;
-		}
-
 		ThemeDisplay themeDisplay = (ThemeDisplay)_renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
+
+		if ((classNameId == 0) || (resourceClassNameId == 0)) {
+			return ddmDisplay.isShowAddButton(themeDisplay.getScopeGroup());
+		}
 
 		if (ddmDisplay.isShowAddButton(themeDisplay.getScopeGroup()) &&
 			DDMTemplatePermission.containsAddTemplatePermission(
