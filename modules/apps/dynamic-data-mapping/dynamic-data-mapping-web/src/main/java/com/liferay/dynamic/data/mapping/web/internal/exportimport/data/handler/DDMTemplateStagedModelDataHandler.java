@@ -138,11 +138,7 @@ public class DDMTemplateStagedModelDataHandler
 			return referenceAttributes;
 		}
 
-		boolean preloaded = false;
-
-		if (defaultUserId == template.getUserId()) {
-			preloaded = true;
-		}
+		boolean preloaded = isPreloadedTemplate(defaultUserId, template);
 
 		referenceAttributes.put("preloaded", String.valueOf(preloaded));
 
@@ -264,7 +260,7 @@ public class DDMTemplateStagedModelDataHandler
 		long defaultUserId = _userLocalService.getDefaultUserId(
 			template.getCompanyId());
 
-		if (defaultUserId == template.getUserId()) {
+		if (isPreloadedTemplate(defaultUserId, template)) {
 			templateElement.addAttribute("preloaded", "true");
 		}
 
