@@ -42,6 +42,8 @@ import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.SetUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.staging.StagingGroupHelper;
+import com.liferay.staging.StagingGroupHelperUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -407,7 +409,12 @@ public abstract class BaseDDMDisplay implements DDMDisplay {
 			return false;
 		}
 
-		if (!scopeGroup.hasLocalOrRemoteStagingGroup()) {
+		StagingGroupHelper stagingGroupHelper =
+			StagingGroupHelperUtil.getStagingGroupHelper();
+
+		if (!stagingGroupHelper.isLiveGroup(scopeGroup) ||
+			!stagingGroupHelper.isStagedPortlet(scopeGroup, portletId)) {
+
 			return true;
 		}
 
