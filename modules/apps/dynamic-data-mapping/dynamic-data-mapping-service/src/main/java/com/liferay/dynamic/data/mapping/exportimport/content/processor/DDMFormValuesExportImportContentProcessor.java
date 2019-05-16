@@ -212,9 +212,19 @@ public class DDMFormValuesExportImportContentProcessor
 					continue;
 				}
 
-				FileEntry fileEntry =
-					_dlAppLocalService.getFileEntryByUuidAndGroupId(
+				FileEntry fileEntry;
+
+				try {
+					fileEntry = _dlAppLocalService.getFileEntryByUuidAndGroupId(
 						uuid, groupId);
+				}
+				catch (PortalException pe) {
+					if (_log.isWarnEnabled()) {
+						_log.warn(pe.getMessage());
+					}
+
+					return;
+				}
 
 				FileVersion fileVersion = fileEntry.getFileVersion();
 
@@ -360,7 +370,11 @@ public class DDMFormValuesExportImportContentProcessor
 						}
 					}
 					else {
-						throw nsfee;
+						_log.error(
+							StringBundler.concat(
+								"Unable to find file entry with uuid ", uuid,
+								" and groupId ", groupId),
+							nsfee);
 					}
 				}
 			}
@@ -430,6 +444,10 @@ public class DDMFormValuesExportImportContentProcessor
 
 				JournalArticle journalArticle =
 					_journalArticleLocalService.fetchLatestArticle(classPK);
+
+				if (journalArticle == null) {
+					return;
+				}
 
 				jsonObject.put(
 					"groupId", journalArticle.getGroupId()
@@ -545,7 +563,10 @@ public class DDMFormValuesExportImportContentProcessor
 						}
 					}
 					else {
-						throw nsae;
+						_log.error(
+							"Unable to find journal article with  primaryKey " +
+								newClassPK,
+							nsae);
 					}
 				}
 			}
