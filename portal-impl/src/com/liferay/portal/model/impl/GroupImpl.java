@@ -1053,14 +1053,8 @@ public class GroupImpl extends GroupBaseImpl {
 				PortletDataHandler stagedPortletDataHandler =
 					stagedPortlet.getPortletDataHandlerInstance();
 
-				String portletDataHandlerServiceName =
-					portletDataHandler.getServiceName();
-
-				String stagedDataHandlerServiceName =
-					stagedPortletDataHandler.getServiceName();
-
-				if (portletDataHandlerServiceName.equals(
-						stagedDataHandlerServiceName)) {
+				if (portletDataHandler.getServiceName().equals(
+						stagedPortletDataHandler.getServiceName())) {
 
 					return GetterUtil.getBoolean(entry.getValue());
 				}
