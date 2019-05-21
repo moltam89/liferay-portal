@@ -37,6 +37,7 @@ import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.NoSuchLayoutException;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactory;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
@@ -286,7 +287,18 @@ public class JournalArticleExportImportContentProcessor
 			for (Element dynamicContentElement : dynamicContentElements) {
 				String jsonData = dynamicContentElement.getStringValue();
 
-				JSONObject jsonObject = _jsonFactory.createJSONObject(jsonData);
+				JSONObject jsonObject = null;
+
+				try {
+					jsonObject = _jsonFactory.createJSONObject(jsonData);
+				}
+				catch (JSONException jsone) {
+					if (_log.isDebugEnabled()) {
+						_log.debug("Unable to parse JSON", jsone);
+					}
+
+					continue;
+				}
 
 				long classPK = GetterUtil.getLong(jsonObject.get("classPK"));
 
