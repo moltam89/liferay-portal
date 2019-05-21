@@ -212,7 +212,7 @@ public class DDMFormValuesExportImportContentProcessor
 						_log.warn("Unable to find file entry", pe);
 					}
 
-					return;
+					continue;
 				}
 
 				FileVersion fileVersion = fileEntry.getFileVersion();
@@ -427,7 +427,7 @@ public class DDMFormValuesExportImportContentProcessor
 					_journalArticleLocalService.fetchLatestArticle(classPK);
 
 				if (journalArticle == null) {
-					return;
+					continue;
 				}
 
 				jsonObject.put(
@@ -592,7 +592,7 @@ public class DDMFormValuesExportImportContentProcessor
 				String valueString = value.getString(locale);
 
 				if (Validator.isNull(valueString)) {
-					return;
+					continue;
 				}
 
 				JSONObject jsonObject = null;

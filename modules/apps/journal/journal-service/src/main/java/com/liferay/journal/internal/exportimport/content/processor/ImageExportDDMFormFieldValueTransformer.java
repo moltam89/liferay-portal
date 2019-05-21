@@ -99,7 +99,7 @@ public class ImageExportDDMFormFieldValueTransformer
 						_portletDataContext, _stagedModel, fileEntry,
 						_portletDataContext.REFERENCE_TYPE_DEPENDENCY);
 
-					return;
+					continue;
 				}
 
 				Element entityElement =
