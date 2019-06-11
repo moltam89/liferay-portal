@@ -439,14 +439,20 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			userId, stagingGroup, branchingPublic, branchingPrivate, true,
 			serviceContext);
 
-		ThemeDisplay themeDisplay = serviceContext.getThemeDisplay();
+		String groupDisplayURL = null;
 
-		Layout layout = themeDisplay.getLayout();
+		if ((serviceContext != null) &&
+			(serviceContext.getThemeDisplay() != null)) {
 
-		boolean privateLayout = layout.isPrivateLayout();
+			ThemeDisplay themeDisplay = serviceContext.getThemeDisplay();
 
-		String groupDisplayURL = GroupServiceHttp.getGroupDisplayURL(
-			httpPrincipal, remoteGroupId, privateLayout, secureConnection);
+			Layout layout = themeDisplay.getLayout();
+
+			boolean privateLayout = layout.isPrivateLayout();
+
+			groupDisplayURL = GroupServiceHttp.getGroupDisplayURL(
+				httpPrincipal, remoteGroupId, privateLayout, secureConnection);
+		}
 
 		typeSettingsProperties.setProperty(
 			"branchingPrivate", String.valueOf(branchingPrivate));
