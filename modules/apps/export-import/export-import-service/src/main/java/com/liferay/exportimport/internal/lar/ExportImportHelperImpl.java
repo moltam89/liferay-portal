@@ -97,6 +97,7 @@ import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
 import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.portal.model.impl.LayoutImpl;
+import com.liferay.portal.kernel.model.GroupedModel;
 
 import java.io.File;
 import java.io.InputStream;
@@ -834,14 +835,14 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	public boolean isReferenceWithinExportScope(
 		PortletDataContext portletDataContext, StagedModel stagedModel) {
 
-		if (!(stagedModel instanceof StagedGroupedModel)) {
+		if (!(stagedModel instanceof GroupedModel)) {
 			return true;
 		}
 
-		StagedGroupedModel stagedGroupedModel = (StagedGroupedModel)stagedModel;
+		GroupedModel groupedModel = (GroupedModel)stagedModel;
 
 		if (portletDataContext.getGroupId() ==
-				stagedGroupedModel.getGroupId()) {
+				groupedModel.getGroupId()) {
 
 			return true;
 		}
@@ -850,7 +851,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 
 		try {
 			group = _groupLocalService.getGroup(
-				stagedGroupedModel.getGroupId());
+				groupedModel.getGroupId());
 		}
 		catch (Exception e) {
 			return false;
