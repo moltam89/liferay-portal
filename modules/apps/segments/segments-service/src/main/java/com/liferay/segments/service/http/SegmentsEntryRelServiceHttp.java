@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.segments.service.SegmentsEntryRelServiceUtil;
 
+import java.net.ConnectException;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -90,7 +92,16 @@ public class SegmentsEntryRelServiceHttp {
 			return (com.liferay.segments.model.SegmentsEntryRel)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -124,7 +135,16 @@ public class SegmentsEntryRelServiceHttp {
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -159,7 +179,16 @@ public class SegmentsEntryRelServiceHttp {
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -199,7 +228,16 @@ public class SegmentsEntryRelServiceHttp {
 				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -243,7 +281,16 @@ public class SegmentsEntryRelServiceHttp {
 				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -284,7 +331,16 @@ public class SegmentsEntryRelServiceHttp {
 				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -322,7 +378,16 @@ public class SegmentsEntryRelServiceHttp {
 			return ((Integer)returnObj).intValue();
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -361,7 +426,16 @@ public class SegmentsEntryRelServiceHttp {
 			return ((Integer)returnObj).intValue();
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -392,7 +466,16 @@ public class SegmentsEntryRelServiceHttp {
 			return ((Boolean)returnObj).booleanValue();
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}

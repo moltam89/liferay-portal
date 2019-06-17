@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.service.http.TunnelUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 
+import java.net.ConnectException;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -81,7 +83,16 @@ public class MBThreadServiceHttp {
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -124,7 +135,16 @@ public class MBThreadServiceHttp {
 				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -165,7 +185,16 @@ public class MBThreadServiceHttp {
 				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -208,7 +237,16 @@ public class MBThreadServiceHttp {
 				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -249,7 +287,16 @@ public class MBThreadServiceHttp {
 				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -290,7 +337,16 @@ public class MBThreadServiceHttp {
 				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -322,7 +378,16 @@ public class MBThreadServiceHttp {
 			return ((Integer)returnObj).intValue();
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -353,7 +418,16 @@ public class MBThreadServiceHttp {
 			return ((Integer)returnObj).intValue();
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -383,7 +457,16 @@ public class MBThreadServiceHttp {
 			return ((Integer)returnObj).intValue();
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -414,7 +497,16 @@ public class MBThreadServiceHttp {
 			return ((Integer)returnObj).intValue();
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -446,7 +538,16 @@ public class MBThreadServiceHttp {
 			return ((Integer)returnObj).intValue();
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -479,7 +580,16 @@ public class MBThreadServiceHttp {
 				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -521,7 +631,16 @@ public class MBThreadServiceHttp {
 				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -552,7 +671,16 @@ public class MBThreadServiceHttp {
 			return ((Integer)returnObj).intValue();
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -592,7 +720,16 @@ public class MBThreadServiceHttp {
 			return ((Integer)returnObj).intValue();
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -630,7 +767,16 @@ public class MBThreadServiceHttp {
 			return (com.liferay.portal.kernel.lock.Lock)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -668,7 +814,16 @@ public class MBThreadServiceHttp {
 			return (com.liferay.message.boards.model.MBThread)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -706,7 +861,16 @@ public class MBThreadServiceHttp {
 			return (com.liferay.message.boards.model.MBThread)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -744,7 +908,16 @@ public class MBThreadServiceHttp {
 			return (com.liferay.message.boards.model.MBThread)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -778,7 +951,16 @@ public class MBThreadServiceHttp {
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -816,7 +998,16 @@ public class MBThreadServiceHttp {
 			return (com.liferay.portal.kernel.search.Hits)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -855,7 +1046,16 @@ public class MBThreadServiceHttp {
 			return (com.liferay.portal.kernel.search.Hits)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -894,7 +1094,16 @@ public class MBThreadServiceHttp {
 			return (com.liferay.message.boards.model.MBThread)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -927,7 +1136,16 @@ public class MBThreadServiceHttp {
 			}
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}

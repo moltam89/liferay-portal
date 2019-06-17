@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.sync.service.SyncDLObjectServiceUtil;
 
+import java.net.ConnectException;
+
 import org.osgi.annotation.versioning.ProviderType;
 
 /**
@@ -91,7 +93,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -132,7 +143,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -170,7 +190,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -211,7 +240,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -250,7 +288,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -290,7 +337,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -332,7 +388,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -372,7 +437,16 @@ public class SyncDLObjectServiceHttp {
 				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -411,7 +485,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -451,7 +534,16 @@ public class SyncDLObjectServiceHttp {
 				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -489,7 +581,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -528,7 +629,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -569,7 +679,16 @@ public class SyncDLObjectServiceHttp {
 				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -606,7 +725,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.portal.kernel.model.Group)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -642,7 +770,16 @@ public class SyncDLObjectServiceHttp {
 			return ((Long)returnObj).longValue();
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -678,7 +815,16 @@ public class SyncDLObjectServiceHttp {
 			return returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -717,7 +863,16 @@ public class SyncDLObjectServiceHttp {
 			return (String)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -757,7 +912,16 @@ public class SyncDLObjectServiceHttp {
 			return (String)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -796,7 +960,16 @@ public class SyncDLObjectServiceHttp {
 			return (String)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -834,7 +1007,16 @@ public class SyncDLObjectServiceHttp {
 				returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -873,7 +1055,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -911,7 +1102,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -950,7 +1150,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -988,7 +1197,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -1032,7 +1250,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -1070,7 +1297,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -1108,7 +1344,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -1145,7 +1390,16 @@ public class SyncDLObjectServiceHttp {
 			return (java.util.Map<String, Object>)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -1189,7 +1443,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
@@ -1229,7 +1492,16 @@ public class SyncDLObjectServiceHttp {
 			return (com.liferay.sync.model.SyncDLObject)returnObj;
 		}
 		catch (com.liferay.portal.kernel.exception.SystemException se) {
-			_log.error(se, se);
+			if (se.getCause() instanceof ConnectException) {
+				_log.error("Connection error: " + se.getMessage());
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(se, se);
+				}
+			}
+			else {
+				_log.error(se, se);
+			}
 
 			throw se;
 		}
