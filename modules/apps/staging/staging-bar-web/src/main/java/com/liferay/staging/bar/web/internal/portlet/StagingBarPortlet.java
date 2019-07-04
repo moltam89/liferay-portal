@@ -540,7 +540,7 @@ public class StagingBarPortlet extends MVCPortlet {
 			LayoutTypeControllerTracker.getLayoutTypeController(
 				layout.getType());
 
-		boolean isWorkflowEnabled = layoutTypeController.isWorkflowEnabled();
+		boolean workflowEnabled = layoutTypeController.isWorkflowEnabled();
 
 		long parentPlid = layout.getParentPlid();
 
@@ -558,7 +558,7 @@ public class StagingBarPortlet extends MVCPortlet {
 					layoutRevision.getLayoutSetBranchId(),
 					parentLayout.getPlid());
 
-			if (!(isWorkflowEnabled &&
+			if (!(workflowEnabled &&
 				  (parentLayoutsRevision.getStatus() ==
 					  WorkflowConstants.STATUS_APPROVED))) {
 
