@@ -536,6 +536,12 @@ public class StagingBarPortlet extends MVCPortlet {
 			return;
 		}
 
+		LayoutTypeController layoutTypeController =
+			LayoutTypeControllerTracker.getLayoutTypeController(
+				layout.getType());
+
+		boolean isWorkflowEnabled = layoutTypeController.isWorkflowEnabled();
+
 		long parentPlid = layout.getParentPlid();
 
 		Layout parentLayout = null;
@@ -552,21 +558,26 @@ public class StagingBarPortlet extends MVCPortlet {
 					layoutRevision.getLayoutSetBranchId(),
 					parentLayout.getPlid());
 
-			_layoutRevisionLocalService.updateLayoutRevision(
-				serviceContext.getUserId(),
-				parentLayoutsRevision.getLayoutRevisionId(),
-				parentLayoutsRevision.getLayoutBranchId(),
-				parentLayoutsRevision.getName(),
-				parentLayoutsRevision.getTitle(),
-				parentLayoutsRevision.getDescription(),
-				parentLayoutsRevision.getKeywords(),
-				parentLayoutsRevision.getRobots(),
-				parentLayoutsRevision.getTypeSettings(),
-				parentLayoutsRevision.getIconImage(),
-				parentLayoutsRevision.getIconImageId(),
-				parentLayoutsRevision.getThemeId(),
-				parentLayoutsRevision.getColorSchemeId(),
-				parentLayoutsRevision.getCss(), serviceContext);
+			if (!(isWorkflowEnabled &&
+				  (parentLayoutsRevision.getStatus() ==
+					  WorkflowConstants.STATUS_APPROVED))) {
+
+				_layoutRevisionLocalService.updateLayoutRevision(
+					serviceContext.getUserId(),
+					parentLayoutsRevision.getLayoutRevisionId(),
+					parentLayoutsRevision.getLayoutBranchId(),
+					parentLayoutsRevision.getName(),
+					parentLayoutsRevision.getTitle(),
+					parentLayoutsRevision.getDescription(),
+					parentLayoutsRevision.getKeywords(),
+					parentLayoutsRevision.getRobots(),
+					parentLayoutsRevision.getTypeSettings(),
+					parentLayoutsRevision.getIconImage(),
+					parentLayoutsRevision.getIconImageId(),
+					parentLayoutsRevision.getThemeId(),
+					parentLayoutsRevision.getColorSchemeId(),
+					parentLayoutsRevision.getCss(), serviceContext);
+			}
 
 			parentPlid = parentLayout.getParentPlid();
 		}
