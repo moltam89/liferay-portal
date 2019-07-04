@@ -52,6 +52,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.GroupConstants;
+import com.liferay.portal.kernel.model.GroupedModel;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutRevision;
@@ -883,23 +884,22 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	public boolean isReferenceWithinExportScope(
 		PortletDataContext portletDataContext, StagedModel stagedModel) {
 
-		if (!(stagedModel instanceof StagedGroupedModel)) {
+		if (!(stagedModel instanceof StagedGroupedModel) &&
+			!(stagedModel instanceof GroupedModel)) {
+
 			return true;
 		}
 
-		StagedGroupedModel stagedGroupedModel = (StagedGroupedModel)stagedModel;
+		GroupedModel groupedModel = (GroupedModel)stagedModel;
 
-		if (portletDataContext.getGroupId() ==
-				stagedGroupedModel.getGroupId()) {
-
+		if (portletDataContext.getGroupId() == groupedModel.getGroupId()) {
 			return true;
 		}
 
 		Group group = null;
 
 		try {
-			group = _groupLocalService.getGroup(
-				stagedGroupedModel.getGroupId());
+			group = _groupLocalService.getGroup(groupedModel.getGroupId());
 		}
 		catch (Exception e) {
 			return false;
