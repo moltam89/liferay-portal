@@ -57,7 +57,6 @@ import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.Portlet;
-import com.liferay.portal.kernel.model.StagedGroupedModel;
 import com.liferay.portal.kernel.model.StagedModel;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
@@ -884,9 +883,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	public boolean isReferenceWithinExportScope(
 		PortletDataContext portletDataContext, StagedModel stagedModel) {
 
-		if (!(stagedModel instanceof StagedGroupedModel) &&
-			!(stagedModel instanceof GroupedModel)) {
-
+		if (!(stagedModel instanceof GroupedModel)) {
 			return true;
 		}
 
