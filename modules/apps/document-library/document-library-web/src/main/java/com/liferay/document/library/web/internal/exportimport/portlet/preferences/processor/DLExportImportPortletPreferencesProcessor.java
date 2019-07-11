@@ -93,10 +93,14 @@ public class DLExportImportPortletPreferencesProcessor
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
 
-		if (!MapUtil.getBoolean(
+		if ((!MapUtil.getBoolean(
 				portletDataContext.getParameterMap(),
 				PortletDataHandlerKeys.PORTLET_DATA) &&
-			MergeLayoutPrototypesThreadLocal.isInProgress()) {
+			 MergeLayoutPrototypesThreadLocal.isInProgress()) ||
+			!MapUtil.getBoolean(
+				portletDataContext.getParameterMap(),
+				PortletDataHandlerKeys.PORTLET_DATA + "_" +
+					DLPortletKeys.DOCUMENT_LIBRARY_ADMIN)) {
 
 			return portletPreferences;
 		}
