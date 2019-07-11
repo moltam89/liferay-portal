@@ -17,6 +17,7 @@ package com.liferay.message.boards.web.internal.exportimport.portlet.preferences
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.portlet.preferences.processor.Capability;
 import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessor;
@@ -34,6 +35,7 @@ import com.liferay.message.boards.service.MBThreadFlagLocalService;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
 
 import java.util.List;
@@ -82,6 +84,14 @@ public class MBExportImportPortletPreferencesProcessor
 			pde.setType(PortletDataException.EXPORT_PORTLET_PERMISSIONS);
 
 			throw pde;
+		}
+
+		if (!MapUtil.getBoolean(
+				portletDataContext.getParameterMap(),
+				PortletDataHandlerKeys.PORTLET_DATA + "_" +
+					MBPortletKeys.MESSAGE_BOARDS_ADMIN)) {
+
+			return portletPreferences;
 		}
 
 		try {
