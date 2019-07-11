@@ -21,6 +21,7 @@ import com.liferay.blogs.service.BlogsEntryLocalService;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.portlet.preferences.processor.Capability;
 import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessor;
@@ -28,6 +29,7 @@ import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.util.ListUtil;
+import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.xml.Element;
 
 import java.util.List;
@@ -79,7 +81,11 @@ public class BlogsExportImportPortletPreferencesProcessor
 		}
 
 		if (!portletDataContext.getBooleanParameter(
-				_blogsPortletDataHandler.getNamespace(), "entries")) {
+				_blogsPortletDataHandler.getNamespace(), "entries") ||
+			!MapUtil.getBoolean(
+				portletDataContext.getParameterMap(),
+				PortletDataHandlerKeys.PORTLET_DATA + "_" +
+					BlogsPortletKeys.BLOGS_ADMIN)) {
 
 			return portletPreferences;
 		}
