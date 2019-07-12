@@ -85,7 +85,8 @@ public class BlogsExportImportPortletPreferencesProcessor
 			!MapUtil.getBoolean(
 				portletDataContext.getParameterMap(),
 				PortletDataHandlerKeys.PORTLET_DATA + "_" +
-					BlogsPortletKeys.BLOGS_ADMIN)) {
+					BlogsPortletKeys.BLOGS_ADMIN,
+				true)) {
 
 			return portletPreferences;
 		}

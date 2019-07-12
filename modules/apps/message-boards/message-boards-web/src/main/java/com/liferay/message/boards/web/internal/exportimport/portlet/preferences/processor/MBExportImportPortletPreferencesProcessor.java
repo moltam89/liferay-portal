@@ -89,7 +89,8 @@ public class MBExportImportPortletPreferencesProcessor
 		if (!MapUtil.getBoolean(
 				portletDataContext.getParameterMap(),
 				PortletDataHandlerKeys.PORTLET_DATA + "_" +
-					MBPortletKeys.MESSAGE_BOARDS_ADMIN)) {
+					MBPortletKeys.MESSAGE_BOARDS_ADMIN,
+				true)) {
 
 			return portletPreferences;
 		}
