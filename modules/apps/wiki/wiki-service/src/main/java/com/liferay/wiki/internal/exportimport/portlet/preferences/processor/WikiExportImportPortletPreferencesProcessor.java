@@ -85,7 +85,8 @@ public class WikiExportImportPortletPreferencesProcessor
 			!MapUtil.getBoolean(
 				portletDataContext.getParameterMap(),
 				PortletDataHandlerKeys.PORTLET_DATA + "_" +
-					WikiPortletKeys.WIKI_ADMIN)) {
+					WikiPortletKeys.WIKI_ADMIN,
+				true)) {
 
 			return portletPreferences;
 		}

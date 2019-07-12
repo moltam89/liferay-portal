@@ -100,7 +100,8 @@ public class DLExportImportPortletPreferencesProcessor
 			!MapUtil.getBoolean(
 				portletDataContext.getParameterMap(),
 				PortletDataHandlerKeys.PORTLET_DATA + "_" +
-					DLPortletKeys.DOCUMENT_LIBRARY_ADMIN)) {
+					DLPortletKeys.DOCUMENT_LIBRARY_ADMIN,
+				true)) {
 
 			return portletPreferences;
 		}
