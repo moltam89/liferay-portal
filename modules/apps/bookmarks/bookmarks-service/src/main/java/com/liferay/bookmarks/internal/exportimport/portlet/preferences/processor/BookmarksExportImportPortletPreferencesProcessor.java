@@ -24,6 +24,7 @@ import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerKeys;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.portlet.preferences.processor.Capability;
 import com.liferay.exportimport.portlet.preferences.processor.ExportImportPortletPreferencesProcessor;
@@ -84,6 +85,15 @@ public class BookmarksExportImportPortletPreferencesProcessor
 			pde.setType(PortletDataException.EXPORT_PORTLET_PERMISSIONS);
 
 			throw pde;
+		}
+
+		if (!MapUtil.getBoolean(
+				portletDataContext.getParameterMap(),
+				PortletDataHandlerKeys.PORTLET_DATA + "_" +
+					BookmarksPortletKeys.BOOKMARKS_ADMIN,
+				true)) {
+
+			return portletPreferences;
 		}
 
 		try {
