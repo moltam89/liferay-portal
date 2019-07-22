@@ -17,6 +17,7 @@ package com.liferay.journal.internal.exportimport.data.handler;
 import com.liferay.changeset.model.ChangesetCollection;
 import com.liferay.changeset.service.ChangesetCollectionLocalService;
 import com.liferay.changeset.service.ChangesetEntryLocalService;
+import com.liferay.dynamic.data.lists.model.DDLRecordSet;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
@@ -590,8 +591,13 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 				long articleClassNameId = _portal.getClassNameId(
 					JournalArticle.class);
 
+				long ddlRecordSetClassNameId = _portal.getClassNameId(
+					DDLRecordSet.class);
+
 				ddmStructureDynamicQuery.add(
-					classNameIdProperty.eq(articleClassNameId));
+					RestrictionsFactoryUtil.or(
+						classNameIdProperty.eq(articleClassNameId),
+						classNameIdProperty.eq(ddlRecordSetClassNameId)));
 
 				ddmStructureDynamicQuery.setProjection(
 					ProjectionFactoryUtil.property("structureId"));
