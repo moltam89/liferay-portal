@@ -544,26 +544,31 @@ public class StagingBarPortlet extends MVCPortlet {
 				break;
 			}
 
-			LayoutRevision parentLayoutsRevision =
-				_layoutRevisionLocalService.fetchLatestLayoutRevision(
+			if (_layoutRevisionLocalService.getLayoutRevisions(
 					layoutRevision.getLayoutSetBranchId(),
-					parentLayout.getPlid());
+					parentLayout.getPlid(), true).size() == 0) {
 
-			_layoutRevisionLocalService.updateLayoutRevision(
-				serviceContext.getUserId(),
-				parentLayoutsRevision.getLayoutRevisionId(),
-				parentLayoutsRevision.getLayoutBranchId(),
-				parentLayoutsRevision.getName(),
-				parentLayoutsRevision.getTitle(),
-				parentLayoutsRevision.getDescription(),
-				parentLayoutsRevision.getKeywords(),
-				parentLayoutsRevision.getRobots(),
-				parentLayoutsRevision.getTypeSettings(),
-				parentLayoutsRevision.getIconImage(),
-				parentLayoutsRevision.getIconImageId(),
-				parentLayoutsRevision.getThemeId(),
-				parentLayoutsRevision.getColorSchemeId(),
-				parentLayoutsRevision.getCss(), serviceContext);
+				LayoutRevision parentLayoutsRevision =
+					_layoutRevisionLocalService.fetchLatestLayoutRevision(
+						layoutRevision.getLayoutSetBranchId(),
+						parentLayout.getPlid());
+
+				_layoutRevisionLocalService.updateLayoutRevision(
+					serviceContext.getUserId(),
+					parentLayoutsRevision.getLayoutRevisionId(),
+					parentLayoutsRevision.getLayoutBranchId(),
+					parentLayoutsRevision.getName(),
+					parentLayoutsRevision.getTitle(),
+					parentLayoutsRevision.getDescription(),
+					parentLayoutsRevision.getKeywords(),
+					parentLayoutsRevision.getRobots(),
+					parentLayoutsRevision.getTypeSettings(),
+					parentLayoutsRevision.getIconImage(),
+					parentLayoutsRevision.getIconImageId(),
+					parentLayoutsRevision.getThemeId(),
+					parentLayoutsRevision.getColorSchemeId(),
+					parentLayoutsRevision.getCss(), serviceContext);
+			}
 
 			parentPlid = parentLayout.getParentPlid();
 		}
