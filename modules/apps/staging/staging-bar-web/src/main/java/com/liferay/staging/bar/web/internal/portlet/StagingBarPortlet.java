@@ -544,12 +544,12 @@ public class StagingBarPortlet extends MVCPortlet {
 				break;
 			}
 
-			List<LayoutRevision> parentLayoutRevisions =
+			List<LayoutRevision> parentHeadLayoutRevisions =
 				_layoutRevisionLocalService.getLayoutRevisions(
 					layoutRevision.getLayoutSetBranchId(),
 					parentLayout.getPlid(), true);
 
-			if (parentLayoutRevisions.isEmpty()) {
+			if (parentHeadLayoutRevisions.isEmpty()) {
 				LayoutRevision parentLayoutsRevision =
 					_layoutRevisionLocalService.fetchLatestLayoutRevision(
 						layoutRevision.getLayoutSetBranchId(),
