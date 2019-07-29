@@ -67,6 +67,10 @@ public class StagingProcessesControlPanelEntry extends BaseControlPanelEntry {
 			return true;
 		}
 
+		if (group.isUser() || group.isUserGroup()) {
+			return true;
+		}
+
 		return super.hasAccessPermissionDenied(
 			permissionChecker, group, portlet);
 	}
