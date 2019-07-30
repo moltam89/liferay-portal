@@ -48,7 +48,9 @@ public class StagingProcessesControlPanelEntry extends BaseControlPanelEntry {
 			return true;
 		}
 
-		if (group.isLayoutPrototype() || group.isLayoutSetPrototype()) {
+		if (group.isLayoutPrototype() || group.isLayoutSetPrototype() ||
+			group.isUser() || group.isUserGroup()) {
+
 			return true;
 		}
 
@@ -64,10 +66,6 @@ public class StagingProcessesControlPanelEntry extends BaseControlPanelEntry {
 		if (!GroupPermissionUtil.contains(
 				permissionChecker, group, ActionKeys.VIEW_STAGING)) {
 
-			return true;
-		}
-
-		if (group.isUser() || group.isUserGroup()) {
 			return true;
 		}
 
