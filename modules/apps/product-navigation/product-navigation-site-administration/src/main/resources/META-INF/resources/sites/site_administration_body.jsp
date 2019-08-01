@@ -20,12 +20,18 @@
 PanelCategory panelCategory = (PanelCategory)request.getAttribute(ApplicationListWebKeys.PANEL_CATEGORY);
 
 SiteAdministrationPanelCategoryDisplayContext siteAdministrationPanelCategoryDisplayContext = new SiteAdministrationPanelCategoryDisplayContext(liferayPortletRequest, liferayPortletResponse, null);
+
+Group group = siteAdministrationPanelCategoryDisplayContext.getGroup();
+
+String liveGroupURL;
+
+boolean showStagingInfo = siteAdministrationPanelCategoryDisplayContext.isShowStagingInfo();
 %>
 
-<c:if test="<%= siteAdministrationPanelCategoryDisplayContext.getGroup() != null %>">
+<c:if test="<%= group != null %>">
 	<div class="row">
 		<div class="col-md-12">
-			<c:if test="<%= siteAdministrationPanelCategoryDisplayContext.isShowStagingInfo() %>">
+			<c:if test="<%= showStagingInfo %>">
 
 				<%
 				Map<String, Object> data = new HashMap<String, Object>();
@@ -41,41 +47,13 @@ SiteAdministrationPanelCategoryDisplayContext siteAdministrationPanelCategoryDis
 
 					<%
 					data.put("qa-id", "live");
-
-					try {
-						String liveGroupURL = siteAdministrationPanelCategoryDisplayContext.getLiveGroupURL();
 					%>
 
-						<span class="<%= Validator.isNull(liveGroupURL) ? "active" : StringPool.BLANK %>">
-							<aui:a data="<%= data %>" href="<%= liveGroupURL %>" label="<%= siteAdministrationPanelCategoryDisplayContext.getLiveGroupLabel() %>" />
-						</span>
+					<aui:a data="<%= data %>" href="javascript:;" id="remoteLiveLink" label="<%= siteAdministrationPanelCategoryDisplayContext.getLiveGroupLabel() %>" />
 
-					<%
-					}
-					catch (RemoteExportException | SystemException e) {
-						if (e instanceof SystemException) {
-							_log.error(e, e);
-						}
-					%>
-
-						<aui:a data="<%= data %>" href="" id="remoteLiveLink" label="<%= siteAdministrationPanelCategoryDisplayContext.getLiveGroupLabel() %>" />
-
-						<aui:script use="aui-tooltip">
-							new A.Tooltip({
-								bodyContent: Liferay.Language.get(
-									'the-connection-to-the-remote-live-site-cannot-be-established-due-to-a-network-problem'
-								),
-								position: 'right',
-								trigger: A.one('#<portlet:namespace />remoteLiveLink'),
-								visible: false,
-								zIndex: Liferay.zIndex.TOOLTIP
-							}).render();
-						</aui:script>
-
-					<%
-					}
-					%>
-
+					<div class="inline-item" id="<portlet:namespace />loader">
+						<span aria-hidden="true" class="loading-animation loading-animation-light loading-animation-sm"></span>
+					</div>
 				</div>
 			</c:if>
 
@@ -85,13 +63,53 @@ SiteAdministrationPanelCategoryDisplayContext siteAdministrationPanelCategoryDis
 		</div>
 	</div>
 
+	<c:if test="<%= showStagingInfo %>">
+		<aui:script use="aui-base,aui-io-request,aui-tooltip">
+			var link = A.one('#<portlet:namespace />remoteLiveLink');
+			var loader = A.one('#<portlet:namespace />loader');
+
+			var failureCallback = function() {
+				loader.hide();
+
+				new A.Tooltip({
+					bodyContent: Liferay.Language.get(
+						'the-connection-to-the-remote-live-site-cannot-be-established-due-to-a-network-problem'
+					),
+					position: 'right',
+					trigger: A.one('#<portlet:namespace />remoteLiveLink'),
+					visible: false,
+					zIndex: Liferay.zIndex.TOOLTIP
+				}).render();
+			};
+
+			AUI().ready(function() {
+				A.io.request(
+					'<%= liveGroupURL = siteAdministrationPanelCategoryDisplayContext.getLiveGroupURL() %>',
+					{
+						on: {
+							beforeSend: function() {
+								loader.show();
+							},
+							failure: failureCallback,
+							success: function() {
+								loader.hide();
+
+								link.attr('href', '<%= liveGroupURL %>');
+
+								if (link.getAttribute('href') === 'javascript:;') {
+									link.addClass('active');
+								}
+							}
+						}
+					}
+				);
+			});
+		</aui:script>
+	</c:if>
+
 	<c:if test="<%= siteAdministrationPanelCategoryDisplayContext.isShowSiteAdministration() %>">
 		<liferay-application-list:panel-category-body
 			panelCategory="<%= panelCategory %>"
 		/>
 	</c:if>
 </c:if>
-
-<%!
-private static Log _log = LogFactoryUtil.getLog("com_liferay_product_navigation_site_administration.sites.site_administration_body_jsp");
-%>

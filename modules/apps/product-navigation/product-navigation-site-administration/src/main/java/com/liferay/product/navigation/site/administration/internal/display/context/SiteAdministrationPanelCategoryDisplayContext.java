@@ -19,7 +19,6 @@ import com.liferay.application.list.PanelCategory;
 import com.liferay.application.list.constants.ApplicationListWebKeys;
 import com.liferay.application.list.constants.PanelCategoryKeys;
 import com.liferay.application.list.display.context.logic.PanelCategoryHelper;
-import com.liferay.exportimport.kernel.exception.RemoteExportException;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -164,7 +163,7 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 		return "live";
 	}
 
-	public String getLiveGroupURL() throws RemoteExportException {
+	public String getLiveGroupURL() {
 		if (_liveGroupURL != null) {
 			return _liveGroupURL;
 		}
@@ -199,9 +198,6 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 						"Unable to connect to remote live: " +
 							cause.getMessage());
 				}
-
-				throw new RemoteExportException(
-					RemoteExportException.BAD_CONNECTION);
 			}
 		}
 		else if (group.isStagingGroup()) {
