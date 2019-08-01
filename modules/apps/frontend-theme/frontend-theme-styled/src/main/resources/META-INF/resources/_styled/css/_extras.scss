@@ -52,8 +52,10 @@
 }
 
 .product-menu {
-	.loading-animation {
-		margin-top: 160px;
+	:not(.inline-item) {
+		> .loading-animation {
+			margin-top: 160px;
+		}
 	}
 }
 
