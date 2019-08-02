@@ -21,6 +21,7 @@ import com.liferay.document.library.kernel.model.DLFileShortcut;
 import com.liferay.document.library.kernel.model.DLFolder;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppLocalService;
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
@@ -129,6 +130,12 @@ public class DLExportImportPortletPreferencesProcessor
 
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
 				portletDataContext, portletId, folder);
+
+			return portletPreferences;
+		}
+
+		if (ExportImportThreadLocal.isLayoutExportInProcess() ||
+			ExportImportThreadLocal.isLayoutStagingInProcess()) {
 
 			return portletPreferences;
 		}
