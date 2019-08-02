@@ -52,6 +52,17 @@ public class AppBuilderAppLocalServiceUtil {
 		return getService().addAppBuilderApp(appBuilderApp);
 	}
 
+	public static com.liferay.app.builder.model.AppBuilderApp addAppBuilderApp(
+			long groupId, long companyId, long userId, long ddmStructureId,
+			long ddmStructureLayoutId, long deDataListViewId,
+			java.util.Map<java.util.Locale, String> nameMap, String settings)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return getService().addAppBuilderApp(
+			groupId, companyId, userId, ddmStructureId, ddmStructureLayoutId,
+			deDataListViewId, nameMap, settings);
+	}
+
 	/**
 	 * Creates a new app builder app with the primary key. Does not add the app builder app to the database.
 	 *

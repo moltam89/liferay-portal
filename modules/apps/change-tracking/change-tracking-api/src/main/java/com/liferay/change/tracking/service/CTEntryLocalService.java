@@ -14,7 +14,6 @@
 
 package com.liferay.change.tracking.service;
 
-import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -73,7 +72,6 @@ public interface CTEntryLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public CTEntry addCTEntry(CTEntry ctEntry);
 
-	@Indexable(type = IndexableType.REINDEX)
 	public CTEntry addCTEntry(
 			long userId, long modelClassNameId, long modelClassPK,
 			long modelResourcePrimKey, int changeType, long ctCollectionId,
@@ -325,20 +323,6 @@ public interface CTEntryLocalService
 		throws PortalException;
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CTEntry> getRelatedOwnerCTEntries(
-		long companyId, long ctCollectionId, long ctEntryId, String keywords,
-		QueryDefinition<CTEntry> queryDefinition);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CTEntry> getRelatedOwnerCTEntries(
-		long ctEntryId, QueryDefinition<CTEntry> queryDefinition);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public long getRelatedOwnerCTEntriesCount(
-		long companyId, long ctCollectionId, long ctEntryId, String keywords,
-		QueryDefinition<CTEntry> queryDefinition);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getRelatedOwnerCTEntriesCount(
 		long ctEntryId, QueryDefinition<CTEntry> queryDefinition);
 
@@ -349,32 +333,9 @@ public interface CTEntryLocalService
 	public boolean hasCTEntryAggregateCTEntry(
 		long ctEntryAggregateId, long ctEntryId);
 
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CTEntry> search(
-		CTCollection ctCollection, long[] groupIds, long[] userIds,
-		long[] classNameIds, int[] changeTypes, Boolean collision,
-		QueryDefinition<CTEntry> queryDefinition);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public List<CTEntry> search(
-		CTCollection ctCollection, String keywords,
-		QueryDefinition<CTEntry> queryDefinition);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public long searchCount(
-		CTCollection ctCollection, long[] groupIds, long[] userIds,
-		long[] classNameIds, int[] changeTypes, Boolean collision,
-		QueryDefinition<CTEntry> queryDefinition);
-
-	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-	public int searchCount(
-		CTCollection ctCollection, String keywords,
-		QueryDefinition<CTEntry> queryDefinition);
-
 	public void setCTEntryAggregateCTEntries(
 		long ctEntryAggregateId, long[] ctEntryIds);
 
-	@Indexable(type = IndexableType.REINDEX)
 	public CTEntry updateCollision(long ctEntryId, boolean collision);
 
 	/**
@@ -386,7 +347,6 @@ public interface CTEntryLocalService
 	@Indexable(type = IndexableType.REINDEX)
 	public CTEntry updateCTEntry(CTEntry ctEntry);
 
-	@Indexable(type = IndexableType.REINDEX)
 	public CTEntry updateStatus(long ctEntryId, int status);
 
 }

@@ -20,6 +20,7 @@ import com.liferay.change.tracking.engine.CTEngineManager;
 import com.liferay.change.tracking.engine.CTManager;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
+import com.liferay.change.tracking.service.CTEntryLocalServiceUtil;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
@@ -67,10 +68,6 @@ public class ChangeListsHistoryDetailsDisplayContext {
 		_ctManager = _ctManagerServiceTracker.getService();
 	}
 
-	public int getAffectsCount(CTEntry ctEntry) {
-		return _ctManager.getRelatedOwnerCTEntriesCount(ctEntry.getCtEntryId());
-	}
-
 	public List<BreadcrumbEntry> getBreadcrumbEntries(String ctCollectionName) {
 		List<BreadcrumbEntry> breadcrumbEntries = new ArrayList<>();
 
@@ -110,10 +107,6 @@ public class ChangeListsHistoryDetailsDisplayContext {
 			SearchContainer.DEFAULT_CUR_PARAM, 0, SearchContainer.DEFAULT_DELTA,
 			_getIteratorURL(), null, "no-changes-were-found");
 
-		DisplayTerms displayTerms = searchContainer.getDisplayTerms();
-
-		String keywords = displayTerms.getKeywords();
-
 		OrderByComparator<CTEntry> orderByComparator =
 			OrderByComparatorFactoryUtil.create(
 				"CTEntry", _getOrderByCol(), getOrderByType().equals("asc"));
@@ -128,11 +121,11 @@ public class ChangeListsHistoryDetailsDisplayContext {
 		queryDefinition.setStatus(WorkflowConstants.STATUS_APPROVED);
 
 		searchContainer.setResults(
-			_ctEngineManager.getCTEntries(
-				ctCollection, keywords, queryDefinition));
+			CTEntryLocalServiceUtil.getCTCollectionCTEntries(
+				ctCollection.getCtCollectionId()));
 		searchContainer.setTotal(
-			_ctEngineManager.getCTEntriesCount(
-				ctCollection, keywords, queryDefinition));
+			CTEntryLocalServiceUtil.getCTEntriesCount(
+				ctCollection.getCtCollectionId(), queryDefinition));
 
 		return searchContainer;
 	}

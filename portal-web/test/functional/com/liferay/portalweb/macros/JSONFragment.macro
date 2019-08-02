@@ -19,15 +19,35 @@ definition {
 	macro _addSection {
 		var portalURL = JSONCompany.getPortalURL();
 
+		if (!(isSet(html))) {
+			var html = "test";
+		}
+
+		if (!(isSet(configuration))) {
+			var configuration = "";
+		}
+
+		if (!(isSet(type))) {
+			var type = "0";
+		}
+
+		if (!(isSet(status))) {
+			var status = "0";
+		}
+
 		var curl = '''
 			${portalURL}/api/jsonws/fragment.fragmententry/add-fragment-entry \
 			-u test@liferay.com:test \
 			-d groupId=${groupId} \
 			-d fragmentCollectionId=${collectionId} \
+			-d fragmentEntryKey= \
 			-d name=${name} \
 			-d css= \
-			-d html=test \
+			-d html=${html} \
 			-d js= \
+			-d configuration=${configuration} \
+			-d previewFileEntryId=0 \
+			-d type=${type} \
 			-d status=${status}
 		''';
 
@@ -178,10 +198,6 @@ definition {
 			fail("Please set 'name'.");
 		}
 
-		if (!(isSet(status))) {
-			var status = "0";
-		}
-
 		echo("## Adding a 'Fragment' with the following info using JSONWS:");
 
 		echo("## * Collection Name: ${collectionName}");
@@ -203,6 +219,9 @@ definition {
 			collectionId = "${collectionId}",
 			groupId = "${groupId}",
 			name = "${name}",
+			html = "${html}",
+			configuration = "${configuration}",
+			type = "${type}",
 			status = "${status}");
 	}
 

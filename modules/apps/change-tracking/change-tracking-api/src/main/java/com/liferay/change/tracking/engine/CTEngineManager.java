@@ -122,38 +122,6 @@ public interface CTEngineManager {
 	public List<CTCollection> getCTCollections(long companyId);
 
 	/**
-	 * Returns the change entries associated with the given change collection.
-	 *
-	 * @param  ctCollection the change collection
-	 * @param  groupIds the group primary keys
-	 * @param  userIds the user primary keys
-	 * @param  classNameIds the class name primary keys
-	 * @param  changeTypes the change types
-	 * @param  collision whether the change entries collide with the production
-	 *         change collection
-	 * @param  queryDefinition the settings regarding pagination, order, and
-	 *         status filtering
-	 * @return the change entries associated with the given change collection
-	 */
-	public List<CTEntry> getCTEntries(
-		CTCollection ctCollection, long[] groupIds, long[] userIds,
-		long[] classNameIds, int[] changeTypes, Boolean collision,
-		QueryDefinition<CTEntry> queryDefinition);
-
-	/**
-	 * Returns all the change tracking entries associated with the given change
-	 * collection, keywords, and query definition.
-	 *
-	 * @param  ctCollection the change collection
-	 * @param  keywords the keywords
-	 * @param  queryDefinition the settings regarding pagination and order
-	 * @return the change tracking entries
-	 */
-	public List<CTEntry> getCTEntries(
-		CTCollection ctCollection, String keywords,
-		QueryDefinition<CTEntry> queryDefinition);
-
-	/**
 	 * Returns all the change entries associated with the given change
 	 * collection.
 	 *
@@ -173,39 +141,6 @@ public interface CTEngineManager {
 	 */
 	public List<CTEntry> getCTEntries(
 		long ctCollectionId, QueryDefinition<CTEntry> queryDefinition);
-
-	/**
-	 * Returns the number of change entries associated with the given change
-	 * collection and filters.
-	 *
-	 * @param  ctCollection the change collection
-	 * @param  groupIds the group primary keys
-	 * @param  userIds the user primary keys
-	 * @param  classNameIds the class name primary keys
-	 * @param  changeTypes the change types
-	 * @param  collision whether the change entries collide with the production
-	 *         change collection
-	 * @param  queryDefinition the settings regarding the status filtering
-	 * @return the number of change tracking entries with the given change
-	 *         collection and filters
-	 */
-	public int getCTEntriesCount(
-		CTCollection ctCollection, long[] groupIds, long[] userIds,
-		long[] classNameIds, int[] changeTypes, Boolean collision,
-		QueryDefinition<CTEntry> queryDefinition);
-
-	/**
-	 * Returns the number of change tracking entries associated with the given
-	 * change collection, keywords, and query definition.
-	 *
-	 * @param  ctCollection the change collection
-	 * @param  keywords the keywords
-	 * @param  queryDefinition the settings
-	 * @return the number of change tracking entries
-	 */
-	public int getCTEntriesCount(
-		CTCollection ctCollection, String keywords,
-		QueryDefinition<CTEntry> queryDefinition);
 
 	/**
 	 * Returns the number of the change entries associated with the given change

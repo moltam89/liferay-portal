@@ -271,6 +271,12 @@ public class DDMStructureLayoutLocalServiceUtil {
 	}
 
 	public static com.liferay.dynamic.data.mapping.model.DDMStructureLayout
+		fetchStructureLayout(long structureLayoutId) {
+
+		return getService().fetchStructureLayout(structureLayoutId);
+	}
+
+	public static com.liferay.dynamic.data.mapping.model.DDMStructureLayout
 		fetchStructureLayout(
 			long groupId, long classNameId, String structureLayoutKey) {
 

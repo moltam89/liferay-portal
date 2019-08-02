@@ -26,10 +26,8 @@ import com.liferay.change.tracking.rest.client.dto.v1_0.Collection;
 import com.liferay.change.tracking.rest.client.dto.v1_0.Entry;
 import com.liferay.change.tracking.rest.client.http.HttpInvoker;
 import com.liferay.change.tracking.rest.client.pagination.Page;
-import com.liferay.change.tracking.rest.client.pagination.Pagination;
 import com.liferay.change.tracking.rest.client.resource.v1_0.EntryResource;
 import com.liferay.change.tracking.rest.client.serdes.v1_0.EntrySerDes;
-import com.liferay.petra.function.UnsafeTriConsumer;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -41,7 +39,6 @@ import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.DateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.odata.entity.EntityField;
 import com.liferay.portal.odata.entity.EntityModel;
 import com.liferay.portal.test.rule.Inject;
@@ -49,13 +46,9 @@ import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.vulcan.resource.EntityModelResource;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import java.text.DateFormat;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -66,7 +59,6 @@ import javax.annotation.Generated;
 
 import javax.ws.rs.core.MultivaluedHashMap;
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.lang.time.DateUtils;
 
@@ -195,205 +187,6 @@ public abstract class BaseEntryResourceTestCase {
 		Assert.assertEquals(regex, entry.getTitle());
 		Assert.assertEquals(regex, entry.getUserName());
 		Assert.assertEquals(regex, entry.getVersion());
-	}
-
-	@Test
-	public void testGetCollectionEntriesPage() throws Exception {
-		Page<Entry> page = entryResource.getCollectionEntriesPage(
-			testGetCollectionEntriesPage_getCollectionId(), null, null, null,
-			null, null, null, Pagination.of(1, 2), null);
-
-		Assert.assertEquals(0, page.getTotalCount());
-
-		Long collectionId = testGetCollectionEntriesPage_getCollectionId();
-		Long irrelevantCollectionId =
-			testGetCollectionEntriesPage_getIrrelevantCollectionId();
-
-		if ((irrelevantCollectionId != null)) {
-			Entry irrelevantEntry = testGetCollectionEntriesPage_addEntry(
-				irrelevantCollectionId, randomIrrelevantEntry());
-
-			page = entryResource.getCollectionEntriesPage(
-				irrelevantCollectionId, null, null, null, null, null, null,
-				Pagination.of(1, 2), null);
-
-			Assert.assertEquals(1, page.getTotalCount());
-
-			assertEquals(
-				Arrays.asList(irrelevantEntry), (List<Entry>)page.getItems());
-			assertValid(page);
-		}
-
-		Entry entry1 = testGetCollectionEntriesPage_addEntry(
-			collectionId, randomEntry());
-
-		Entry entry2 = testGetCollectionEntriesPage_addEntry(
-			collectionId, randomEntry());
-
-		page = entryResource.getCollectionEntriesPage(
-			collectionId, null, null, null, null, null, null,
-			Pagination.of(1, 2), null);
-
-		Assert.assertEquals(2, page.getTotalCount());
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(entry1, entry2), (List<Entry>)page.getItems());
-		assertValid(page);
-	}
-
-	@Test
-	public void testGetCollectionEntriesPageWithPagination() throws Exception {
-		Long collectionId = testGetCollectionEntriesPage_getCollectionId();
-
-		Entry entry1 = testGetCollectionEntriesPage_addEntry(
-			collectionId, randomEntry());
-
-		Entry entry2 = testGetCollectionEntriesPage_addEntry(
-			collectionId, randomEntry());
-
-		Entry entry3 = testGetCollectionEntriesPage_addEntry(
-			collectionId, randomEntry());
-
-		Page<Entry> page1 = entryResource.getCollectionEntriesPage(
-			collectionId, null, null, null, null, null, null,
-			Pagination.of(1, 2), null);
-
-		List<Entry> entries1 = (List<Entry>)page1.getItems();
-
-		Assert.assertEquals(entries1.toString(), 2, entries1.size());
-
-		Page<Entry> page2 = entryResource.getCollectionEntriesPage(
-			collectionId, null, null, null, null, null, null,
-			Pagination.of(2, 2), null);
-
-		Assert.assertEquals(3, page2.getTotalCount());
-
-		List<Entry> entries2 = (List<Entry>)page2.getItems();
-
-		Assert.assertEquals(entries2.toString(), 1, entries2.size());
-
-		Page<Entry> page3 = entryResource.getCollectionEntriesPage(
-			collectionId, null, null, null, null, null, null,
-			Pagination.of(1, 3), null);
-
-		assertEqualsIgnoringOrder(
-			Arrays.asList(entry1, entry2, entry3),
-			(List<Entry>)page3.getItems());
-	}
-
-	@Test
-	public void testGetCollectionEntriesPageWithSortDateTime()
-		throws Exception {
-
-		testGetCollectionEntriesPageWithSort(
-			EntityField.Type.DATE_TIME,
-			(entityField, entry1, entry2) -> {
-				BeanUtils.setProperty(
-					entry1, entityField.getName(),
-					DateUtils.addMinutes(new Date(), -2));
-			});
-	}
-
-	@Test
-	public void testGetCollectionEntriesPageWithSortInteger() throws Exception {
-		testGetCollectionEntriesPageWithSort(
-			EntityField.Type.INTEGER,
-			(entityField, entry1, entry2) -> {
-				BeanUtils.setProperty(entry1, entityField.getName(), 0);
-				BeanUtils.setProperty(entry2, entityField.getName(), 1);
-			});
-	}
-
-	@Test
-	public void testGetCollectionEntriesPageWithSortString() throws Exception {
-		testGetCollectionEntriesPageWithSort(
-			EntityField.Type.STRING,
-			(entityField, entry1, entry2) -> {
-				Class clazz = entry1.getClass();
-
-				Method method = clazz.getMethod(
-					"get" +
-						StringUtil.upperCaseFirstLetter(entityField.getName()));
-
-				Class<?> returnType = method.getReturnType();
-
-				if (returnType.isAssignableFrom(Map.class)) {
-					BeanUtils.setProperty(
-						entry1, entityField.getName(),
-						Collections.singletonMap("Aaa", "Aaa"));
-					BeanUtils.setProperty(
-						entry2, entityField.getName(),
-						Collections.singletonMap("Bbb", "Bbb"));
-				}
-				else {
-					BeanUtils.setProperty(entry1, entityField.getName(), "Aaa");
-					BeanUtils.setProperty(entry2, entityField.getName(), "Bbb");
-				}
-			});
-	}
-
-	protected void testGetCollectionEntriesPageWithSort(
-			EntityField.Type type,
-			UnsafeTriConsumer<EntityField, Entry, Entry, Exception>
-				unsafeTriConsumer)
-		throws Exception {
-
-		List<EntityField> entityFields = getEntityFields(type);
-
-		if (entityFields.isEmpty()) {
-			return;
-		}
-
-		Long collectionId = testGetCollectionEntriesPage_getCollectionId();
-
-		Entry entry1 = randomEntry();
-		Entry entry2 = randomEntry();
-
-		for (EntityField entityField : entityFields) {
-			unsafeTriConsumer.accept(entityField, entry1, entry2);
-		}
-
-		entry1 = testGetCollectionEntriesPage_addEntry(collectionId, entry1);
-
-		entry2 = testGetCollectionEntriesPage_addEntry(collectionId, entry2);
-
-		for (EntityField entityField : entityFields) {
-			Page<Entry> ascPage = entryResource.getCollectionEntriesPage(
-				collectionId, null, null, null, null, null, null,
-				Pagination.of(1, 2), entityField.getName() + ":asc");
-
-			assertEquals(
-				Arrays.asList(entry1, entry2), (List<Entry>)ascPage.getItems());
-
-			Page<Entry> descPage = entryResource.getCollectionEntriesPage(
-				collectionId, null, null, null, null, null, null,
-				Pagination.of(1, 2), entityField.getName() + ":desc");
-
-			assertEquals(
-				Arrays.asList(entry2, entry1),
-				(List<Entry>)descPage.getItems());
-		}
-	}
-
-	protected Entry testGetCollectionEntriesPage_addEntry(
-			Long collectionId, Entry entry)
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected Long testGetCollectionEntriesPage_getCollectionId()
-		throws Exception {
-
-		throw new UnsupportedOperationException(
-			"This method needs to be implemented");
-	}
-
-	protected Long testGetCollectionEntriesPage_getIrrelevantCollectionId()
-		throws Exception {
-
-		return null;
 	}
 
 	@Test

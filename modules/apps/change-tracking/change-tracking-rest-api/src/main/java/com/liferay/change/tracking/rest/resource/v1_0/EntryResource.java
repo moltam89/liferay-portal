@@ -17,10 +17,7 @@ package com.liferay.change.tracking.rest.resource.v1_0;
 import com.liferay.change.tracking.rest.dto.v1_0.Entry;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.model.User;
-import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.vulcan.accept.language.AcceptLanguage;
-import com.liferay.portal.vulcan.pagination.Page;
-import com.liferay.portal.vulcan.pagination.Pagination;
 
 import javax.annotation.Generated;
 
@@ -42,13 +39,6 @@ import org.osgi.annotation.versioning.ProviderType;
 @Generated("")
 @ProviderType
 public interface EntryResource {
-
-	public Page<Entry> getCollectionEntriesPage(
-			Long collectionId, String[] changeTypesFilter,
-			String[] classNameIdsFilter, Boolean collision,
-			String[] groupIdsFilter, Integer status, String[] userIdsFilter,
-			Pagination pagination, Sort[] sorts)
-		throws Exception;
 
 	public Entry getEntry(Long entryId) throws Exception;
 

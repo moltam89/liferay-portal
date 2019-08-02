@@ -11,9 +11,11 @@
 		<field name="createDate" type="Date" />
 		<field name="modifiedDate" type="Date" />
 		<field name="ddmStructureId" type="long" />
-		<field name="deDataLayoutId" type="long" />
+		<field name="ddmStructureLayoutId" type="long" />
 		<field name="deDataListViewId" type="long" />
 		<field localized="true" name="name" type="String" />
-		<field name="settings" type="String" />
+		<field name="settings" type="String">
+			<hint-collection name="CLOB" />
+		</field>
 	</model>
 </model-hints>

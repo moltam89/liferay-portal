@@ -21,6 +21,7 @@ import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.model.BookmarksFolderConstants;
 import com.liferay.bookmarks.service.BookmarksFolderLocalService;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
@@ -72,6 +73,12 @@ public class BookmarksExportImportPortletPreferencesProcessor
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
+
+		if (ExportImportThreadLocal.isLayoutExportInProcess() ||
+			ExportImportThreadLocal.isLayoutStagingInProcess()) {
+
+			return portletPreferences;
+		}
 
 		try {
 			portletDataContext.addPortletPermissions(

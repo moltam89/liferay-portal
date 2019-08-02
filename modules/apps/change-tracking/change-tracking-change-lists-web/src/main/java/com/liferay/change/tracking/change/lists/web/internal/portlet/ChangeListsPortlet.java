@@ -14,8 +14,13 @@
 
 package com.liferay.change.tracking.change.lists.web.internal.portlet;
 
+import com.liferay.change.tracking.change.lists.web.internal.constants.CTWebConstants;
+import com.liferay.change.tracking.change.lists.web.internal.display.context.ChangeListsDisplayContext;
 import com.liferay.change.tracking.configuration.CTConfiguration;
 import com.liferay.change.tracking.constants.CTPortletKeys;
+import com.liferay.change.tracking.engine.CTEngineManager;
+import com.liferay.change.tracking.service.CTEntryLocalService;
+import com.liferay.change.tracking.service.CTPreferencesLocalService;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.model.Role;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
@@ -24,13 +29,15 @@ import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.security.permission.PermissionThreadLocal;
 import com.liferay.portal.kernel.security.permission.UserBag;
 import com.liferay.portal.kernel.servlet.SessionMessages;
-import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 
 import java.io.IOException;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.portlet.Portlet;
 import javax.portlet.PortletException;
@@ -41,7 +48,6 @@ import javax.portlet.RenderResponse;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
-import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -83,27 +89,40 @@ public class ChangeListsPortlet extends MVCPortlet {
 			checkPermissions(renderRequest);
 		}
 		catch (Exception e) {
-			throw new PortletException(
-				"Unable to check permissions: " + e.getMessage(), e);
+			throw new PortletException(e);
 		}
 
-		boolean production = ParamUtil.getBoolean(renderRequest, "production");
-
-		if (production) {
+		if (ParamUtil.getBoolean(renderRequest, "production")) {
 			SessionMessages.add(
 				renderRequest,
 				_portal.getPortletId(renderRequest) +
 					"checkoutProductionSuccess");
 		}
 
+		ChangeListsDisplayContext changeListsDisplayContext =
+			new ChangeListsDisplayContext(
+				_portal.getHttpServletRequest(renderRequest), renderRequest,
+				renderResponse, _ctPreferencesLocalService,
+				_ctEntryLocalService, _ctEngineManager);
+
+		renderRequest.setAttribute(
+			CTWebConstants.CHANGE_LISTS_DISPLAY_CONTEXT,
+			changeListsDisplayContext);
+
 		super.render(renderRequest, renderResponse);
 	}
 
 	@Activate
-	@Modified
 	protected void activate(Map<String, Object> properties) {
-		_ctConfiguration = ConfigurableUtil.createConfigurable(
+		Set<String> administratorRoleNames = new HashSet<>();
+
+		CTConfiguration ctConfiguration = ConfigurableUtil.createConfigurable(
 			CTConfiguration.class, properties);
+
+		Collections.addAll(
+			administratorRoleNames, ctConfiguration.administratorRoleNames());
+
+		_administratorRoleNames = administratorRoleNames;
 	}
 
 	@Override
@@ -117,13 +136,10 @@ public class ChangeListsPortlet extends MVCPortlet {
 			return;
 		}
 
-		String[] administratorRoleNames =
-			_ctConfiguration.administratorRoleNames();
-
 		UserBag userBag = permissionChecker.getUserBag();
 
 		for (Role role : userBag.getRoles()) {
-			if (ArrayUtil.contains(administratorRoleNames, role.getName())) {
+			if (_administratorRoleNames.contains(role.getName())) {
 				return;
 			}
 		}
@@ -134,7 +150,16 @@ public class ChangeListsPortlet extends MVCPortlet {
 				permissionChecker.getUserId(), getClass().getSimpleName()));
 	}
 
-	private CTConfiguration _ctConfiguration;
+	private Set<String> _administratorRoleNames;
+
+	@Reference
+	private CTEngineManager _ctEngineManager;
+
+	@Reference
+	private CTEntryLocalService _ctEntryLocalService;
+
+	@Reference
+	private CTPreferencesLocalService _ctPreferencesLocalService;
 
 	@Reference
 	private Portal _portal;

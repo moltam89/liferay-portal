@@ -229,6 +229,9 @@ public interface DDMStructureLayoutLocalService
 		String uuid, long groupId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public DDMStructureLayout fetchStructureLayout(long structureLayoutId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public DDMStructureLayout fetchStructureLayout(
 		long groupId, long classNameId, String structureLayoutKey);
 

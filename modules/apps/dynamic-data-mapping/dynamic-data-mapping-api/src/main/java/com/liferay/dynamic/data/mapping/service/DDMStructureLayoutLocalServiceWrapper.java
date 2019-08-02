@@ -292,6 +292,14 @@ public class DDMStructureLayoutLocalServiceWrapper
 
 	@Override
 	public com.liferay.dynamic.data.mapping.model.DDMStructureLayout
+		fetchStructureLayout(long structureLayoutId) {
+
+		return _ddmStructureLayoutLocalService.fetchStructureLayout(
+			structureLayoutId);
+	}
+
+	@Override
+	public com.liferay.dynamic.data.mapping.model.DDMStructureLayout
 		fetchStructureLayout(
 			long groupId, long classNameId, String structureLayoutKey) {
 

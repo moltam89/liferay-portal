@@ -43,7 +43,7 @@ public class AppBuilderAppSoap implements Serializable {
 		soapModel.setCreateDate(model.getCreateDate());
 		soapModel.setModifiedDate(model.getModifiedDate());
 		soapModel.setDdmStructureId(model.getDdmStructureId());
-		soapModel.setDeDataLayoutId(model.getDeDataLayoutId());
+		soapModel.setDdmStructureLayoutId(model.getDdmStructureLayoutId());
 		soapModel.setDeDataListViewId(model.getDeDataListViewId());
 		soapModel.setName(model.getName());
 		soapModel.setSettings(model.getSettings());
@@ -172,12 +172,12 @@ public class AppBuilderAppSoap implements Serializable {
 		_ddmStructureId = ddmStructureId;
 	}
 
-	public long getDeDataLayoutId() {
-		return _deDataLayoutId;
+	public long getDdmStructureLayoutId() {
+		return _ddmStructureLayoutId;
 	}
 
-	public void setDeDataLayoutId(long deDataLayoutId) {
-		_deDataLayoutId = deDataLayoutId;
+	public void setDdmStructureLayoutId(long ddmStructureLayoutId) {
+		_ddmStructureLayoutId = ddmStructureLayoutId;
 	}
 
 	public long getDeDataListViewId() {
@@ -213,7 +213,7 @@ public class AppBuilderAppSoap implements Serializable {
 	private Date _createDate;
 	private Date _modifiedDate;
 	private long _ddmStructureId;
-	private long _deDataLayoutId;
+	private long _ddmStructureLayoutId;
 	private long _deDataListViewId;
 	private String _name;
 	private String _settings;

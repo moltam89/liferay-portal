@@ -84,9 +84,10 @@ public class AppBuilderAppModelImpl
 		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
 		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
 		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
-		{"ddmStructureId", Types.BIGINT}, {"deDataLayoutId", Types.BIGINT},
+		{"ddmStructureId", Types.BIGINT},
+		{"ddmStructureLayoutId", Types.BIGINT},
 		{"deDataListViewId", Types.BIGINT}, {"name", Types.VARCHAR},
-		{"settings_", Types.VARCHAR}
+		{"settings_", Types.CLOB}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -102,14 +103,14 @@ public class AppBuilderAppModelImpl
 		TABLE_COLUMNS_MAP.put("createDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("modifiedDate", Types.TIMESTAMP);
 		TABLE_COLUMNS_MAP.put("ddmStructureId", Types.BIGINT);
-		TABLE_COLUMNS_MAP.put("deDataLayoutId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("ddmStructureLayoutId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("deDataListViewId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("name", Types.VARCHAR);
-		TABLE_COLUMNS_MAP.put("settings_", Types.VARCHAR);
+		TABLE_COLUMNS_MAP.put("settings_", Types.CLOB);
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table AppBuilderApp (uuid_ VARCHAR(75) null,appBuilderAppId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,ddmStructureId LONG,deDataLayoutId LONG,deDataListViewId LONG,name STRING null,settings_ VARCHAR(75) null)";
+		"create table AppBuilderApp (uuid_ VARCHAR(75) null,appBuilderAppId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,ddmStructureId LONG,ddmStructureLayoutId LONG,deDataListViewId LONG,name STRING null,settings_ TEXT null)";
 
 	public static final String TABLE_SQL_DROP = "drop table AppBuilderApp";
 
@@ -308,10 +309,11 @@ public class AppBuilderAppModelImpl
 			"ddmStructureId",
 			(BiConsumer<AppBuilderApp, Long>)AppBuilderApp::setDdmStructureId);
 		attributeGetterFunctions.put(
-			"deDataLayoutId", AppBuilderApp::getDeDataLayoutId);
+			"ddmStructureLayoutId", AppBuilderApp::getDdmStructureLayoutId);
 		attributeSetterBiConsumers.put(
-			"deDataLayoutId",
-			(BiConsumer<AppBuilderApp, Long>)AppBuilderApp::setDeDataLayoutId);
+			"ddmStructureLayoutId",
+			(BiConsumer<AppBuilderApp, Long>)
+				AppBuilderApp::setDdmStructureLayoutId);
 		attributeGetterFunctions.put(
 			"deDataListViewId", AppBuilderApp::getDeDataListViewId);
 		attributeSetterBiConsumers.put(
@@ -501,13 +503,13 @@ public class AppBuilderAppModelImpl
 	}
 
 	@Override
-	public long getDeDataLayoutId() {
-		return _deDataLayoutId;
+	public long getDdmStructureLayoutId() {
+		return _ddmStructureLayoutId;
 	}
 
 	@Override
-	public void setDeDataLayoutId(long deDataLayoutId) {
-		_deDataLayoutId = deDataLayoutId;
+	public void setDdmStructureLayoutId(long ddmStructureLayoutId) {
+		_ddmStructureLayoutId = ddmStructureLayoutId;
 	}
 
 	@Override
@@ -754,7 +756,7 @@ public class AppBuilderAppModelImpl
 		appBuilderAppImpl.setCreateDate(getCreateDate());
 		appBuilderAppImpl.setModifiedDate(getModifiedDate());
 		appBuilderAppImpl.setDdmStructureId(getDdmStructureId());
-		appBuilderAppImpl.setDeDataLayoutId(getDeDataLayoutId());
+		appBuilderAppImpl.setDdmStructureLayoutId(getDdmStructureLayoutId());
 		appBuilderAppImpl.setDeDataListViewId(getDeDataListViewId());
 		appBuilderAppImpl.setName(getName());
 		appBuilderAppImpl.setSettings(getSettings());
@@ -891,7 +893,8 @@ public class AppBuilderAppModelImpl
 
 		appBuilderAppCacheModel.ddmStructureId = getDdmStructureId();
 
-		appBuilderAppCacheModel.deDataLayoutId = getDeDataLayoutId();
+		appBuilderAppCacheModel.ddmStructureLayoutId =
+			getDdmStructureLayoutId();
 
 		appBuilderAppCacheModel.deDataListViewId = getDeDataListViewId();
 
@@ -1004,7 +1007,7 @@ public class AppBuilderAppModelImpl
 	private long _ddmStructureId;
 	private long _originalDdmStructureId;
 	private boolean _setOriginalDdmStructureId;
-	private long _deDataLayoutId;
+	private long _ddmStructureLayoutId;
 	private long _deDataListViewId;
 	private String _name;
 	private String _nameCurrentLanguageId;

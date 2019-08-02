@@ -24,7 +24,7 @@
 		<!-- Other fields -->
 
 		<column name="ddmStructureId" type="long" />
-		<column name="deDataLayoutId" type="long" />
+		<column name="ddmStructureLayoutId" type="long" />
 		<column name="deDataListViewId" type="long" />
 		<column localized="true" name="name" type="String" />
 		<column name="settings" type="String" />
@@ -39,5 +39,9 @@
 			<finder-column name="companyId" />
 			<finder-column name="ddmStructureId" />
 		</finder>
+
+		<!-- References -->
+
+		<reference entity="User" package-path="com.liferay.portal" />
 	</entity>
 </service-builder>

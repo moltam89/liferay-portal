@@ -8,8 +8,8 @@ create table AppBuilderApp (
 	createDate DATE null,
 	modifiedDate DATE null,
 	ddmStructureId LONG,
-	deDataLayoutId LONG,
+	ddmStructureLayoutId LONG,
 	deDataListViewId LONG,
 	name STRING null,
-	settings_ VARCHAR(75) null
+	settings_ TEXT null
 );

@@ -14,27 +14,34 @@
 
 package com.liferay.change.tracking.change.lists.web.internal.display.context;
 
+import com.liferay.change.tracking.constants.CTConstants;
 import com.liferay.change.tracking.constants.CTPortletKeys;
 import com.liferay.change.tracking.definition.CTDefinitionRegistryUtil;
 import com.liferay.change.tracking.engine.CTEngineManager;
 import com.liferay.change.tracking.model.CTCollection;
 import com.liferay.change.tracking.model.CTEntry;
 import com.liferay.change.tracking.model.CTPreferences;
-import com.liferay.change.tracking.service.CTPreferencesLocalServiceUtil;
+import com.liferay.change.tracking.service.CTEntryLocalService;
+import com.liferay.change.tracking.service.CTPreferencesLocalService;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItemList;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.QueryDefinition;
 import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
+import com.liferay.portal.kernel.json.JSONArray;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.portlet.PortletURLFactoryUtil;
 import com.liferay.portal.kernel.portlet.PortletURLUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
+import com.liferay.portal.kernel.util.FastDateFormatFactoryUtil;
 import com.liferay.portal.kernel.util.OrderByComparatorFactoryUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -42,6 +49,8 @@ import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.template.soy.util.SoyContext;
 import com.liferay.portal.template.soy.util.SoyContextFactoryUtil;
+
+import java.text.Format;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,10 +66,6 @@ import javax.portlet.RenderResponse;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.util.tracker.ServiceTracker;
-
 /**
  * @author Máté Thurzó
  */
@@ -68,15 +73,19 @@ public class ChangeListsDisplayContext {
 
 	public ChangeListsDisplayContext(
 		HttpServletRequest httpServletRequest, RenderRequest renderRequest,
-		RenderResponse renderResponse) {
+		RenderResponse renderResponse,
+		CTPreferencesLocalService ctPreferencesLocalService,
+		CTEntryLocalService ctEntryLocalService,
+		CTEngineManager ctEngineManager) {
 
 		_httpServletRequest = httpServletRequest;
 		_renderRequest = renderRequest;
 		_renderResponse = renderResponse;
+		_ctPreferencesLocalService = ctPreferencesLocalService;
+		_ctEntryLocalService = ctEntryLocalService;
+		_ctEngineManager = ctEngineManager;
 
-		_ctEngineManager = _ctEngineManagerServiceTracker.getService();
-
-		_themeDisplay = (ThemeDisplay)_httpServletRequest.getAttribute(
+		_themeDisplay = (ThemeDisplay)renderRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 	}
 
@@ -84,16 +93,10 @@ public class ChangeListsDisplayContext {
 		SoyContext soyContext = SoyContextFactoryUtil.createSoyContext();
 
 		soyContext.put(
-			"entityNameTranslations",
-			JSONUtil.toJSONArray(
-				CTDefinitionRegistryUtil.getContentTypeLanguageKeys(),
-				contentTypeLanguageKey -> JSONUtil.put(
-					"key", contentTypeLanguageKey
-				).put(
-					"translation",
-					LanguageUtil.get(
-						_httpServletRequest, contentTypeLanguageKey)
-				))
+			"changeEntries", _getCTEntriesJSONArray()
+		).put(
+			"entityNameTranslationsJSONArray",
+			_getEntityNameTranslationsJSONArray()
 		).put(
 			"namespace", _renderResponse.getNamespace()
 		).put(
@@ -338,30 +341,6 @@ public class ChangeListsDisplayContext {
 		};
 	}
 
-	public boolean hasCollision(long ctCollectionId) {
-		Optional<CTCollection> ctCollectionOptional =
-			_ctEngineManager.getCTCollectionOptional(
-				_themeDisplay.getCompanyId(), ctCollectionId);
-
-		if (!ctCollectionOptional.isPresent()) {
-			return false;
-		}
-
-		QueryDefinition<CTEntry> queryDefinition = new QueryDefinition<>();
-
-		queryDefinition.setStatus(WorkflowConstants.STATUS_DRAFT);
-
-		int ctEntriesCount = _ctEngineManager.getCTEntriesCount(
-			ctCollectionOptional.get(), null, null, null, null, true,
-			queryDefinition);
-
-		if (ctEntriesCount > 0) {
-			return true;
-		}
-
-		return false;
-	}
-
 	public boolean hasCTEntries(long ctCollectionId) {
 		QueryDefinition<CTEntry> queryDefinition = new QueryDefinition<>();
 
@@ -390,7 +369,7 @@ public class ChangeListsDisplayContext {
 
 	public boolean isCheckoutCtCollectionConfirmationEnabled() {
 		CTPreferences ctPreferences =
-			CTPreferencesLocalServiceUtil.fetchCTPreferences(
+			_ctPreferencesLocalService.fetchCTPreferences(
 				_themeDisplay.getCompanyId(), _themeDisplay.getUserId());
 
 		if (ctPreferences == null) {
@@ -398,6 +377,122 @@ public class ChangeListsDisplayContext {
 		}
 
 		return ctPreferences.isConfirmationEnabled();
+	}
+
+	private long _getCTCollectionId() {
+		CTPreferences ctPreferences =
+			_ctPreferencesLocalService.fetchCTPreferences(
+				_themeDisplay.getCompanyId(), 0);
+
+		if (ctPreferences == null) {
+			return CTConstants.CT_COLLECTION_ID_PRODUCTION;
+		}
+
+		ctPreferences = _ctPreferencesLocalService.fetchCTPreferences(
+			_themeDisplay.getCompanyId(), _themeDisplay.getUserId());
+
+		if (ctPreferences == null) {
+			return CTConstants.CT_COLLECTION_ID_PRODUCTION;
+		}
+
+		return ctPreferences.getCtCollectionId();
+	}
+
+	private JSONArray _getCTEntriesJSONArray() throws Exception {
+		JSONArray jsonArray = JSONFactoryUtil.createJSONArray();
+
+		long ctCollectionId = _getCTCollectionId();
+
+		if (ctCollectionId != CTConstants.CT_COLLECTION_ID_PRODUCTION) {
+			for (CTEntry ctEntry :
+					_ctEntryLocalService.getCTCollectionCTEntries(
+						ctCollectionId)) {
+
+				jsonArray.put(_getCTEntryJSONObject(ctEntry));
+			}
+		}
+
+		return jsonArray;
+	}
+
+	private JSONObject _getCTEntryJSONObject(CTEntry ctEntry) throws Exception {
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+		String changeTypeKey = "added";
+
+		if (ctEntry.getChangeType() == 1) {
+			changeTypeKey = "deleted";
+		}
+		else if (ctEntry.getChangeType() == 2) {
+			changeTypeKey = "modified";
+		}
+
+		String contentType =
+			CTDefinitionRegistryUtil.getVersionEntityContentTypeLanguageKey(
+				ctEntry.getModelClassNameId());
+		Format format = FastDateFormatFactoryUtil.getDateTime(
+			_themeDisplay.getLocale());
+
+		return jsonObject.put(
+			"changeType",
+			LanguageUtil.get(_themeDisplay.getLocale(), changeTypeKey)
+		).put(
+			"contentType", _getEntityNameTranslation(contentType)
+		).put(
+			"lastEdited", format.format(ctEntry.getModifiedDate())
+		).put(
+			"site",
+			CTDefinitionRegistryUtil.getVersionEntitySiteName(
+				ctEntry.getModelClassNameId(), ctEntry.getModelClassPK())
+		).put(
+			"title",
+			CTDefinitionRegistryUtil.getVersionEntityTitle(
+				ctEntry.getModelClassNameId(), ctEntry.getModelClassPK())
+		).put(
+			"userName", ctEntry.getUserName()
+		).put(
+			"version",
+			String.valueOf(
+				CTDefinitionRegistryUtil.getVersionEntityVersion(
+					ctEntry.getModelClassNameId(), ctEntry.getModelClassPK()))
+		);
+	}
+
+	private String _getEntityNameTranslation(String contentType)
+		throws Exception {
+
+		JSONArray entityNameTranslationsJSONArray =
+			_getEntityNameTranslationsJSONArray();
+
+		for (int i = 0; i < entityNameTranslationsJSONArray.length(); i++) {
+			JSONObject entityNameTranslationJSONObject =
+				entityNameTranslationsJSONArray.getJSONObject(i);
+
+			if (contentType.equals(
+					entityNameTranslationJSONObject.getString("key"))) {
+
+				return entityNameTranslationJSONObject.getString("translation");
+			}
+		}
+
+		return StringPool.BLANK;
+	}
+
+	private JSONArray _getEntityNameTranslationsJSONArray() throws Exception {
+		if (_entityNameTranslationsJSONArray != null) {
+			return _entityNameTranslationsJSONArray;
+		}
+
+		_entityNameTranslationsJSONArray = JSONUtil.toJSONArray(
+			CTDefinitionRegistryUtil.getContentTypeLanguageKeys(),
+			contentTypeLanguageKey -> JSONUtil.put(
+				"key", contentTypeLanguageKey
+			).put(
+				"translation",
+				LanguageUtil.get(_httpServletRequest, contentTypeLanguageKey)
+			));
+
+		return _entityNameTranslationsJSONArray;
 	}
 
 	private String _getFilterByStatus() {
@@ -528,23 +623,11 @@ public class ChangeListsDisplayContext {
 		return portletURL;
 	}
 
-	private static ServiceTracker<CTEngineManager, CTEngineManager>
-		_ctEngineManagerServiceTracker;
-
-	static {
-		Bundle bundle = FrameworkUtil.getBundle(CTEngineManager.class);
-
-		ServiceTracker<CTEngineManager, CTEngineManager>
-			ctEngineManagerServiceTracker = new ServiceTracker<>(
-				bundle.getBundleContext(), CTEngineManager.class, null);
-
-		ctEngineManagerServiceTracker.open();
-
-		_ctEngineManagerServiceTracker = ctEngineManagerServiceTracker;
-	}
-
 	private final CTEngineManager _ctEngineManager;
+	private final CTEntryLocalService _ctEntryLocalService;
+	private final CTPreferencesLocalService _ctPreferencesLocalService;
 	private String _displayStyle;
+	private JSONArray _entityNameTranslationsJSONArray;
 	private String _filterByStatus;
 	private final HttpServletRequest _httpServletRequest;
 	private String _orderByCol;

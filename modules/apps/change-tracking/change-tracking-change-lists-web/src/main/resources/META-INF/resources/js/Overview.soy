@@ -8,15 +8,12 @@
 	{@param urlProductionView: string}
 	{@param urlSelectChangeList: string}
 	{@param? changeEntries: list<[
-		ctEntryId: number,
 		title: string,
-		conflict: bool,
 		userName: string,
 		site: string,
 		contentType: string,
 		lastEdited: string,
 		changeType: string,
-		affectedByCTEntriesCount: number,
 		version: string
 	]>}
 	{@param? changes: [
@@ -24,9 +21,6 @@
 		deleted: number,
 		modified: number
 	]}
-	{@param? collisionsLoading: bool}
-	{@param? collisionsCount: number}
-	{@param? collisionsTooltip: string}
 	{@param? descriptionActiveChangeList: string}
 	{@param? descriptionProductionInformation: string}
 	{@param? changeListsDropdownMenu: list<[
@@ -45,7 +39,6 @@
 		userPortraitURL: string,
 		userName: string
 	]}
-	{@param? _handleClickAffected: any}
 	{@param? _handleClickPublish: any}
 	{@param? _handleClickRecentCollections: any}
 	{@param? _handleClickTrash: any}
@@ -89,9 +82,6 @@
 						{param changesLabel kind="text"}
 							{msg desc=""}changes{/msg}
 						{/param}
-						{param collisionsLoading: $collisionsLoading /}
-						{param collisionsCount: $collisionsCount /}
-						{param collisionsTooltip: $collisionsTooltip /}
 						{param description: $descriptionActiveChangeList /}
 						{param descriptionTitle kind="text"}
 							{msg desc=""}description{/msg}
@@ -152,7 +142,6 @@
 							{msg desc=""}latest-changes-in{/msg} {$headerTitleActiveChangeList}
 						{/param}
 						{param spritemap: $spritemap /}
-						{param _handleClickAffected: $_handleClickAffected /}
 					{/call}
 				</div>
 			</div>
@@ -170,15 +159,12 @@
 	{@param? cardEmpty: bool}
 	{@param? cardStateColor: string}
 	{@param? changeEntries: list<[
-		ctEntryId: number,
 		title: string,
-		conflict: bool,
 		userName: string,
 		site: string,
 		contentType: string,
 		lastEdited: string,
 		changeType: string,
-		affectedByCTEntriesCount: number,
 		version: string
 	]>}
 	{@param? changeListsDropdownMenu: list<[
@@ -196,9 +182,6 @@
 		modifiedLabel: string
 	]}
 	{@param? changesLabel: string}
-	{@param? collisionsLoading : bool}
-	{@param? collisionsCount: number}
-	{@param? collisionsTooltip: string}
 	{@param? description: string}
 	{@param? descriptionTitle: string}
 	{@param? headerButton: [
@@ -220,7 +203,6 @@
 	]}
 	{@param? publishedByTitle: string}
 	{@param? urlSelectChangeList: string}
-	{@param? _handleClickAffected: any}
 	{@param? _handleClickPublish: any}
 	{@param? _handleClickRecentCollections: any}
 	{@param? _handleClickTrash: any}
@@ -233,9 +215,6 @@
 			{param changeListsDropdownMenu: $changeListsDropdownMenu /}
 			{param changeListsDropdownMenuTitle: $changeListsDropdownMenuTitle /}
 			{param changeListsProductionDropdownMenuTitle: $changeListsProductionDropdownMenuTitle /}
-			{param collisionsLoading: $collisionsLoading /}
-			{param collisionsCount: $collisionsCount /}
-			{param collisionsTooltip: $collisionsTooltip /}
 			{param urlSelectChangeList: $urlSelectChangeList /}
 			{param headerLink: $headerLink /}
 			{param headerSubTitle: $headerSubTitle /}
@@ -257,8 +236,6 @@
 				{param descriptionTitle: $descriptionTitle /}
 				{param publishedBy: $publishedBy /}
 				{param publishedByTitle: $publishedByTitle /}
-				{param spritemap: $spritemap /}
-				{param _handleClickAffected: $_handleClickAffected /}
 			{/call}
 		{else}
 			<div class="empty-production-view sheet-text text-center text-strong">
@@ -278,9 +255,6 @@
 	]>}
 	{@param? changeListsDropdownMenuTitle: string}
 	{@param? changeListsProductionDropdownMenuTitle: string}
-	{@param? collisionsLoading: bool}
-	{@param? collisionsCount: number}
-	{@param? collisionsTooltip: string}
 	{@param? headerButton: [
 		label: string
 	]}
@@ -342,14 +316,6 @@
 				<div class="col-sm-6">
 					<div class="navbar-nav stick-to-right">
 						<div class="btn-group">
-
-							{call .collisions}
-								{param spritemap: $spritemap /}
-								{param collisionsCount: $collisionsCount /}
-								{param collisionsLoading: $collisionsLoading /}
-								{param collisionsTooltip: $collisionsTooltip /}
-							{/call}
-
 							{if $headerButton}
 								<div class="btn-group-item">
 									<div class="flex-col">
@@ -377,15 +343,12 @@
 
 {template .overviewCardBody}
 	{@param? changeEntries: list<[
-		ctEntryId: number,
 		title: string,
-		conflict: bool,
 		userName: string,
 		site: string,
 		contentType: string,
 		lastEdited: string,
 		changeType: string,
-		affectedByCTEntriesCount: number,
 		version: string
 	]>}
 	{@param? changesLabel: string}
@@ -406,8 +369,6 @@
 		userName: string
 	]}
 	{@param? publishedByTitle: string}
-	{@param spritemap: string}
-	{@param? _handleClickAffected: any}
 
 	<div class="overview-card-body overview-card-container">
 
@@ -499,8 +460,6 @@
 									<th class="table-cell-expand">{msg desc=""}
 										title{/msg}</th>
 									<th class="table-cell-expand">{msg desc=""}
-										conflict{/msg}</th>
-									<th class="table-cell-expand">{msg desc=""}
 										user-name{/msg}</th>
 									<th class="table-cell-expand">{msg desc=""}
 										site{/msg}</th>
@@ -511,8 +470,6 @@
 									<th class="table-cell-expand">{msg desc=""}
 										change-type{/msg}</th>
 									<th class="table-cell-expand">{msg desc=""}
-										affects{/msg}</th>
-									<th class="table-cell-expand">{msg desc=""}
 										version{/msg}</th>
 								</tr>
 								</thead>
@@ -520,19 +477,14 @@
 								<tbody>
 									{foreach $changeEntry in $changeEntries}
 										{call .changeEntry}
-											{param ctEntryId: $changeEntry.ctEntryId /}
-											{param affects: $changeEntry.affectedByCTEntriesCount /}
 											{param changeType: $changeEntry.changeType /}
-											{param conflict: $changeEntry.conflict /}
 											{param contentType: $changeEntry.contentType /}
 											{param index: index($changeEntry) /}
 											{param lastEdited: $changeEntry.lastEdited /}
 											{param site: $changeEntry.site /}
-											{param spritemap: $spritemap /}
 											{param title: $changeEntry.title /}
 											{param userName: $changeEntry.userName /}
 											{param version: $changeEntry.version /}
-											{param _handleClickAffected: $_handleClickAffected /}
 										{/call}
 									{/foreach}
 								</tbody>
@@ -546,35 +498,18 @@
 {/template}
 
 {template .changeEntry}
-	{@param ctEntryId: number}
-	{@param affects: number}
 	{@param changeType: string}
-	{@param conflict: bool}
 	{@param contentType: string}
 	{@param index: number}
 	{@param lastEdited: string}
 	{@param site: string}
-	{@param spritemap: string}
 	{@param title: string}
 	{@param userName: string}
 	{@param version: string}
-	{@param _handleClickAffected: any}
 
 	<tr>
 		<td class="table-cell-expand">
 			<div id="change-entry-title-{$index}">{$title}</div>
-		</td>
-		<td class="table-cell-expand">
-			<div id="change-entry-conflict-{$index}">
-			{if $conflict}
-				<span class="change-lists-helper">
-					{call ClayIcon.render}
-						{param spritemap: $spritemap /}
-						{param symbol: 'exclamation-circle' /}
-					{/call}
-				</span>
-			{/if}
-			</div>
 		</td>
 		<td class="table-cell-expand">
 			<div id="change-entry-user-name-{$index}">{$userName}</div>
@@ -592,13 +527,6 @@
 			<div id="change-entry-change-type-{$index}">{$changeType}</div>
 		</td>
 		<td class="table-cell-expand">
-			<div id="change-entry-affects-{$index}">
-				{if $affects > 0}
-					<a data-entry-id="{$ctEntryId}" href="#" onclick="{$_handleClickAffected}" >{$affects}</a>
-				{/if}
-			</div>
-		</td>
-		<td class="table-cell-expand">
 			<div id="change-entry-version-{$index}">{$version}</div>
 		</td>
 	</tr>
@@ -607,39 +535,6 @@
 {template .loading}
 	<div class="loading-indicator">
 		<span aria-hidden="true" class="loading-animation"></span>
-	</div>
-{/template}
-
-{template .collisions}
-	{@param spritemap: string}
-	{@param? collisionsCount: number}
-	{@param? collisionsLoading: bool}
-	{@param? collisionsTooltip: string}
-
-	<div class="btn-group-item">
-		{if $collisionsLoading}
-			<span class="change-lists-helper float-right lfr-portal-tooltip"
-					title="{msg desc=""}collision-detection{/msg}">
-				{call .smallLoading /}
-			</span>
-		{else}
-			{if $collisionsCount > 0}
-				<span class="change-lists-helper float-right lfr-portal-tooltip" data-qa-id="collision-detected" title="{$collisionsTooltip}">
-					{call ClayIcon.render}
-						{param spritemap: $spritemap /}
-						{param symbol: 'exclamation-circle' /}
-					{/call}
-				</span>
-			{else}
-				<span class="change-lists-helper float-right lfr-portal-tooltip"
-						title="{msg desc=""}no-collisions{/msg}">
-					{call ClayIcon.render}
-						{param spritemap: $spritemap /}
-						{param symbol: 'check-circle' /}
-					{/call}
-				</span>
-			{/if}
-		{/if}
 	</div>
 {/template}
 

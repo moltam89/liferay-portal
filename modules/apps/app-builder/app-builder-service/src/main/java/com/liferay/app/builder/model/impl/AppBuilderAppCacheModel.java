@@ -85,8 +85,8 @@ public class AppBuilderAppCacheModel
 		sb.append(modifiedDate);
 		sb.append(", ddmStructureId=");
 		sb.append(ddmStructureId);
-		sb.append(", deDataLayoutId=");
-		sb.append(deDataLayoutId);
+		sb.append(", ddmStructureLayoutId=");
+		sb.append(ddmStructureLayoutId);
 		sb.append(", deDataListViewId=");
 		sb.append(deDataListViewId);
 		sb.append(", name=");
@@ -136,7 +136,7 @@ public class AppBuilderAppCacheModel
 		}
 
 		appBuilderAppImpl.setDdmStructureId(ddmStructureId);
-		appBuilderAppImpl.setDeDataLayoutId(deDataLayoutId);
+		appBuilderAppImpl.setDdmStructureLayoutId(ddmStructureLayoutId);
 		appBuilderAppImpl.setDeDataListViewId(deDataListViewId);
 
 		if (name == null) {
@@ -175,7 +175,7 @@ public class AppBuilderAppCacheModel
 
 		ddmStructureId = objectInput.readLong();
 
-		deDataLayoutId = objectInput.readLong();
+		ddmStructureLayoutId = objectInput.readLong();
 
 		deDataListViewId = objectInput.readLong();
 		name = objectInput.readUTF();
@@ -211,7 +211,7 @@ public class AppBuilderAppCacheModel
 
 		objectOutput.writeLong(ddmStructureId);
 
-		objectOutput.writeLong(deDataLayoutId);
+		objectOutput.writeLong(ddmStructureLayoutId);
 
 		objectOutput.writeLong(deDataListViewId);
 
@@ -239,7 +239,7 @@ public class AppBuilderAppCacheModel
 	public long createDate;
 	public long modifiedDate;
 	public long ddmStructureId;
-	public long deDataLayoutId;
+	public long ddmStructureLayoutId;
 	public long deDataListViewId;
 	public String name;
 	public String settings;

@@ -157,6 +157,12 @@ public class DDMStructureLayoutLocalServiceImpl
 	}
 
 	@Override
+	public DDMStructureLayout fetchStructureLayout(long structureLayoutId) {
+		return ddmStructureLayoutPersistence.fetchByPrimaryKey(
+			structureLayoutId);
+	}
+
+	@Override
 	public DDMStructureLayout fetchStructureLayout(
 		long groupId, long classNameId, String structureLayoutKey) {
 

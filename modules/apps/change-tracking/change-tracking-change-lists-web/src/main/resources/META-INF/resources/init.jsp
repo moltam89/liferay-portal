@@ -26,7 +26,8 @@ taglib uri="http://liferay.com/tld/soy" prefix="soy" %><%@
 taglib uri="http://liferay.com/tld/theme" prefix="liferay-theme" %><%@
 taglib uri="http://liferay.com/tld/ui" prefix="liferay-ui" %>
 
-<%@ page import="com.liferay.change.tracking.change.lists.web.internal.display.context.ChangeListsDisplayContext" %><%@
+<%@ page import="com.liferay.change.tracking.change.lists.web.internal.constants.CTWebConstants" %><%@
+page import="com.liferay.change.tracking.change.lists.web.internal.display.context.ChangeListsDisplayContext" %><%@
 page import="com.liferay.change.tracking.constants.CTConstants" %><%@
 page import="com.liferay.change.tracking.constants.CTPortletKeys" %><%@
 page import="com.liferay.change.tracking.engine.exception.CTCollectionDescriptionCTEngineException" %><%@
@@ -57,7 +58,7 @@ page import="javax.portlet.PortletURL" %>
 <portlet:defineObjects />
 
 <%
-ChangeListsDisplayContext changeListsDisplayContext = new ChangeListsDisplayContext(request, renderRequest, renderResponse);
+ChangeListsDisplayContext changeListsDisplayContext = (ChangeListsDisplayContext)request.getAttribute(CTWebConstants.CHANGE_LISTS_DISPLAY_CONTEXT);
 
 portletDisplay.setShowStagingIcon(false);
 %>

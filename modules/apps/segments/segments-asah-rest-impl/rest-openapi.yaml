@@ -1,0 +1,55 @@
+components:
+    schemas:
+        Experiment:
+            properties:
+                dateCreated:
+                    format: date-time
+                    type: string
+                dateModified:
+                    format: date-time
+                    type: string
+                description:
+                    type: string
+                id:
+                    readOnly: true
+                    type: string
+                name:
+                    type: string
+                siteId:
+                    format: int64
+                    type: integer
+                status:
+                    type: string
+info:
+    description: ""
+    title: "Segments Asah"
+    version: v1.0
+openapi: 3.0.1
+paths:
+    "/experiments/{experimentId}":
+        patch:
+            description: ""
+            operationId: patchExperiment
+            parameters:
+                - in: path
+                  name: experimentId
+                  required: true
+                  schema:
+                      format: int64
+                      type: integer
+            requestBody:
+                content:
+                    text/plain:
+                        schema:
+                            type: string
+            responses:
+                200:
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Experiment"
+                        application/xml:
+                            schema:
+                                $ref: "#/components/schemas/Experiment"
+                    description: ""
+            tags: ["Experiment"]

@@ -26,9 +26,9 @@ import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.segments.constants.SegmentsConstants;
+import com.liferay.segments.constants.SegmentsExperimentConstants;
+import com.liferay.segments.exception.NoSuchExperimentException;
 import com.liferay.segments.exception.SegmentsExperimentNameException;
 import com.liferay.segments.exception.SegmentsExperimentStatusException;
 import com.liferay.segments.model.SegmentsExperiment;
@@ -54,11 +54,11 @@ public class SegmentsExperimentLocalServiceImpl
 		long segmentsExperimentId = counterLocalService.increment();
 
 		long publishedLayoutClassPK = _getPublishedLayoutClassPK(classPK);
-		int status = SegmentsConstants.SEGMENTS_EXPERIMENT_STATUS_DRAFT;
+		int status = SegmentsExperimentConstants.STATUS_DRAFT;
 
 		_validate(
-			segmentsExperienceId, classNameId, publishedLayoutClassPK, name,
-			status);
+			segmentsExperimentId, segmentsExperienceId, classNameId,
+			publishedLayoutClassPK, name, status);
 
 		SegmentsExperiment segmentsExperiment =
 			segmentsExperimentPersistence.create(segmentsExperimentId);
@@ -166,6 +166,15 @@ public class SegmentsExperimentLocalServiceImpl
 	}
 
 	@Override
+	public SegmentsExperiment getSegmentsExperiment(
+			String segmentsExperimentKey)
+		throws NoSuchExperimentException {
+
+		return segmentsExperimentPersistence.findBySegmentsExperimentKey_First(
+			segmentsExperimentKey, null);
+	}
+
+	@Override
 	public List<SegmentsExperiment> getSegmentsExperiments(
 		long groupId, long classNameId, long classPK) {
 
@@ -182,8 +191,30 @@ public class SegmentsExperimentLocalServiceImpl
 			segmentsExperimentPersistence.findByPrimaryKey(
 				segmentsExperimentId);
 
+		_validateName(name);
+
 		segmentsExperiment.setName(name);
 		segmentsExperiment.setDescription(description);
+
+		return segmentsExperimentPersistence.update(segmentsExperiment);
+	}
+
+	@Override
+	public SegmentsExperiment updateSegmentsExperiment(
+			String segmentsExperimentKey, int status)
+		throws PortalException {
+
+		SegmentsExperiment segmentsExperiment =
+			segmentsExperimentPersistence.findBySegmentsExperimentKey_First(
+				segmentsExperimentKey, null);
+
+		_validateStatus(
+			segmentsExperiment.getSegmentsExperimentId(),
+			segmentsExperiment.getSegmentsExperienceId(),
+			segmentsExperiment.getClassNameId(),
+			segmentsExperiment.getClassPK(), status);
+
+		segmentsExperiment.setStatus(status);
 
 		return segmentsExperimentPersistence.update(segmentsExperiment);
 	}
@@ -220,12 +251,14 @@ public class SegmentsExperimentLocalServiceImpl
 	}
 
 	private void _validate(
-			long segmentsExperienceId, long classNameId, long classPK,
-			String name, int status)
+			long segmentsExperimentId, long segmentsExperienceId,
+			long classNameId, long classPK, String name, int status)
 		throws PortalException {
 
 		_validateName(name);
-		_validateStatus(segmentsExperienceId, classNameId, classPK, status);
+		_validateStatus(
+			segmentsExperimentId, segmentsExperienceId, classNameId, classPK,
+			status);
 	}
 
 	private void _validateName(String name) throws PortalException {
@@ -235,18 +268,22 @@ public class SegmentsExperimentLocalServiceImpl
 	}
 
 	private void _validateStatus(
-			long segmentsExperienceId, long classNameId, long classPK,
-			int status)
+			long segmentsExperimentId, long segmentsExperienceId,
+			long classNameId, long classPK, int status)
 		throws SegmentsExperimentStatusException {
 
-		if (SegmentsConstants.SEGMENTS_EXPERIMENT_STATUS_DRAFT != status) {
+		if (SegmentsExperimentConstants.STATUS_DRAFT != status) {
 			return;
 		}
 
-		if (ListUtil.isNotEmpty(
-				segmentsExperimentPersistence.findByS_C_C_S(
-					segmentsExperienceId, classNameId, classPK,
-					SegmentsConstants.SEGMENTS_EXPERIMENT_STATUS_DRAFT))) {
+		SegmentsExperiment segmentsExperiment =
+			segmentsExperimentPersistence.fetchByS_C_C_S_First(
+				segmentsExperienceId, classNameId, classPK,
+				SegmentsExperimentConstants.STATUS_DRAFT, null);
+
+		if ((segmentsExperiment != null) &&
+			(segmentsExperiment.getSegmentsExperimentId() !=
+				segmentsExperimentId)) {
 
 			throw new SegmentsExperimentStatusException();
 		}

@@ -36,6 +36,8 @@ import com.liferay.portal.kernel.util.OrderByComparator;
 import java.io.Serializable;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -71,6 +73,13 @@ public interface AppBuilderAppLocalService
 	 */
 	@Indexable(type = IndexableType.REINDEX)
 	public AppBuilderApp addAppBuilderApp(AppBuilderApp appBuilderApp);
+
+	@Indexable(type = IndexableType.REINDEX)
+	public AppBuilderApp addAppBuilderApp(
+			long groupId, long companyId, long userId, long ddmStructureId,
+			long ddmStructureLayoutId, long deDataListViewId,
+			Map<Locale, String> nameMap, String settings)
+		throws PortalException;
 
 	/**
 	 * Creates a new app builder app with the primary key. Does not add the app builder app to the database.

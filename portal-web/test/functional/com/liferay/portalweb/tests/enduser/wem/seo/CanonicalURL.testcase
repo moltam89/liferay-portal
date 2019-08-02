@@ -23,6 +23,53 @@ definition {
 		}
 	}
 
+	@description = "This test ensures that when a user sets a custom canonical URL at the page level, it will overwrite system level settings."
+	@ignore = "true"
+	@priority = "5"
+	test SetCustomURLAtPageLevel {
+		var portalURL = PropsUtil.get("portal.url");
+
+		JSONLayout.addPublicLayout(
+			groupName = "Guest",
+			layoutName = "Canonical URL Test Page");
+
+		User.logoutPG();
+
+		Navigator.gotoPage(pageName = "Canonical URL Test Page");
+
+		Page.assertCanonicalURL(
+			pageName = "Canonical URL Test Page",
+			portalURL = "${portalURL}");
+
+		User.loginPG(
+			password = "test",
+			userEmailAddress = "test@liferay.com");
+
+		Navigator.gotoPage(pageName = "Canonical URL Test Page");
+
+		Navigator.gotoEditPageViaControlMenu(pageName = "Canonical URL Test Page");
+
+		Navigator.gotoSEOPanel();
+
+		Check.checkToggleSwitch(
+			key_toggleSwitchLabel = "Use Custom Canonical URL",
+			locator1 = "ToggleSwitch#ANY_TOGGLE_SWITCH");
+
+		Type(
+			key_fieldLabel = "Custom Canonical URL",
+			locator1 = "TextInput#GENERIC_TEXT_INPUT",
+			value1 = "http://mycustomizedurl.com/mydesiredurl");
+
+		PortletEntry.save();
+
+		User.logoutPG();
+
+		Navigator.gotoPage(pageName = "Canonical URL Test Page");
+
+		Page.assertCanonicalURL(portalURL = "http://mycustomizedurl.com/mydesiredurl");
+	}
+
+	@ignore = "true"
 	@priority = "5"
 	test SetDefaultURLAtSystemLevel {
 		var portalURL = PropsUtil.get("portal.url");
@@ -63,6 +110,7 @@ definition {
 			portalURL = "${portalURL}");
 	}
 
+	@ignore = "true"
 	@priority = "5"
 	test SetLocalizedURLAtSystemLevel {
 		var portalURL = PropsUtil.get("portal.url");

@@ -4,3 +4,4 @@ Bundle-Version: 1.0.0
 Liferay-Require-SchemaVersion: 1.0.0
 Liferay-Service: true
 Web-ContextPath: /app-builder-service
+-dsannotations-options: inherit

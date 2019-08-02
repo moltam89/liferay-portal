@@ -15,9 +15,13 @@
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
+import com.liferay.layout.page.template.model.LayoutPageTemplateStructure;
+import com.liferay.layout.page.template.service.LayoutPageTemplateStructureLocalService;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.language.LanguageUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -33,12 +37,12 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.segments.constants.SegmentsConstants;
 import com.liferay.segments.model.SegmentsExperience;
 import com.liferay.segments.service.SegmentsExperienceService;
 
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.portlet.ActionRequest;
@@ -63,21 +67,6 @@ import org.osgi.service.component.annotations.Reference;
 public class AddSegmentsExperienceMVCActionCommand
 	extends BaseMVCActionCommand {
 
-	protected SegmentsExperience addSegmentsExperience(
-			ActionRequest actionRequest)
-		throws PortalException {
-
-		return _segmentsExperienceService.addSegmentsExperience(
-			ParamUtil.getLong(actionRequest, "segmentsEntryId"),
-			ParamUtil.getLong(actionRequest, "classNameId"),
-			ParamUtil.getLong(actionRequest, "classPK"),
-			_getNameMap(
-				LocaleUtil.getSiteDefault(),
-				ParamUtil.getString(actionRequest, "name")),
-			ParamUtil.getBoolean(actionRequest, "active", true),
-			ServiceContextFactory.getInstance(actionRequest));
-	}
-
 	@Override
 	protected void doProcessAction(
 			ActionRequest actionRequest, ActionResponse actionResponse)
@@ -86,17 +75,14 @@ public class AddSegmentsExperienceMVCActionCommand
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
 			WebKeys.THEME_DISPLAY);
 
-		Callable<SegmentsExperience> callable =
-			new AddSegmentsExperienceCallable(actionRequest);
+		Callable<JSONObject> callable = new AddSegmentsExperienceCallable(
+			actionRequest);
 
-		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+		JSONObject jsonObject = null;
 
 		try {
-			SegmentsExperience segmentsExperience =
-				TransactionInvokerUtil.invoke(_transactionConfig, callable);
-
-			_populateSegmentsExperienceJSONObject(
-				jsonObject, segmentsExperience);
+			jsonObject = TransactionInvokerUtil.invoke(
+				_transactionConfig, callable);
 		}
 		catch (Throwable t) {
 			_log.error(t, t);
@@ -106,7 +92,7 @@ public class AddSegmentsExperienceMVCActionCommand
 
 			httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-			jsonObject.put(
+			jsonObject = JSONUtil.put(
 				"error",
 				LanguageUtil.get(
 					themeDisplay.getRequest(), "an-unexpected-error-occurred"));
@@ -118,28 +104,86 @@ public class AddSegmentsExperienceMVCActionCommand
 			actionRequest, actionResponse, jsonObject);
 	}
 
-	private Map<Locale, String> _getNameMap(Locale locale, String name) {
-		HashMap<Locale, String> nameMap = new HashMap<>();
+	private String _addLayoutData(
+			long groupId, long classNameId, long classPK,
+			long segmentsExperienceId)
+		throws PortalException {
 
-		nameMap.put(locale, name);
+		LayoutPageTemplateStructure layoutPageTemplateStructure =
+			_layoutPageTemplateStructureService.
+				fetchLayoutPageTemplateStructure(
+					groupId, classNameId, classPK, true);
 
-		return nameMap;
+		String data = layoutPageTemplateStructure.getData(
+			SegmentsConstants.SEGMENTS_EXPERIENCE_ID_DEFAULT);
+
+		_layoutPageTemplateStructureService.updateLayoutPageTemplateStructure(
+			groupId, classNameId, classPK, segmentsExperienceId, data);
+
+		return data;
+	}
+
+	private JSONObject _addSegmentsExperience(ActionRequest actionRequest)
+		throws PortalException {
+
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
+
+		long classNameId = ParamUtil.getLong(actionRequest, "classNameId");
+		long classPK = ParamUtil.getLong(actionRequest, "classPK");
+
+		SegmentsExperience segmentsExperience =
+			_segmentsExperienceService.addSegmentsExperience(
+				ParamUtil.getLong(actionRequest, "segmentsEntryId"),
+				classNameId, classPK,
+				new HashMap<Locale, String>() {
+					{
+						put(
+							LocaleUtil.getSiteDefault(),
+							ParamUtil.getString(actionRequest, "name"));
+					}
+				},
+				ParamUtil.getBoolean(actionRequest, "active", true),
+				ServiceContextFactory.getInstance(actionRequest));
+
+		_populateSegmentsExperienceJSONObject(jsonObject, segmentsExperience);
+
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(
+			WebKeys.THEME_DISPLAY);
+
+		String layoutData = _addLayoutData(
+			themeDisplay.getScopeGroupId(), classNameId, classPK,
+			segmentsExperience.getSegmentsExperienceId());
+
+		_populateLayoutDataJSONObject(jsonObject, layoutData);
+
+		return jsonObject;
+	}
+
+	private void _populateLayoutDataJSONObject(
+			JSONObject jsonObject, String layoutData)
+		throws JSONException {
+
+		jsonObject.put(
+			"layoutData", JSONFactoryUtil.createJSONObject(layoutData));
 	}
 
 	private void _populateSegmentsExperienceJSONObject(
 		JSONObject jsonObject, SegmentsExperience segmentsExperience) {
 
 		jsonObject.put(
-			"active", segmentsExperience.isActive()
-		).put(
-			"name", segmentsExperience.getNameCurrentValue()
-		).put(
-			"priority", segmentsExperience.getPriority()
-		).put(
-			"segmentsEntryId", segmentsExperience.getSegmentsEntryId()
-		).put(
-			"segmentsExperienceId", segmentsExperience.getSegmentsExperienceId()
-		);
+			"segmentsExperience",
+			JSONUtil.put(
+				"active", segmentsExperience.isActive()
+			).put(
+				"name", segmentsExperience.getNameCurrentValue()
+			).put(
+				"priority", segmentsExperience.getPriority()
+			).put(
+				"segmentsEntryId", segmentsExperience.getSegmentsEntryId()
+			).put(
+				"segmentsExperienceId",
+				segmentsExperience.getSegmentsExperienceId()
+			));
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
@@ -150,17 +194,21 @@ public class AddSegmentsExperienceMVCActionCommand
 			Propagation.REQUIRED, new Class<?>[] {Exception.class});
 
 	@Reference
+	private LayoutPageTemplateStructureLocalService
+		_layoutPageTemplateStructureService;
+
+	@Reference
 	private Portal _portal;
 
 	@Reference
 	private SegmentsExperienceService _segmentsExperienceService;
 
 	private class AddSegmentsExperienceCallable
-		implements Callable<SegmentsExperience> {
+		implements Callable<JSONObject> {
 
 		@Override
-		public SegmentsExperience call() throws Exception {
-			return addSegmentsExperience(_actionRequest);
+		public JSONObject call() throws Exception {
+			return _addSegmentsExperience(_actionRequest);
 		}
 
 		private AddSegmentsExperienceCallable(ActionRequest actionRequest) {

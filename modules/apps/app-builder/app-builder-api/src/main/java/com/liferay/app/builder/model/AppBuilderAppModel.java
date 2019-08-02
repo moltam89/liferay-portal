@@ -223,18 +223,18 @@ public interface AppBuilderAppModel
 	public void setDdmStructureId(long ddmStructureId);
 
 	/**
-	 * Returns the de data layout ID of this app builder app.
+	 * Returns the ddm structure layout ID of this app builder app.
 	 *
-	 * @return the de data layout ID of this app builder app
+	 * @return the ddm structure layout ID of this app builder app
 	 */
-	public long getDeDataLayoutId();
+	public long getDdmStructureLayoutId();
 
 	/**
-	 * Sets the de data layout ID of this app builder app.
+	 * Sets the ddm structure layout ID of this app builder app.
 	 *
-	 * @param deDataLayoutId the de data layout ID of this app builder app
+	 * @param ddmStructureLayoutId the ddm structure layout ID of this app builder app
 	 */
-	public void setDeDataLayoutId(long deDataLayoutId);
+	public void setDdmStructureLayoutId(long ddmStructureLayoutId);
 
 	/**
 	 * Returns the de data list view ID of this app builder app.
