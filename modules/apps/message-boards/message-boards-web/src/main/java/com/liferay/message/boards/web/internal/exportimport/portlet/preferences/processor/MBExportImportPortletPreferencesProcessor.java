@@ -14,6 +14,7 @@
 
 package com.liferay.message.boards.web.internal.exportimport.portlet.preferences.processor;
 
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
@@ -71,6 +72,12 @@ public class MBExportImportPortletPreferencesProcessor
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
+
+		if (ExportImportThreadLocal.isLayoutExportInProcess() ||
+			ExportImportThreadLocal.isLayoutStagingInProcess()) {
+
+			return portletPreferences;
+		}
 
 		try {
 			portletDataContext.addPortletPermissions(MBConstants.RESOURCE_NAME);
