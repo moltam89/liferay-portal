@@ -39,11 +39,12 @@ portletURL.setParameter("searchContainerId", String.valueOf(searchContainerId));
 %>
 
 <clay:management-toolbar
-	actionDropdownItems="<%= stagingProcessesWebToolbarDisplayContext.getActionDropdownItems() %>"
+	actionDropdownItems="<%= stagingProcessesWebToolbarDisplayContext.getActionDropdownItems(GroupPermissionUtil.contains(permissionChecker, stagingGroupId, ActionKeys.MANAGE_STAGING)) %>"
 	creationMenu="<%= stagingProcessesWebToolbarDisplayContext.getCreationMenu(GroupPermissionUtil.contains(permissionChecker, stagingGroupId, ActionKeys.PUBLISH_STAGING)) %>"
 	filterDropdownItems="<%= stagingProcessesWebToolbarDisplayContext.getFilterDropdownItems() %>"
 	searchContainerId="<%= searchContainerId %>"
-	showCreationMenu='<%= tabs1.equals("processes") %>'
+	selectable="<%= GroupPermissionUtil.contains(permissionChecker, stagingGroupId, ActionKeys.MANAGE_STAGING) %>"
+	showCreationMenu='<%= tabs1.equals("processes") && GroupPermissionUtil.contains(permissionChecker, stagingGroupId, ActionKeys.PUBLISH_STAGING) %>'
 	showSearch="<%= false %>"
 	sortingOrder="<%= stagingProcessesWebToolbarDisplayContext.getSortingOrder() %>"
 	sortingURL="<%= stagingProcessesWebToolbarDisplayContext.getSortingURL() %>"

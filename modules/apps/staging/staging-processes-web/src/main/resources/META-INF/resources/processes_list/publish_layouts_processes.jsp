@@ -16,10 +16,16 @@
 
 <%@ include file="/init.jsp" %>
 
+<%
+boolean hasManageStagingPermission = GroupPermissionUtil.contains(permissionChecker, scopeGroupId, ActionKeys.MANAGE_STAGING);
+%>
+
 <liferay-staging:process-list
+	deleteMenu="<%= hasManageStagingPermission %>"
 	emptyResultsMessage="no-publication-processes-were-found"
 	localTaskExecutorClassName="<%= BackgroundTaskExecutorNames.LAYOUT_STAGING_BACKGROUND_TASK_EXECUTOR %>"
 	mvcRenderCommandName="publishLayoutsView"
+	relaunchMenu="<%= hasManageStagingPermission %>"
 	remoteTaskExecutorClassName="<%= BackgroundTaskExecutorNames.LAYOUT_REMOTE_STAGING_BACKGROUND_TASK_EXECUTOR %>"
 	resultRowSplitter="<%= new PublishResultRowSplitter() %>"
 />
