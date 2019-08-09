@@ -19,6 +19,7 @@ import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetLinkLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalServiceUtil;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.model.ExpandoColumn;
 import com.liferay.expando.kernel.model.adapter.StagedExpandoColumn;
@@ -2970,23 +2971,51 @@ public class PortletDataContextImpl implements PortletDataContext {
 					long importedClassPK = GetterUtil.getLong(
 						classedModel.getPrimaryKeyObj());
 
-					String referrerUuid =
+					long typePK = GetterUtil.getLong(
 						stagedGroupedWorkflowDefinitionLinkElement.
-							attributeValue("uuid");
+							attributeValue("type-pk"),
+						-1);
 
-					WorkflowDefinitionLink referrerWorkflowDefinitionLink =
-						WorkflowDefinitionLinkLocalServiceUtil.
-							getWorkflowDefinitionLink(
-								Long.valueOf(referrerUuid));
+					String typeUUIDAttribute =
+						stagedGroupedWorkflowDefinitionLinkElement.
+							attributeValue("type-uuid");
 
-					long typePK = referrerWorkflowDefinitionLink.getTypePK();
+					if (typeUUIDAttribute != null) {
+						String[] typeUUIDAttributeValues = StringUtil.split(
+							typeUUIDAttribute, StringPool.POUND);
 
-					if (typePK != -1) {
-						Map<Long, Long> ddmPrimaryKeys =
-							(Map<Long, Long>)getNewPrimaryKeysMap(
-								DDMStructure.class.getName());
+						String uuid = typeUUIDAttributeValues[0];
 
-						typePK = ddmPrimaryKeys.getOrDefault(typePK, typePK);
+						Map<Long, Long> groupIds =
+							(Map<Long, Long>)getNewPrimaryKeysMap(Group.class);
+
+						long groupId = MapUtil.getLong(
+							groupIds,
+							GetterUtil.getLong(typeUUIDAttributeValues[1]),
+							getScopeGroupId());
+
+						DDMStructure ddmStructure =
+							DDMStructureLocalServiceUtil.
+								fetchStructureByUuidAndGroupId(
+									uuid, groupId, true);
+
+						if (ddmStructure == null) {
+							Map<String, String> structureUuids =
+								(Map<String, String>)getNewPrimaryKeysMap(
+									DDMStructure.class + ".ddmStructureUuid");
+
+							String defaultStructureUuid = MapUtil.getString(
+								structureUuids, uuid, uuid);
+
+							ddmStructure =
+								DDMStructureLocalServiceUtil.
+									fetchDDMStructureByUuidAndGroupId(
+										defaultStructureUuid, groupId);
+						}
+
+						if (ddmStructure != null) {
+							typePK = ddmStructure.getStructureId();
+						}
 					}
 
 					PermissionChecker permissionChecker =

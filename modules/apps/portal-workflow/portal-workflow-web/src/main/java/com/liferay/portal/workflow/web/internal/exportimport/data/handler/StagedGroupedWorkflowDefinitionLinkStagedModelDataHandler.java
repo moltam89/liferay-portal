@@ -14,14 +14,21 @@
 
 package com.liferay.portal.workflow.web.internal.exportimport.data.handler;
 
+import com.liferay.dynamic.data.mapping.model.DDMStructure;
+import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.exportimport.kernel.lar.BaseStagedModelDataHandler;
+import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandler;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.adapter.StagedGroupedWorkflowDefinitionLink;
 import com.liferay.portal.kernel.service.WorkflowDefinitionLinkLocalService;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.staging.StagingGroupHelper;
 
 import java.util.Collections;
 import java.util.List;
@@ -92,6 +99,38 @@ public class StagedGroupedWorkflowDefinitionLinkStagedModelDataHandler
 			String.valueOf(
 				stagedGroupedWorkflowDefinitionLink.
 					getWorkflowDefinitionVersion()));
+
+		long typePK = stagedGroupedWorkflowDefinitionLink.getTypePK();
+
+		element.addAttribute("type-pk", String.valueOf(typePK));
+
+		if (typePK == -1) {
+			return;
+		}
+
+		DDMStructure ddmStructure = _ddmStructureLocalService.fetchStructure(
+			typePK);
+
+		if (ddmStructure == null) {
+			return;
+		}
+
+		if (!ExportImportThreadLocal.isStagingInProcess() ||
+			_stagingGroupHelper.isStagedPortletData(
+				portletDataContext.getGroupId(), ddmStructure.getClassName())) {
+
+			StagedModelDataHandlerUtil.exportReferenceStagedModel(
+				portletDataContext, stagedGroupedWorkflowDefinitionLink,
+				ddmStructure, PortletDataContext.REFERENCE_TYPE_DEPENDENCY);
+		}
+
+		element.addAttribute(
+			"type-uuid",
+			StringUtil.merge(
+				new Object[] {
+					ddmStructure.getUuid(), ddmStructure.getGroupId()
+				},
+				StringPool.POUND));
 	}
 
 	@Override
@@ -107,6 +146,12 @@ public class StagedGroupedWorkflowDefinitionLinkStagedModelDataHandler
 				stagedGroupedWorkflowDefinitionLink)
 		throws Exception {
 	}
+
+	@Reference
+	private DDMStructureLocalService _ddmStructureLocalService;
+
+	@Reference
+	private StagingGroupHelper _stagingGroupHelper;
 
 	@Reference
 	private WorkflowDefinitionLinkLocalService
