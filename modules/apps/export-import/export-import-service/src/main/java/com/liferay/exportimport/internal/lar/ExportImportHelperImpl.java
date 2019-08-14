@@ -862,6 +862,21 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		return false;
 	}
 
+	@Override
+	public boolean isExportPortletData(PortletDataContext portletDataContext) {
+		if (((portletDataContext.getScopeGroupId() ==
+				portletDataContext.getGroupId()) ||
+			 (portletDataContext.getScopeGroupId() ==
+				 portletDataContext.getCompanyGroupId())) &&
+			(ExportImportThreadLocal.isLayoutExportInProcess() ||
+			 ExportImportThreadLocal.isLayoutStagingInProcess())) {
+
+			return false;
+		}
+
+		return true;
+	}
+
 	public boolean isLayoutRevisionInReview(Layout layout) {
 		List<LayoutRevision> layoutRevisions =
 			_layoutRevisionLocalService.getLayoutRevisions(layout.getPlid());

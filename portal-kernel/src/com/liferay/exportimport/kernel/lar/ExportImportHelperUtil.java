@@ -344,6 +344,12 @@ public class ExportImportHelperUtil {
 			portletDataContext, referenceStagedModel);
 	}
 
+	public static boolean isExportPortletData(
+		PortletDataContext portletDataContext) {
+
+		return _exportImportHelper.isExportPortletData(portletDataContext);
+	}
+
 	public static boolean isLayoutRevisionInReview(Layout layout) {
 		return _exportImportHelper.isLayoutRevisionInReview(layout);
 	}

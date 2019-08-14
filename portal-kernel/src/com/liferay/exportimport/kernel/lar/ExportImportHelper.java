@@ -306,6 +306,8 @@ public interface ExportImportHelper {
 		PortletDataContext portletDataContext,
 		StagedModel referenceStagedModel);
 
+	public boolean isExportPortletData(PortletDataContext portletDataContext);
+
 	public boolean isLayoutRevisionInReview(Layout layout);
 
 	public boolean isReferenceWithinExportScope(
