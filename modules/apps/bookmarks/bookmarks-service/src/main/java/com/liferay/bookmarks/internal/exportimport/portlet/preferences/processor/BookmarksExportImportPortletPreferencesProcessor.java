@@ -20,6 +20,7 @@ import com.liferay.bookmarks.model.BookmarksEntry;
 import com.liferay.bookmarks.model.BookmarksFolder;
 import com.liferay.bookmarks.model.BookmarksFolderConstants;
 import com.liferay.bookmarks.service.BookmarksFolderLocalService;
+import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.lar.ExportImportPathUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
@@ -72,6 +73,10 @@ public class BookmarksExportImportPortletPreferencesProcessor
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
+
+		if (!_exportImportHelper.isExportPortletData(portletDataContext)) {
+			return portletPreferences;
+		}
 
 		try {
 			portletDataContext.addPortletPermissions(
@@ -250,6 +255,9 @@ public class BookmarksExportImportPortletPreferencesProcessor
 		target = "(javax.portlet.name=" + BookmarksPortletKeys.BOOKMARKS + ")"
 	)
 	private PortletDataHandler _bookmarksPortletDataHandler;
+
+	@Reference
+	private ExportImportHelper _exportImportHelper;
 
 	@Reference
 	private PortletLocalService _portletLocalService;

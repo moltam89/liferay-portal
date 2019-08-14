@@ -14,6 +14,7 @@
 
 package com.liferay.wiki.internal.exportimport.portlet.preferences.processor;
 
+import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataException;
@@ -78,7 +79,8 @@ public class WikiExportImportPortletPreferencesProcessor
 			PortletPreferences portletPreferences)
 		throws PortletDataException {
 
-		if (!portletDataContext.getBooleanParameter(
+		if (!_exportImportHelper.isExportPortletData(portletDataContext) ||
+			!portletDataContext.getBooleanParameter(
 				_wikiPortletDataHandler.getNamespace(), "wiki-pages")) {
 
 			return portletPreferences;
@@ -245,6 +247,9 @@ public class WikiExportImportPortletPreferencesProcessor
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		WikiExportImportPortletPreferencesProcessor.class);
+
+	@Reference
+	private ExportImportHelper _exportImportHelper;
 
 	private GroupLocalService _groupLocalService;
 
