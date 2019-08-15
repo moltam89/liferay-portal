@@ -18,6 +18,7 @@ import com.liferay.asset.kernel.model.AssetLink;
 import com.liferay.asset.kernel.service.AssetEntryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetLinkLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetTagLocalServiceUtil;
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.expando.kernel.model.ExpandoBridge;
 import com.liferay.expando.kernel.model.ExpandoColumn;
@@ -321,6 +322,12 @@ public class PortletDataContextImpl implements PortletDataContext {
 
 	@Override
 	public void addLocks(Class<?> clazz, String key) throws PortalException {
+		String className = clazz.getName();
+
+		if (className.equals(DLFileEntry.class.getName())) {
+			return;
+		}
+
 		if (!_locksMap.containsKey(
 				getPrimaryKeyString(clazz, (Serializable)key)) &&
 			_lockManager.isLocked(clazz.getName(), key)) {
