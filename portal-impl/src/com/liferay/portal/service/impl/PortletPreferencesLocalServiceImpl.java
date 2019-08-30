@@ -793,8 +793,11 @@ public class PortletPreferencesLocalServiceImpl
 		}
 
 		try {
-			boolean hasWorkflowTask = StagingUtil.hasWorkflowTask(
-				serviceContext.getUserId(), layoutRevision);
+			boolean hasWorkflowTask =
+				!layoutRevisionLocalService.getLayoutRevisions(
+					layoutRevision.getLayoutSetBranchId(), plid,
+					WorkflowConstants.STATUS_PENDING
+				).isEmpty();
 
 			serviceContext.setAttribute("revisionInProgress", hasWorkflowTask);
 

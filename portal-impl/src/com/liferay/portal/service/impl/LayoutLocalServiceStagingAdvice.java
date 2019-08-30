@@ -239,8 +239,11 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 			layout.getPlid(), layout.isPrivateLayout(), layoutFriendlyURLMap,
 			serviceContext);
 
-		boolean hasWorkflowTask = StagingUtil.hasWorkflowTask(
-			serviceContext.getUserId(), layoutRevision);
+		boolean hasWorkflowTask =
+			!LayoutRevisionLocalServiceUtil.getLayoutRevisions(
+				layoutRevision.getLayoutSetBranchId(), layoutRevision.getPlid(),
+				WorkflowConstants.STATUS_PENDING
+			).isEmpty();
 
 		serviceContext.setAttribute("revisionInProgress", hasWorkflowTask);
 
@@ -293,8 +296,11 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
-		boolean hasWorkflowTask = StagingUtil.hasWorkflowTask(
-			serviceContext.getUserId(), layoutRevision);
+		boolean hasWorkflowTask =
+			!LayoutRevisionLocalServiceUtil.getLayoutRevisions(
+				layoutRevision.getLayoutSetBranchId(), layoutRevision.getPlid(),
+				WorkflowConstants.STATUS_PENDING
+			).isEmpty();
 
 		serviceContext.setAttribute("revisionInProgress", hasWorkflowTask);
 
@@ -344,8 +350,11 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
-		boolean hasWorkflowTask = StagingUtil.hasWorkflowTask(
-			serviceContext.getUserId(), layoutRevision);
+		boolean hasWorkflowTask =
+			!LayoutRevisionLocalServiceUtil.getLayoutRevisions(
+				layoutRevision.getLayoutSetBranchId(), layoutRevision.getPlid(),
+				WorkflowConstants.STATUS_PENDING
+			).isEmpty();
 
 		serviceContext.setAttribute("revisionInProgress", hasWorkflowTask);
 
@@ -388,8 +397,11 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
-		boolean hasWorkflowTask = StagingUtil.hasWorkflowTask(
-			serviceContext.getUserId(), layoutRevision);
+		boolean hasWorkflowTask =
+			!LayoutRevisionLocalServiceUtil.getLayoutRevisions(
+				layoutRevision.getLayoutSetBranchId(), layoutRevision.getPlid(),
+				WorkflowConstants.STATUS_PENDING
+			).isEmpty();
 
 		serviceContext.setAttribute("revisionInProgress", hasWorkflowTask);
 
