@@ -74,6 +74,7 @@ import com.liferay.portal.kernel.util.Time;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
+import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.randomizerbumpers.FriendlyURLRandomizerBumper;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.util.PortalImpl;
@@ -148,7 +149,10 @@ public class DefaultExportImportContentProcessorTest {
 		_externalGroup = GroupTestUtil.addGroup();
 		_liveGroup = GroupTestUtil.addGroup();
 
-		GroupTestUtil.enableLocalStaging(_liveGroup);
+		ServiceTestUtil.setUser(TestPropsValues.getUser());
+
+		GroupTestUtil.enableLocalStaging(
+			_liveGroup, TestPropsValues.getUserId());
 
 		_stagingGroup = _liveGroup.getStagingGroup();
 

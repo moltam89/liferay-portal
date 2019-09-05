@@ -47,6 +47,7 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.util.LocaleThreadLocal;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.service.test.ServiceTestUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
 import java.io.File;
@@ -103,6 +104,8 @@ public class StagingLocalizationTest {
 		CompanyTestUtil.resetCompanyLocales(
 			TestPropsValues.getCompanyId(), _locales, LocaleUtil.US);
 
+		ServiceTestUtil.setUser(TestPropsValues.getUser());
+
 		_sourceGroup = GroupTestUtil.addGroup();
 		_targetGroup = GroupTestUtil.addGroup();
 	}
@@ -157,7 +160,8 @@ public class StagingLocalizationTest {
 			String defaultContentLanguageId)
 		throws Exception {
 
-		GroupTestUtil.enableLocalStaging(_sourceGroup);
+		GroupTestUtil.enableLocalStaging(
+			_sourceGroup, TestPropsValues.getUserId());
 
 		JournalArticle article = JournalTestUtil.addArticle(
 			_sourceGroup.getGroupId(), "Title", "content",

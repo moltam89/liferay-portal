@@ -69,6 +69,8 @@ public class StagingGroupHelperTest {
 
 	@Before
 	public void setUp() throws Exception {
+		ServiceTestUtil.setUser(TestPropsValues.getUser());
+
 		_addLocalStagingGroups();
 
 		_addRemoteStagingGroups();
@@ -899,8 +901,6 @@ public class StagingGroupHelperTest {
 			(serverPort < 1) || (serverPort > 65535));
 
 		String pathContext = PortalUtil.getPathContext();
-
-		ServiceTestUtil.setUser(TestPropsValues.getUser());
 
 		ServiceContext serviceContext = new ServiceContext();
 
