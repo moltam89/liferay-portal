@@ -247,7 +247,13 @@ public class PortletDataContextImpl implements PortletDataContext {
 				_addAssetLinks(classNameId, GetterUtil.getLong(classPK));
 
 				addExpando(element, path, classedModel, clazz);
-				addLocks(clazz, String.valueOf(classPK));
+
+				if (getBooleanParameter(
+						clazz.getName(), PortletDataHandlerKeys.LOCKS, false)) {
+
+					addLocks(clazz, String.valueOf(classPK));
+				}
+
 				addPermissions(clazz, classPK);
 			}
 
