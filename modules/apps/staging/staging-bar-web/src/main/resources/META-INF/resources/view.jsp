@@ -222,12 +222,14 @@ if (liveLayout != null) {
 													</li>
 												</c:when>
 												<c:otherwise>
-													<liferay-staging:menu
-														cssClass="publish-link"
-														onlyActions="<%= true %>"
-													/>
+													<div class="col-2">
+														<liferay-staging:menu
+															cssClass="publish-link"
+															onlyActions="<%= true %>"
+														/>
+													</div>
 
-													<li>
+													<li class="col-10">
 														<c:choose>
 															<c:when test="<%= liveLayout == null %>">
 																<span class="last-publication-branch">
