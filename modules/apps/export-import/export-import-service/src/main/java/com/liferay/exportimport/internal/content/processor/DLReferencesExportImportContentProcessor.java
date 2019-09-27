@@ -673,11 +673,13 @@ public class DLReferencesExportImportContentProcessor
 	private String _getUuid(String s) {
 		Matcher matcher = _uuidPattern.matcher(s);
 
-		if (matcher.find()) {
-			return matcher.group(0);
+		String uuid = StringPool.BLANK;
+
+		while (matcher.find()) {
+			uuid = matcher.group(0);
 		}
 
-		return StringPool.BLANK;
+		return uuid;
 	}
 
 	private static final String[] _DL_REFERENCE_LEGACY_STOP_STRINGS = {
