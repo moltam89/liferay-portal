@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.exportimport.internal.content.processor;
+package com.liferay.exportimport.internal.exportimport.content.processor;
 
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
 import com.liferay.document.library.kernel.model.DLFileEntry;
