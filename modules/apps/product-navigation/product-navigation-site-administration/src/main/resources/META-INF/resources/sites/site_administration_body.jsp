@@ -26,6 +26,8 @@ Group group = siteAdministrationPanelCategoryDisplayContext.getGroup();
 String liveGroupURL;
 
 boolean showStagingInfo = siteAdministrationPanelCategoryDisplayContext.isShowStagingInfo();
+
+UnicodeProperties typeSettingsProperties = group.getTypeSettingsProperties();
 %>
 
 <c:if test="<%= group != null %>">
@@ -94,10 +96,10 @@ boolean showStagingInfo = siteAdministrationPanelCategoryDisplayContext.isShowSt
 								},
 								failure: failureCallback,
 								success: function() {
-									if (<%= !liveGroupURL.equals(StringPool.BLANK) %>) {
+									if (<%= GetterUtil.getBoolean(typeSettingsProperties.getProperty("isConnected")) %>) {
 										link.attr('href', '<%= liveGroupURL %>');
 
-										if (link.getAttribute('href') === 'javascript:;') {
+										if (link.getAttribute('href') === '') {
 											link.removeAttribute('href');
 											link.addClass('active');
 										}

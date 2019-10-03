@@ -33,12 +33,14 @@ import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.GroupLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.util.PropsValues;
@@ -163,7 +165,7 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 		return "live";
 	}
 
-	public String getLiveGroupURL() {
+	public String getLiveGroupURL() throws PortalException {
 		if (_liveGroupURL != null) {
 			return _liveGroupURL;
 		}
@@ -171,6 +173,12 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 		_liveGroupURL = StringPool.BLANK;
 
 		Group group = getGroup();
+
+		UnicodeProperties typeSettingsProperties =
+			group.getTypeSettingsProperties();
+
+		typeSettingsProperties.setProperty(
+			"isConnected", Boolean.TRUE.toString());
 
 		if (group.isStagedRemotely()) {
 			Layout layout = _themeDisplay.getLayout();
@@ -198,6 +206,9 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 						"Unable to connect to remote live: " +
 							cause.getMessage());
 				}
+
+				typeSettingsProperties.setProperty(
+					"isConnected", Boolean.FALSE.toString());
 			}
 		}
 		else if (group.isStagingGroup()) {
@@ -208,6 +219,9 @@ public class SiteAdministrationPanelCategoryDisplayContext {
 					liveGroup, _portletRequest);
 			}
 		}
+
+		GroupLocalServiceUtil.updateGroup(
+			group.getGroupId(), typeSettingsProperties.toString());
 
 		return _liveGroupURL;
 	}
