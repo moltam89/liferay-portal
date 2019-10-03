@@ -92,10 +92,10 @@ boolean showStagingInfo = siteAdministrationPanelCategoryDisplayContext.isShowSt
 							},
 							failure: failureCallback,
 							success: function() {
-								if (<%= !liveGroupURL.equals(StringPool.BLANK) %>) {
+								if (<%= SessionErrors.isEmpty(liferayPortletRequest) %>) {
 									link.attr('href', '<%= liveGroupURL %>');
 
-									if (link.getAttribute('href') === 'javascript:;') {
+									if (link.getAttribute('href') === '') {
 										link.removeAttribute('href');
 										link.addClass('active');
 									}
