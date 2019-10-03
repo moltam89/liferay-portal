@@ -69,7 +69,7 @@ boolean showStagingInfo = siteAdministrationPanelCategoryDisplayContext.isShowSt
 			var loader = A.one('#<portlet:namespace />loader');
 
 			var failureCallback = function() {
-				loader.hide();
+				link.removeAttribute('href');
 
 				new A.Tooltip({
 					bodyContent: Liferay.Language.get(
@@ -92,13 +92,19 @@ boolean showStagingInfo = siteAdministrationPanelCategoryDisplayContext.isShowSt
 							},
 							failure: failureCallback,
 							success: function() {
-								loader.hide();
+								if (<%= !liveGroupURL.equals(StringPool.BLANK) %>) {
+									link.attr('href', '<%= liveGroupURL %>');
 
-								link.attr('href', '<%= liveGroupURL %>');
-
-								if (link.getAttribute('href') === 'javascript:;') {
-									link.addClass('active');
+									if (link.getAttribute('href') === 'javascript:;') {
+										link.removeAttribute('href');
+										link.addClass('active');
+									}
+								} else {
+									failureCallback();
 								}
+							},
+							complete: function() {
+								loader.hide();
 							}
 						}
 					}
