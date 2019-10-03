@@ -161,19 +161,15 @@ public class EditPublishConfigurationMVCActionCommand
 
 			sendRedirect(actionRequest, actionResponse, redirect);
 		}
+		catch (ConnectException | RemoteExportException e) {
+			_log.error("Connection error: " + e.getMessage());
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(e, e);
+			}
+		}
 		catch (Exception e) {
-			if (e instanceof ConnectException ||
-				e instanceof RemoteExportException) {
-
-				_log.error("Connection error: " + e.getMessage());
-
-				if (_log.isDebugEnabled()) {
-					_log.debug(e, e);
-				}
-			}
-			else {
-				_log.error(e, e);
-			}
+			_log.error(e, e);
 
 			SessionErrors.add(actionRequest, e.getClass(), e);
 		}
