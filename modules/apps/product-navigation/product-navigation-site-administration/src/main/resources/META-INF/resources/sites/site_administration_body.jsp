@@ -82,7 +82,8 @@ boolean showStagingInfo = siteAdministrationPanelCategoryDisplayContext.isShowSt
 				).render();
 			};
 
-			AUI().ready(
+			Liferay.on(
+				'allPortletsReady',
 				function() {
 					A.io.request(
 						'<%= liveGroupURL = siteAdministrationPanelCategoryDisplayContext.getLiveGroupURL() %>',
