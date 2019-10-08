@@ -14,10 +14,17 @@
 
 package com.liferay.staging.bar.web.internal.portlet;
 
+import com.liferay.asset.display.page.constants.AssetDisplayPageWebKeys;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.exportimport.kernel.exception.RemoteExportException;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.exportimport.kernel.staging.StagingURLHelper;
+import com.liferay.info.display.contributor.InfoDisplayContributor;
+import com.liferay.info.display.contributor.InfoDisplayContributorTracker;
+import com.liferay.info.display.contributor.InfoDisplayObjectProvider;
+import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -32,6 +39,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutBranch;
+import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
 import com.liferay.portal.kernel.model.Release;
@@ -62,6 +70,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -201,13 +210,35 @@ public class StagingBarPortlet extends MVCPortlet {
 		String remoteURL = null;
 		String stagingURL = null;
 
+		InfoDisplayObjectProvider infoDisplayObjectProvider =
+			(InfoDisplayObjectProvider)httpServletRequest.getAttribute(
+				AssetDisplayPageWebKeys.INFO_DISPLAY_OBJECT_PROVIDER);
+
 		if (themeDisplay.isShowStagingIcon()) {
 			if (liveGroup != null) {
 				liveLayout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
 					layout.getUuid(), liveGroup.getGroupId(),
 					layout.isPrivateLayout());
 
-				if (liveLayout != null) {
+				if ((liveLayout != null) &&
+					Objects.equals(
+						liveLayout.getType(),
+						LayoutConstants.TYPE_ASSET_DISPLAY)) {
+
+					try {
+						liveURL = _getAssetDisplayURL(
+							liveLayout, liveGroup, infoDisplayObjectProvider,
+							themeDisplay);
+					}
+					catch (PortalException pe) {
+						throw new PortletException(pe);
+					}
+				}
+				else if ((liveLayout != null) &&
+						 !Objects.equals(
+							 liveLayout.getType(),
+							 LayoutConstants.TYPE_ASSET_DISPLAY)) {
+
 					try {
 						liveURL = _portal.getLayoutURL(
 							liveLayout, themeDisplay);
@@ -232,7 +263,25 @@ public class StagingBarPortlet extends MVCPortlet {
 						layout.getUuid(), stagingGroup.getGroupId(),
 						layout.isPrivateLayout());
 
-				if (stagingLayout != null) {
+				if ((stagingLayout != null) &&
+					Objects.equals(
+						stagingLayout.getType(),
+						LayoutConstants.TYPE_ASSET_DISPLAY)) {
+
+					try {
+						stagingURL = _getAssetDisplayURL(
+							stagingLayout, stagingGroup,
+							infoDisplayObjectProvider, themeDisplay);
+					}
+					catch (PortalException pe) {
+						throw new PortletException(pe);
+					}
+				}
+				else if ((stagingLayout != null) &&
+						 !Objects.equals(
+							 stagingLayout.getType(),
+							 LayoutConstants.TYPE_ASSET_DISPLAY)) {
+
 					try {
 						stagingURL = _portal.getLayoutURL(
 							stagingLayout, themeDisplay);
@@ -621,8 +670,49 @@ public class StagingBarPortlet extends MVCPortlet {
 		}
 	}
 
+	private String _getAssetDisplayURL(
+			Layout layout, Group group,
+			InfoDisplayObjectProvider infoDisplayObjectProvider,
+			ThemeDisplay themeDisplay)
+		throws PortalException {
+
+		if (infoDisplayObjectProvider == null) {
+			return _portal.getLayoutURL(layout, themeDisplay);
+		}
+
+		AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
+			infoDisplayObjectProvider.getClassNameId(),
+			infoDisplayObjectProvider.getClassPK());
+
+		if (assetEntry == null) {
+			return _portal.getLayoutURL(layout, themeDisplay);
+		}
+
+		InfoDisplayContributor infoDisplayContributor =
+			_infoDisplayContributorTracker.getInfoDisplayContributor(
+				_portal.getClassName(
+					infoDisplayObjectProvider.getClassNameId()));
+
+		StringBundler sb = new StringBundler(3);
+
+		sb.append(
+			_portal.getGroupFriendlyURL(
+				group.getPublicLayoutSet(), themeDisplay));
+		sb.append(infoDisplayContributor.getInfoURLSeparator());
+		sb.append(
+			infoDisplayObjectProvider.getURLTitle(themeDisplay.getLocale()));
+
+		return sb.toString();
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		StagingBarPortlet.class);
+
+	@Reference
+	private AssetEntryLocalService _assetEntryLocalService;
+
+	@Reference
+	private InfoDisplayContributorTracker _infoDisplayContributorTracker;
 
 	private LayoutLocalService _layoutLocalService;
 	private LayoutRevisionLocalService _layoutRevisionLocalService;
