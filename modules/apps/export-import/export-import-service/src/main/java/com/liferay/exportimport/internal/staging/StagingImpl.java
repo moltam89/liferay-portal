@@ -220,17 +220,30 @@ public class StagingImpl implements Staging {
 		}
 
 		if (stagedGroupedModel instanceof WorkflowedModel) {
-			WorkflowedModel workflowedModel =
-				(WorkflowedModel)stagedGroupedModel;
+			int[] exportableStatuses = {WorkflowConstants.STATUS_APPROVED};
+
+			String className = ExportImportClassedModelUtil.getClassName(
+				stagedGroupedModel);
 
 			StagedModelDataHandler stagedModelDataHandler =
 				StagedModelDataHandlerRegistryUtil.getStagedModelDataHandler(
-					ExportImportClassedModelUtil.getClassName(
-						stagedGroupedModel));
+					className);
+
+			if (stagedModelDataHandler != null) {
+				exportableStatuses =
+					stagedModelDataHandler.getExportableStatuses();
+			}
+			else if (_log.isWarnEnabled()) {
+				_log.warn(
+					"Unable find staged model data handler for class name " +
+						className);
+			}
+
+			WorkflowedModel workflowedModel =
+				(WorkflowedModel)stagedGroupedModel;
 
 			if (!ArrayUtil.contains(
-					stagedModelDataHandler.getExportableStatuses(),
-					workflowedModel.getStatus())) {
+					exportableStatuses, workflowedModel.getStatus())) {
 
 				removeModelFromChangesetCollection(model);
 
