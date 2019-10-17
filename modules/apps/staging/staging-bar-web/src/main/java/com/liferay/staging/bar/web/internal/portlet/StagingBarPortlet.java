@@ -15,8 +15,6 @@
 package com.liferay.staging.bar.web.internal.portlet;
 
 import com.liferay.asset.display.page.constants.AssetDisplayPageWebKeys;
-import com.liferay.asset.kernel.model.AssetEntry;
-import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.exportimport.kernel.exception.RemoteExportException;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.Staging;
@@ -680,14 +678,6 @@ public class StagingBarPortlet extends MVCPortlet {
 			return _portal.getLayoutURL(layout, themeDisplay);
 		}
 
-		AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
-			infoDisplayObjectProvider.getClassNameId(),
-			infoDisplayObjectProvider.getClassPK());
-
-		if (assetEntry == null) {
-			return _portal.getLayoutURL(layout, themeDisplay);
-		}
-
 		InfoDisplayContributor infoDisplayContributor =
 			_infoDisplayContributorTracker.getInfoDisplayContributor(
 				_portal.getClassName(
@@ -707,9 +697,6 @@ public class StagingBarPortlet extends MVCPortlet {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		StagingBarPortlet.class);
-
-	@Reference
-	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
 	private InfoDisplayContributorTracker _infoDisplayContributorTracker;
