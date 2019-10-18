@@ -64,6 +64,7 @@
 
 		int[] monthIds = CalendarUtil.getMonthIds();
 		String[] months = CalendarUtil.getMonths(locale);
+		String timeZoneID = timeZone.getID();
 		%>
 
 		<table class="staging-publish-schedule">
@@ -424,6 +425,8 @@
 				</tr>
 			</tbody>
 		</table>
+
+		<aui:input cssClass="calendar-portlet-time-zone-field" label="time-zone" name="timeZoneId" type="timeZone" value="<%= timeZoneID %>" />
 
 		<script>
 			(function() {
