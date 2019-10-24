@@ -1022,6 +1022,13 @@ public class LayoutRevisionWrapper
 		return model.isContentDisplayPage();
 	}
 
+	@Override
+	public boolean isCustomizable()
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return model.isCustomizable();
+	}
+
 	/**
 	 * Returns <code>true</code> if this layout revision is denied.
 	 *

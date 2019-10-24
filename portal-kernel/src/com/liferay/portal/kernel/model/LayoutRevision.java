@@ -97,6 +97,9 @@ public interface LayoutRevision extends LayoutRevisionModel, PersistedModel {
 
 	public boolean isContentDisplayPage();
 
+	public boolean isCustomizable()
+		throws com.liferay.portal.kernel.exception.PortalException;
+
 	public boolean isIconImage();
 
 	public boolean isInheritLookAndFeel();
