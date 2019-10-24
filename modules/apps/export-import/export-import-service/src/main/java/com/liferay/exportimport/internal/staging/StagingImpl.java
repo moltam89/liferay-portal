@@ -3451,7 +3451,7 @@ public class StagingImpl implements Staging {
 			portletRequest, "schedulerStartDate", true);
 
 		String cronText = SchedulerEngineHelperUtil.getCronText(
-			portletRequest, startCalendar, true, recurrenceType);
+			portletRequest, startCalendar, false, recurrenceType);
 
 		scheduleInformation.setCronText(cronText);
 
