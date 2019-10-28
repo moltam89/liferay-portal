@@ -112,6 +112,17 @@
 			<tbody>
 				<tr>
 					<th class="staging-scheduler-title">
+						<liferay-ui:message key="time-zone" />:
+					</th>
+					<td class="staging-scheduler-content">
+						<aui:input cssClass="calendar-portlet-time-zone-field" label="" name="timeZoneId" type="timeZone" value="<%= timeZoneID %>" />
+					</td>
+				</tr>
+			</tbody>
+
+			<tbody>
+				<tr>
+					<th class="staging-scheduler-title">
 						<liferay-ui:message key="end-date" />:
 					</th>
 					<td class="bottom-gap staging-scheduler-content">
@@ -425,8 +436,6 @@
 				</tr>
 			</tbody>
 		</table>
-
-		<aui:input cssClass="calendar-portlet-time-zone-field" label="time-zone" name="timeZoneId" type="timeZone" value="<%= timeZoneID %>" />
 
 		<script>
 			(function() {
