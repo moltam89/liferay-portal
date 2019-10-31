@@ -25,7 +25,7 @@ ExportImportToolbarDisplayContext exportImportToolbarDisplayContext = new Export
 	creationMenu="<%= exportImportToolbarDisplayContext.getCreationMenu() %>"
 	filterDropdownItems="<%= exportImportToolbarDisplayContext.getFilterDropdownItems() %>"
 	searchContainerId="<%= exportImportToolbarDisplayContext.getSearchContainerId() %>"
-	showCreationMenu="<%= !StagingUtil.isChangeTrackingEnabled(company.getCompanyId()) %>"
+	showCreationMenu="<%= true %>"
 	showSearch="<%= false %>"
 	sortingOrder="<%= exportImportToolbarDisplayContext.getSortingOrder() %>"
 	sortingURL="<%= exportImportToolbarDisplayContext.getSortingURL() %>"
