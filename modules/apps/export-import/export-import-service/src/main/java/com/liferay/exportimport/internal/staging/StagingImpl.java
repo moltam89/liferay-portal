@@ -14,7 +14,6 @@
 
 package com.liferay.exportimport.internal.staging;
 
-import com.liferay.change.tracking.model.CTPreferences;
 import com.liferay.change.tracking.service.CTPreferencesLocalService;
 import com.liferay.changeset.model.ChangesetCollection;
 import com.liferay.changeset.model.ChangesetEntry;
@@ -1908,18 +1907,6 @@ public class StagingImpl implements Staging {
 		}
 
 		return false;
-	}
-
-	@Override
-	public boolean isChangeTrackingEnabled(long companyId) {
-		CTPreferences ctPreferences =
-			_ctPreferencesLocalService.fetchCTPreferences(companyId, 0);
-
-		if (ctPreferences == null) {
-			return false;
-		}
-
-		return true;
 	}
 
 	@Override
