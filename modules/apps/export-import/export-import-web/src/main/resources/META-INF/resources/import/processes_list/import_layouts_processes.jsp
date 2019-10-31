@@ -17,7 +17,7 @@
 <%@ include file="/import/init.jsp" %>
 
 <liferay-staging:process-list
-	deleteMenu="<%= !StagingUtil.isChangeTrackingEnabled(company.getCompanyId()) %>"
+	deleteMenu="<%= true %>"
 	emptyResultsMessage="no-publication-processes-were-found"
 	localTaskExecutorClassName="<%= BackgroundTaskExecutorNames.LAYOUT_IMPORT_BACKGROUND_TASK_EXECUTOR %>"
 	mvcRenderCommandName="importLayoutsView"
