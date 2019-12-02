@@ -105,6 +105,7 @@ import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
@@ -468,6 +469,7 @@ public class LayoutStagedModelDataHandler
 		Layout existingLayout = null;
 
 		String friendlyURL = layout.getFriendlyURL();
+		String uuid = layout.getUuid();
 
 		String layoutsImportMode = MapUtil.getString(
 			portletDataContext.getParameterMap(),
@@ -481,6 +483,15 @@ public class LayoutStagedModelDataHandler
 				groupId, privateLayout);
 
 			friendlyURL = StringPool.SLASH + layoutId;
+		}
+		else if (layoutsImportMode.equals(
+					PortletDataHandlerKeys.
+						LAYOUTS_IMPORT_MODE_ADD_AS_NEW_PROTOTYPE)) {
+
+			layoutId = _layoutLocalService.getNextLayoutId(
+				groupId, privateLayout);
+
+			uuid = PortalUUIDUtil.generate();
 		}
 		else if (layoutsImportMode.equals(
 					PortletDataHandlerKeys.
@@ -513,7 +524,7 @@ public class LayoutStagedModelDataHandler
 						LAYOUTS_IMPORT_MODE_CREATED_FROM_PROTOTYPE)) {
 
 			existingLayout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
-				layout.getUuid(), groupId, privateLayout);
+				uuid, groupId, privateLayout);
 
 			if (SitesUtil.isLayoutModifiedSinceLastMerge(existingLayout)) {
 				layouts.put(oldLayoutId, existingLayout);
@@ -556,7 +567,7 @@ public class LayoutStagedModelDataHandler
 			// PortletDataHandlerKeys.LAYOUTS_IMPORT_MODE_MERGE_BY_LAYOUT_UUID
 
 			existingLayout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
-				layout.getUuid(), groupId, privateLayout);
+				uuid, groupId, privateLayout);
 
 			if (existingLayout == null) {
 				existingLayout = _layoutLocalService.fetchLayoutByFriendlyURL(
@@ -602,7 +613,7 @@ public class LayoutStagedModelDataHandler
 					PortletDataHandlerKeys.
 						LAYOUTS_IMPORT_MODE_CREATED_FROM_PROTOTYPE)) {
 
-				importedLayout.setSourcePrototypeLayoutUuid(layout.getUuid());
+				importedLayout.setSourcePrototypeLayoutUuid(uuid);
 
 				layoutId = _layoutLocalService.getNextLayoutId(
 					groupId, privateLayout);
@@ -618,7 +629,7 @@ public class LayoutStagedModelDataHandler
 					layout.getSourcePrototypeLayoutUuid());
 			}
 
-			importedLayout.setUuid(layout.getUuid());
+			importedLayout.setUuid(uuid);
 			importedLayout.setGroupId(groupId);
 			importedLayout.setUserId(userId);
 			importedLayout.setPrivateLayout(privateLayout);
