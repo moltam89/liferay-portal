@@ -23,7 +23,7 @@ List<LayoutSetBranch> layoutSetBranches = (List<LayoutSetBranch>)renderRequest.g
 liveGroup = (Group)renderRequest.getAttribute(StagingProcessesWebKeys.LIVE_GROUP);
 Layout liveLayout = (Layout)renderRequest.getAttribute(StagingProcessesWebKeys.LIVE_LAYOUT);
 String liveURL = (String)renderRequest.getAttribute(StagingProcessesWebKeys.LIVE_URL);
-String remoteSiteURL = (String)renderRequest.getAttribute(StagingProcessesWebKeys.REMOTE_SITE_URL);
+String remoteSiteURL = StringPool.BLANK;
 String remoteURL = (String)renderRequest.getAttribute(StagingProcessesWebKeys.REMOTE_URL);
 stagingGroup = (Group)renderRequest.getAttribute(StagingProcessesWebKeys.STAGING_GROUP);
 String stagingURL = (String)renderRequest.getAttribute(StagingProcessesWebKeys.STAGING_URL);
@@ -112,49 +112,9 @@ if (liveLayout != null) {
 			<c:choose>
 				<c:when test="<%= group.isStagedRemotely() %>">
 					<li class="control-menu-link control-menu-nav-item d-none d-sm-block live-link">
-						<c:choose>
-							<c:when test="<%= !remoteSiteURL.isEmpty() %>">
-								<a class="control-menu-icon" href="<%= HtmlUtil.escape(remoteSiteURL) %>" value="go-to-remote-live">
-									<aui:icon image="home" label="go-to-remote-live" markupView="lexicon" />
-								</a>
-							</c:when>
-							<c:when test="<%= SessionErrors.contains(renderRequest, AuthException.class) %>">
-								<a class="control-menu-icon" value="go-to-remote-live">
-									<aui:icon image="home" label="go-to-remote-live" markupView="lexicon" />
-								</a>
-
-								<liferay-ui:icon
-									icon="exclamation-full"
-									markupView="lexicon"
-									message="an-error-occurred-while-authenticating-user"
-									toolTip="<%= true %>"
-								/>
-							</c:when>
-							<c:when test="<%= SessionErrors.contains(renderRequest, RemoteExportException.class) %>">
-								<a class="control-menu-icon" value="go-to-remote-live">
-									<aui:icon image="home" label="go-to-remote-live" markupView="lexicon" />
-								</a>
-
-								<liferay-ui:icon
-									icon="exclamation-full"
-									markupView="lexicon"
-									message="the-connection-to-the-remote-live-site-cannot-be-established-due-to-a-network-problem"
-									toolTip="<%= true %>"
-								/>
-							</c:when>
-							<c:otherwise>
-								<a class="control-menu-icon" value="go-to-remote-live">
-									<aui:icon image="home" label="go-to-remote-live" markupView="lexicon" />
-								</a>
-
-								<liferay-ui:icon
-									icon="exclamation-full"
-									markupView="lexicon"
-									message="an-unexpected-error-occurred"
-									toolTip="<%= true %>"
-								/>
-							</c:otherwise>
-						</c:choose>
+						<a class="control-menu-icon" href="javascript:;" id="remoteSiteURL" value="go-to-remote-live">
+							<aui:icon image="home" label="go-to-remote-live" markupView="lexicon" />
+						</a>
 					</li>
 				</c:when>
 				<c:when test="<%= group.isStagingGroup() %>">
@@ -270,7 +230,7 @@ if (liveLayout != null) {
 		</aui:script>
 	</c:if>
 
-	<aui:script use="aui-base">
+	<aui:script use="aui-base,aui-io-request,aui-tooltip">
 		var viewPageStagingOptions = document.getElementById('viewPageStagingOptions');
 
 		var controlMenuLevelTwo = document.querySelector('.control-menu-level-2');
@@ -334,5 +294,67 @@ if (liveLayout != null) {
 		};
 
 		checkBackgroundTasks();
+
+		var link = document.getElementById('remoteSiteURL');
+
+		var failureCallback = function() {
+			link.removeAttribute('href');
+
+			new A.Tooltip({
+				bodyContent: Liferay.Language.get('an-unexpected-error-occurred'),
+				trigger: document.getElementById('remoteSiteURL'),
+				visible: false,
+				zIndex: Liferay.zIndex.TOOLTIP
+			}).render();
+		};
+
+		Liferay.on('allPortletsReady', function() {
+			A.io.request(
+				'<%= remoteSiteURL = StagingBarPortlet.getLiveGroupURL(group, liveGroup, layout, renderRequest) %>',
+				{
+					on: {
+						failure: failureCallback,
+						success: function() {
+							if (<%= SessionErrors.isEmpty(renderRequest) %>) {
+								if (link !== null) {
+									link.setAttribute(
+										'href',
+										'<%= HtmlUtil.escape(remoteSiteURL) %>'
+									);
+
+									if (link.getAttribute('href') === '') {
+										link.removeAttribute('href');
+									}
+								}
+							} else if (
+								<%= SessionErrors.contains(renderRequest, AuthException.class) %>
+							) {
+								new A.Tooltip({
+									bodyContent: Liferay.Language.get(
+										'an-error-occurred-while-authenticating-user'
+									),
+									trigger: document.getElementById('remoteSiteURL'),
+									visible: false,
+									zIndex: Liferay.zIndex.TOOLTIP
+								}).render();
+							} else if (
+								<%= SessionErrors.contains(renderRequest, RemoteExportException.class) %>
+							) {
+								new A.Tooltip({
+									bodyContent: Liferay.Language.get(
+										'the-connection-to-the-remote-live-site-cannot-be-established-due-to-a-network-problem'
+									),
+									trigger: document.getElementById('remoteSiteURL'),
+									visible: false,
+									zIndex: Liferay.zIndex.TOOLTIP
+								}).render();
+							} else {
+								failureCallback();
+							}
+						}
+					}
+				}
+			);
+		});
 	</aui:script>
 </c:if>

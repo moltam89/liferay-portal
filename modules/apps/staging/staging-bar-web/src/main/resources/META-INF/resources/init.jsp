@@ -76,6 +76,7 @@ page import="com.liferay.portal.kernel.workflow.WorkflowTask" %><%@
 page import="com.liferay.portal.util.PropsValues" %><%@
 page import="com.liferay.staging.bar.web.internal.display.context.LayoutBranchDisplayContext" %><%@
 page import="com.liferay.staging.bar.web.internal.display.context.LayoutSetBranchDisplayContext" %><%@
+page import="com.liferay.staging.bar.web.internal.portlet.StagingBarPortlet" %><%@
 page import="com.liferay.staging.constants.StagingProcessesWebKeys" %>
 
 <%@ page import="java.util.ArrayList" %><%@

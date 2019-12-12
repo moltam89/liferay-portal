@@ -18,6 +18,7 @@ import com.liferay.exportimport.kernel.exception.RemoteExportException;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.exportimport.kernel.staging.StagingURLHelper;
+import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -105,6 +106,47 @@ import org.osgi.service.component.annotations.Reference;
 	service = Portlet.class
 )
 public class StagingBarPortlet extends MVCPortlet {
+
+	public static String getLiveGroupURL(
+		Group group, Group liveGroup, Layout layout,
+		RenderRequest renderRequest) {
+
+		String remoteSiteURL = StringPool.BLANK;
+
+		if ((liveGroup != null) && group.isStagedRemotely()) {
+			try {
+				remoteSiteURL = StagingUtil.getRemoteSiteURL(
+					group, layout.isPrivateLayout());
+			}
+			catch (AuthException ae) {
+				_log.error(ae.getMessage());
+
+				SessionErrors.add(renderRequest, AuthException.class);
+			}
+			catch (SystemException se) {
+				Throwable cause = se.getCause();
+
+				if (!(cause instanceof ConnectException)) {
+					throw se;
+				}
+
+				if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Unable to connect to remote live: " +
+							cause.getMessage());
+				}
+
+				SessionErrors.add(renderRequest, RemoteExportException.class);
+			}
+			catch (Exception e) {
+				_log.error(e, e);
+
+				SessionErrors.add(renderRequest, Exception.class);
+			}
+		}
+
+		return remoteSiteURL;
+	}
 
 	public void deleteLayoutRevision(
 			ActionRequest actionRequest, ActionResponse actionResponse)
@@ -267,39 +309,6 @@ public class StagingBarPortlet extends MVCPortlet {
 
 			remoteURL = _stagingURLHelper.buildRemoteURL(
 				remoteAddress, remotePort, remotePathContext, secureConnection);
-
-			if ((liveGroup != null) && group.isStagedRemotely()) {
-				try {
-					remoteSiteURL = _staging.getRemoteSiteURL(
-						group, layout.isPrivateLayout());
-				}
-				catch (AuthException ae) {
-					_log.error(ae.getMessage());
-
-					SessionErrors.add(renderRequest, AuthException.class);
-				}
-				catch (SystemException se) {
-					Throwable cause = se.getCause();
-
-					if (!(cause instanceof ConnectException)) {
-						throw se;
-					}
-
-					if (_log.isWarnEnabled()) {
-						_log.warn(
-							"Unable to connect to remote live: " +
-								cause.getMessage());
-					}
-
-					SessionErrors.add(
-						renderRequest, RemoteExportException.class);
-				}
-				catch (Exception e) {
-					_log.error(e, e);
-
-					SessionErrors.add(renderRequest, Exception.class);
-				}
-			}
 		}
 
 		renderRequest.setAttribute(WebKeys.GROUP, group);
