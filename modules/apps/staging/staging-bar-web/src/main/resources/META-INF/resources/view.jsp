@@ -310,7 +310,7 @@ if (liveLayout != null) {
 
 		Liferay.on('allPortletsReady', function() {
 			A.io.request(
-				'<%= remoteSiteURL = StagingBarPortlet.getLiveGroupURL(group, liveGroup, layout, renderRequest) %>',
+				'<%= remoteSiteURL = stagingBarPortletDisplayContext.getLiveGroupURL(group, liveGroup, layout) %>',
 				{
 					on: {
 						failure: failureCallback,
