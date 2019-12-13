@@ -14,11 +14,9 @@
 
 package com.liferay.staging.bar.web.internal.portlet;
 
-import com.liferay.exportimport.kernel.exception.RemoteExportException;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.exportimport.kernel.staging.StagingURLHelper;
-import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.dao.orm.DynamicQuery;
@@ -28,8 +26,6 @@ import com.liferay.portal.kernel.exception.LayoutSetBranchNameException;
 import com.liferay.portal.kernel.exception.NoSuchGroupException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
-import com.liferay.portal.kernel.log.Log;
-import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutBranch;
@@ -37,7 +33,6 @@ import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
 import com.liferay.portal.kernel.model.Release;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
-import com.liferay.portal.kernel.security.auth.AuthException;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutRevisionLocalService;
@@ -59,8 +54,6 @@ import com.liferay.staging.bar.web.internal.portlet.constants.StagingBarPortletK
 import com.liferay.staging.constants.StagingProcessesWebKeys;
 
 import java.io.IOException;
-
-import java.net.ConnectException;
 
 import java.util.List;
 
@@ -106,47 +99,6 @@ import org.osgi.service.component.annotations.Reference;
 	service = Portlet.class
 )
 public class StagingBarPortlet extends MVCPortlet {
-
-	public static String getLiveGroupURL(
-		Group group, Group liveGroup, Layout layout,
-		RenderRequest renderRequest) {
-
-		String remoteSiteURL = StringPool.BLANK;
-
-		if ((liveGroup != null) && group.isStagedRemotely()) {
-			try {
-				remoteSiteURL = StagingUtil.getRemoteSiteURL(
-					group, layout.isPrivateLayout());
-			}
-			catch (AuthException ae) {
-				_log.error(ae.getMessage());
-
-				SessionErrors.add(renderRequest, AuthException.class);
-			}
-			catch (SystemException se) {
-				Throwable cause = se.getCause();
-
-				if (!(cause instanceof ConnectException)) {
-					throw se;
-				}
-
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to connect to remote live: " +
-							cause.getMessage());
-				}
-
-				SessionErrors.add(renderRequest, RemoteExportException.class);
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-
-				SessionErrors.add(renderRequest, Exception.class);
-			}
-		}
-
-		return remoteSiteURL;
-	}
 
 	public void deleteLayoutRevision(
 			ActionRequest actionRequest, ActionResponse actionResponse)
@@ -629,9 +581,6 @@ public class StagingBarPortlet extends MVCPortlet {
 			_portal.updateImageId(layout, false, null, "iconImageId", 0, 0, 0);
 		}
 	}
-
-	private static final Log _log = LogFactoryUtil.getLog(
-		StagingBarPortlet.class);
 
 	private LayoutLocalService _layoutLocalService;
 	private LayoutRevisionLocalService _layoutRevisionLocalService;
