@@ -185,6 +185,12 @@ public class StagedLayoutSetStagedModelDataHandler
 			if (!sourceLayoutUuids.contains(layout.getUuid()) &&
 				!layoutPlids.containsValue(layout.getPlid())) {
 
+				layout = _layoutLocalService.fetchLayout(layout.getPlid());
+
+				if (layout == null) {
+					continue;
+				}
+
 				String layoutUUID = layout.getUuid();
 				long stagingGroupID = portletDataContext.getSourceGroupId();
 
