@@ -61,8 +61,8 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 			return doAddDefaultData(
 				portletDataContext, portletId, portletPreferences);
 		}
-		catch (PortletDataException portletDataException) {
-			throw portletDataException;
+		catch (PortletDataException pde) {
+			throw pde;
 		}
 		catch (Exception exception) {
 			throw new PortletDataException(exception);
@@ -667,7 +667,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 
 			return document.formattedString();
 		}
-		catch (IOException ioException) {
+		catch (IOException ioe) {
 			return StringPool.BLANK;
 		}
 	}
