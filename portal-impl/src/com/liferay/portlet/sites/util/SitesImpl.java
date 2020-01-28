@@ -2156,9 +2156,20 @@ public class SitesImpl implements Sites {
 					Map<String, String[]> parameterMap =
 						getLayoutSetPrototypesParameters(true);
 
-					importLayoutSetPrototype(
-						layoutSetPrototype, groupId, privateLayout,
-						parameterMap, true);
+					boolean mergeLayoutPrototypesThreadLocalIsInProgress =
+						MergeLayoutPrototypesThreadLocal.isInProgress();
+
+					try {
+						MergeLayoutPrototypesThreadLocal.setInProgress(true);
+
+						importLayoutSetPrototype(
+							layoutSetPrototype, groupId, privateLayout,
+							parameterMap, true);
+					}
+					finally {
+						MergeLayoutPrototypesThreadLocal.setInProgress(
+							mergeLayoutPrototypesThreadLocalIsInProgress);
+					}
 				}
 			}
 		}
