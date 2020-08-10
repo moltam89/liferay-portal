@@ -51,6 +51,7 @@ import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
@@ -62,6 +63,7 @@ import java.io.IOException;
 import java.net.ConnectException;
 
 import java.util.List;
+import java.util.Locale;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -245,6 +247,30 @@ public class StagingBarPortlet extends MVCPortlet {
 					stagingURL = stagingGroup.getDisplayURL(
 						themeDisplay, layout.isPrivateLayout());
 				}
+			}
+
+			try {
+				if ((liveURL != null) && liveURL.equals(stagingURL)) {
+					String liveGroupFriendlyUrl = getGroupFriendlyURL(
+						liveGroup, themeDisplay);
+
+					String stagingGroupFriendlyUrl = getGroupFriendlyURL(
+						stagingGroup, themeDisplay);
+
+					if (layout.getGroupId() == liveGroup.getGroupId()) {
+						stagingURL = StringUtil.replace(
+							stagingURL, liveGroupFriendlyUrl,
+							stagingGroupFriendlyUrl);
+					}
+					else {
+						liveURL = StringUtil.replace(
+							liveURL, stagingGroupFriendlyUrl,
+							liveGroupFriendlyUrl);
+					}
+				}
+			}
+			catch (Exception exception) {
+				_log.error("Unable to change group friendly URLs", exception);
 			}
 
 			if (group.isStagingGroup() || group.isStagedRemotely()) {
@@ -435,6 +461,20 @@ public class StagingBarPortlet extends MVCPortlet {
 		else {
 			super.doDispatch(renderRequest, renderResponse);
 		}
+	}
+
+	protected String getGroupFriendlyURL(Group group, ThemeDisplay themeDisplay)
+		throws PortalException {
+
+		Locale locale = themeDisplay.getLocale();
+
+		if (locale != null) {
+			return _portal.getGroupFriendlyURL(
+				group.getPublicLayoutSet(), themeDisplay, locale);
+		}
+
+		return _portal.getGroupFriendlyURL(
+			group.getPublicLayoutSet(), themeDisplay);
 	}
 
 	@Override
