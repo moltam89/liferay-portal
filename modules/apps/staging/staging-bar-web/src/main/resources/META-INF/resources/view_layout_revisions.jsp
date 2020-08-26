@@ -98,18 +98,7 @@ List<LayoutRevision> rootLayoutRevisions = LayoutRevisionLocalServiceUtil.getChi
 							>
 								<aui:model-context bean="<%= curLayoutRevision %>" model="<%= LayoutRevision.class %>" />
 
-								<%
-								int status = curLayoutRevision.getStatus();
-								%>
-
-								<c:choose>
-									<c:when test="<%= curLayoutRevision.isHead() %>">
-										<aui:workflow-status showIcon="<%= false %>" showLabel="<%= false %>" status="<%= status %>" statusMessage="ready-for-publication" />
-									</c:when>
-									<c:otherwise>
-										<aui:workflow-status showIcon="<%= false %>" showLabel="<%= false %>" status="<%= status %>" />
-									</c:otherwise>
-								</c:choose>
+								<aui:workflow-status showIcon="<%= false %>" showLabel="<%= false %>" status="<%= curLayoutRevision.getStatus() %>" statusMessage="<%= _getStatusMessage(curLayoutRevision, group, layout) %>" />
 							</liferay-ui:search-container-column-text>
 
 							<liferay-ui:search-container-column-text
