@@ -81,6 +81,7 @@ page import="com.liferay.portal.kernel.exception.LocaleException" %><%@
 page import="com.liferay.portal.kernel.exception.NoSuchGroupException" %><%@
 page import="com.liferay.portal.kernel.exception.NoSuchLayoutException" %><%@
 page import="com.liferay.portal.kernel.exception.NoSuchRoleException" %><%@
+page import="com.liferay.portal.kernel.exception.PortalException" %><%@
 page import="com.liferay.portal.kernel.exception.PortletIdException" %><%@
 page import="com.liferay.portal.kernel.exception.RemoteOptionsException" %><%@
 page import="com.liferay.portal.kernel.exception.SystemException" %><%@
