@@ -146,7 +146,7 @@ else {
 						<portlet:param name="tabs1" value="scheduled" />
 					</portlet:renderURL>
 
-					<portlet:actionURL name="publishLayouts" var="deleteScheduledPublicationURL">
+					<portlet:actionURL name="/staging_processes/publish_layouts" var="deleteScheduledPublicationURL">
 						<portlet:param name="cmd" value="<%= cmd %>" />
 						<portlet:param name="stagingGroupId" value="<%= String.valueOf(stagingGroupId) %>" />
 						<portlet:param name="jobName" value="<%= schedulerResponse.getJobName() %>" />
