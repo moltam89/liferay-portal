@@ -115,7 +115,8 @@ public class StagingProcessesWebToolbarDisplayContext {
 
 							dropdownItem.setHref(
 								_liferayPortletResponse.createRenderURL(),
-								"mvcRenderCommandName", "publishLayouts",
+								"mvcRenderCommandName",
+								"/staging_processes/publish_layouts",
 								Constants.CMD, cmd,
 								"exportImportConfigurationId",
 								String.valueOf(
@@ -137,10 +138,10 @@ public class StagingProcessesWebToolbarDisplayContext {
 
 						dropdownItem.setHref(
 							_liferayPortletResponse.createRenderURL(),
-							"mvcRenderCommandName", "publishLayouts",
-							Constants.CMD, cmd, "groupId",
-							String.valueOf(stagingGroupId), "privateLayout",
-							Boolean.FALSE.toString());
+							"mvcRenderCommandName",
+							"/staging_processes/publish_layouts", Constants.CMD,
+							cmd, "groupId", String.valueOf(stagingGroupId),
+							"privateLayout", Boolean.FALSE.toString());
 						dropdownItem.setLabel(
 							LanguageUtil.get(
 								_httpServletRequest, "custom-publish-process"));
