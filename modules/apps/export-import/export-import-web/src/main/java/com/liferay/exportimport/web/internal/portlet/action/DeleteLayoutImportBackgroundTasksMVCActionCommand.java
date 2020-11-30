@@ -40,7 +40,7 @@ import org.osgi.service.component.annotations.Reference;
 	},
 	service = MVCActionCommand.class
 )
-public class DeleteLayoutImportBackgroundTaskMVCActionCommand
+public class DeleteLayoutImportBackgroundTasksMVCActionCommand
 	extends BaseMVCActionCommand {
 
 	@Override
