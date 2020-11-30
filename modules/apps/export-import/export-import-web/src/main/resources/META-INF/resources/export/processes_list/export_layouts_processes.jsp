@@ -37,7 +37,7 @@ portletURL.setParameter("orderByType", orderByType);
 portletURL.setParameter("searchContainerId", searchContainerId);
 %>
 
-<portlet:actionURL name="deleteBackgroundTasks" var="deleteBackgroundTasksURL">
+<portlet:actionURL name="/export_import/delete_layout_export_background_tasks" var="deleteBackgroundTasksURL">
 	<portlet:param name="redirect" value="<%= currentURL.toString() %>" />
 </portlet:actionURL>
 
@@ -322,7 +322,7 @@ portletURL.setParameter("searchContainerId", searchContainerId);
 							url="<%= relaunchURL %>"
 						/>
 
-						<portlet:actionURL name="deleteBackgroundTasks" var="deleteBackgroundTaskURL">
+						<portlet:actionURL name="/export_import/delete_layout_export_background_tasks" var="deleteBackgroundTaskURL">
 							<portlet:param name="redirect" value="<%= portletURL.toString() %>" />
 							<portlet:param name="deleteBackgroundTaskIds" value="<%= String.valueOf(backgroundTask.getBackgroundTaskId()) %>" />
 						</portlet:actionURL>

@@ -36,7 +36,7 @@ import org.osgi.service.component.annotations.Reference;
 	immediate = true,
 	property = {
 		"javax.portlet.name=" + ExportImportPortletKeys.IMPORT,
-		"mvc.command.name=deleteBackgroundTasks"
+		"mvc.command.name=/export_import/delete_layout_import_background_tasks"
 	},
 	service = MVCActionCommand.class
 )
