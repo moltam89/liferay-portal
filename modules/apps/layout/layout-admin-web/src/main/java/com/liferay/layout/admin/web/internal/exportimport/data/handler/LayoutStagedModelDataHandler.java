@@ -573,7 +573,9 @@ public class LayoutStagedModelDataHandler
 			existingLayout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
 				uuid, groupId, privateLayout);
 
-			if (SitesUtil.isLayoutModifiedSinceLastMerge(existingLayout)) {
+			if (SitesUtil.isLayoutModifiedSinceLastMerge(existingLayout) ||
+				!isLayoutOutdated(existingLayout, layout)) {
+
 				layouts.put(oldLayoutId, existingLayout);
 
 				return;
@@ -1866,6 +1868,28 @@ public class LayoutStagedModelDataHandler
 			companyId, groupId, userId, Layout.class.getName(),
 			importedLayout.getPlid(), false, addGroupPermissions,
 			addGuestPermissions);
+	}
+
+	protected boolean isLayoutOutdated(Layout layout, Layout layoutPrototype) {
+		if ((layout == null) || (layoutPrototype == null)) {
+			return true;
+		}
+
+		Date layoutModifiedDate = layout.getModifiedDate();
+
+		long lastMergeTime = GetterUtil.getLong(
+			layout.getTypeSettingsProperty(Sites.LAST_MERGE_TIME));
+
+		Date layoutPrototypeModifiedDate = layoutPrototype.getModifiedDate();
+
+		if ((layoutModifiedDate == null) ||
+			(layoutPrototypeModifiedDate == null) ||
+			(layoutPrototypeModifiedDate.getTime() > lastMergeTime)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	@Override
