@@ -144,3 +144,5 @@ else {
 	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "add-page"), currentURL);
 }
 %>
+
+<%@ include file="/propagation_alert.jspf" %>

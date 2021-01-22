@@ -213,3 +213,5 @@
 		});
 	});
 </aui:script>
+
+<%@ include file="/propagation_alert.jspf" %>
