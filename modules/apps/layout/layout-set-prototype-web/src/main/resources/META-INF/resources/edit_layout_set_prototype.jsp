@@ -144,3 +144,13 @@ else {
 	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "add-page"), currentURL);
 }
 %>
+
+<c:if test='<%= SessionMessages.contains(renderRequest, "disablePropagation") %>'>
+	<aui:script>
+		Liferay.Util.openToast({
+			autoClose: 10000,
+			message: '<liferay-ui:message key="Propagation has been disabled. Connected sites might not have been updated yet." />',
+			type: 'info'
+		});
+	</aui:script>
+</c:if>
