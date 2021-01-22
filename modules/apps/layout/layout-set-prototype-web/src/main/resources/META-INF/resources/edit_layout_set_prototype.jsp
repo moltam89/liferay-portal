@@ -144,3 +144,23 @@ else {
 	PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(request, "add-page"), currentURL);
 }
 %>
+
+<c:if test='<%= SessionMessages.contains(renderRequest, "disablePropagation") %>'>
+	<aui:script>
+		Liferay.Util.openToast({
+			autoClose: 10000,
+			message: '<liferay-ui:message key="propagation-is-disabled-connected-sites-might-not-have-been-updated-yet-propagation-is-only-triggered-when-a-site-created-from-the-template-is-visited" />',
+			type: 'info'
+		});
+	</aui:script>
+</c:if>
+
+<c:if test='<%= SessionMessages.contains(renderRequest, "enablePropagation") %>'>
+	<aui:script>
+		Liferay.Util.openToast({
+			autoClose: 10000,
+			message: '<liferay-ui:message key="propagation-is-enabled-connected-sites-will-be-updated-once-a-site-page-is-visited" />',
+			type: 'info'
+		});
+	</aui:script>
+</c:if>
