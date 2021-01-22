@@ -16,6 +16,8 @@
 
 <%@ include file="/init.jsp" %>
 
+<%@ include file="/propagation_alert.jspf" %>
+
 <%
 String redirect = ParamUtil.getString(request, "redirect");
 

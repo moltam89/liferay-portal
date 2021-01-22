@@ -1,0 +1,37 @@
+<%--
+/**
+ * Copyright (c) 2000-present Liferay, Inc. All rights reserved.
+ *
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License as published by the Free
+ * Software Foundation; either version 2.1 of the License, or (at your option)
+ * any later version.
+ *
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
+ * details.
+ */
+--%>
+
+<c:if test='<%= SessionMessages.contains(renderRequest, "disablePropagation") %>'>
+	<aui:script>
+		Liferay.Util.openToast({
+			autoClose: 10000,
+			message:
+				'<liferay-ui:message key="propagation-is-disabled-connected-sites-might-not-have-been-updated-yet-propagation-is-only-triggered-when-a-site-created-from-the-template-is-visited" />',
+			type: 'info',
+		});
+	</aui:script>
+</c:if>
+
+<c:if test='<%= SessionMessages.contains(renderRequest, "enablePropagation") %>'>
+	<aui:script>
+		Liferay.Util.openToast({
+			autoClose: 10000,
+			message:
+				'<liferay-ui:message key="propagation-is-enabled-connected-sites-will-be-updated-once-a-site-page-is-visited" />',
+			type: 'info',
+		});
+	</aui:script>
+</c:if>
