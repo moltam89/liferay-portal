@@ -30,6 +30,7 @@ import com.liferay.portal.kernel.service.LayoutSetPrototypeService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
 import com.liferay.portal.kernel.servlet.SessionErrors;
+import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.LocalizationUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -166,6 +167,20 @@ public class LayoutSetPrototypePortlet extends MVCPortlet {
 			// Update layout prototoype
 
 			layoutSetPrototype =
+				layoutSetPrototypeService.getLayoutSetPrototype(
+					layoutSetPrototypeId);
+
+			UnicodeProperties oldSettingsUnicodeProperties =
+				layoutSetPrototype.getSettingsProperties();
+
+			boolean oldReadyForPropagation = GetterUtil.getBoolean(
+				oldSettingsUnicodeProperties.getProperty(
+					"readyForPropagation"));
+
+			_addSessionMessages(
+				actionRequest, oldReadyForPropagation, readyForPropagation);
+
+			layoutSetPrototype =
 				layoutSetPrototypeService.updateLayoutSetPrototype(
 					layoutSetPrototypeId, nameMap, descriptionMap, active,
 					layoutsUpdateable, readyForPropagation, serviceContext);
@@ -211,11 +226,14 @@ public class LayoutSetPrototypePortlet extends MVCPortlet {
 		boolean layoutsUpdateable = GetterUtil.getBoolean(
 			settingsUnicodeProperties.getProperty("layoutsUpdateable"));
 
-		boolean readyForPropagation = GetterUtil.getBoolean(
+		boolean oldReadyForPropagation = GetterUtil.getBoolean(
 			settingsUnicodeProperties.getProperty("readyForPropagation"));
 
-		readyForPropagation = ParamUtil.getBoolean(
-			actionRequest, "readyForPropagation", readyForPropagation);
+		boolean readyForPropagation = ParamUtil.getBoolean(
+			actionRequest, "readyForPropagation", oldReadyForPropagation);
+
+		_addSessionMessages(
+			actionRequest, oldReadyForPropagation, readyForPropagation);
 
 		ServiceContext serviceContext = ServiceContextFactory.getInstance(
 			actionRequest);
@@ -281,5 +299,18 @@ public class LayoutSetPrototypePortlet extends MVCPortlet {
 	protected LayoutSetPrototypeService layoutSetPrototypeService;
 	protected PanelAppRegistry panelAppRegistry;
 	protected PanelCategoryRegistry panelCategoryRegistry;
+
+	private void _addSessionMessages(
+		ActionRequest actionRequest, boolean oldReadyForPropagation,
+		boolean readyForPropagation) {
+
+		if (oldReadyForPropagation && !readyForPropagation) {
+			SessionMessages.add(actionRequest, "disablePropagation");
+		}
+
+		if (!oldReadyForPropagation && readyForPropagation) {
+			SessionMessages.add(actionRequest, "enablePropagation");
+		}
+	}
 
 }
