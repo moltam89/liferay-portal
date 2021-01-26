@@ -80,7 +80,22 @@
 			</c:if>
 
 			<li class="layout-selector-options">
-				<aui:fieldset helpMessage="child-page-publish-process-warning" label='<%= "pages-to-" + action %>'>
+
+				<%
+				String childPageHelpMessage = "child-page-export-process-warning";
+
+				if (action.equals(Constants.PUBLISH)) {
+					childPageHelpMessage = "child-page-publish-process-warning";
+
+					ExportImportServiceConfiguration exportImportServiceConfiguration = ConfigurationProviderUtil.getCompanyConfiguration(ExportImportServiceConfiguration.class, company.getCompanyId());
+
+					if (!exportImportServiceConfiguration.publishParentLayoutsByDefault()) {
+						childPageHelpMessage = null;
+					}
+				}
+				%>
+
+				<aui:fieldset helpMessage="<%= childPageHelpMessage %>" label='<%= "pages-to-" + action %>'>
 					<c:choose>
 						<c:when test="<%= disableInputs %>">
 							<liferay-util:buffer
