@@ -16,7 +16,7 @@
 
 <%@ include file="/dynamic_include/init.jsp" %>
 
-<div class="staging">
+<div class="staging-top">
 	<liferay-portlet:runtime
 		portletName="<%= StagingBarPortletKeys.STAGING_BAR %>"
 	/>
