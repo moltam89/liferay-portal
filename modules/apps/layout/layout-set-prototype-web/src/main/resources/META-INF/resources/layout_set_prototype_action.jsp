@@ -93,13 +93,9 @@ boolean readyForPropagation = GetterUtil.getBoolean(layoutSetPrototype.getSettin
 					<portlet:param name="readyForPropagation" value="<%= Boolean.FALSE.toString() %>" />
 				</portlet:actionURL>
 
-				<%
-				String taglibDisablePropagationURL = "javascript:if (confirm('" + UnicodeLanguageUtil.get(resourceBundle, "are-you-sure-you-want-to-disable-propagation-connected-sites-might-not-have-triggered-the-propagation-yet") + "')){submitForm(document.hrefFm, '" + HtmlUtil.escapeJS(disablePropagationURL.toString()) + "');}";
-				%>
-
 				<liferay-ui:icon
 					message="disable-propagation"
-					url="<%= taglibDisablePropagationURL %>"
+					url="<%= disablePropagationURL %>"
 				/>
 			</c:when>
 			<c:when test="<%= !readyForPropagation %>">
