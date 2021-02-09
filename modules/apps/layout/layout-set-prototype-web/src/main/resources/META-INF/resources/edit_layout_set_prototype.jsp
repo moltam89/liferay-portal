@@ -149,7 +149,7 @@ else {
 	<aui:script>
 		Liferay.Util.openToast({
 			autoClose: 10000,
-			message: '<liferay-ui:message key="propagation-is-disabled-connected-sites-might-not-have-been-updated-yet-propagation-is-only-triggered-when-a-site-created-from-the-template-is-visited" />',
+			message: '<liferay-ui:message key="disable-propagation" />',
 			type: 'info'
 		});
 	</aui:script>
@@ -159,7 +159,7 @@ else {
 	<aui:script>
 		Liferay.Util.openToast({
 			autoClose: 10000,
-			message: '<liferay-ui:message key="propagation-is-enabled-connected-sites-will-be-updated-once-a-site-page-is-visited" />',
+			message: '<liferay-ui:message key="ready-for-propagation" />',
 			type: 'info'
 		});
 	</aui:script>
