@@ -39,10 +39,11 @@ portletURL.setParameter("orderByType", orderByType);
 portletURL.setParameter("searchContainerId", String.valueOf(searchContainerId));
 %>
 
-<clay:management-toolbar-v2
+<clay:management-toolbar
 	actionDropdownItems="<%= stagingProcessesWebToolbarDisplayContext.getActionDropdownItems(hasPublishStagingPermission) %>"
 	creationMenu="<%= stagingProcessesWebToolbarDisplayContext.getCreationMenu(hasPublishStagingPermission) %>"
 	filterDropdownItems="<%= stagingProcessesWebToolbarDisplayContext.getFilterDropdownItems() %>"
+	propsTransformer="js/StagingProcessesWebToolbarPropsTransformer"
 	searchContainerId="<%= searchContainerId %>"
 	selectable="<%= hasPublishStagingPermission %>"
 	showCreationMenu='<%= tabs1.equals("processes") && hasPublishStagingPermission %>'

@@ -57,8 +57,8 @@ StagingProcessesWebPublishTemplatesToolbarDisplayContext stagingProcessesWebPubl
 	navigationItems="<%= publishTemplatesDisplayContext.getNavigationItems() %>"
 />
 
-<clay:management-toolbar-v2
-	displayContext="<%= stagingProcessesWebPublishTemplatesToolbarDisplayContext %>"
+<clay:management-toolbar
+	managementToolbarDisplayContext="<%= stagingProcessesWebPublishTemplatesToolbarDisplayContext %>"
 	searchFormName="searchFm"
 	selectable="<%= false %>"
 	showCreationMenu="<%= true %>"

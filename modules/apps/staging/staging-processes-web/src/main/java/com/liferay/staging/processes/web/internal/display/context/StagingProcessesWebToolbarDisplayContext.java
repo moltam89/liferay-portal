@@ -68,8 +68,7 @@ public class StagingProcessesWebToolbarDisplayContext {
 
 		return DropdownItemListBuilder.add(
 			dropdownItem -> {
-				dropdownItem.setHref(
-					"javascript:" + _portletNamespace + "deleteEntries();");
+				dropdownItem.putData("action", "deleteEntries");
 				dropdownItem.setLabel(
 					LanguageUtil.get(_httpServletRequest, "delete"));
 			}
