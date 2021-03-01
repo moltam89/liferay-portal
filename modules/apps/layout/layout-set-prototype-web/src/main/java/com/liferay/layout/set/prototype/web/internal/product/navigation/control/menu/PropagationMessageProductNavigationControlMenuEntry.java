@@ -63,6 +63,10 @@ public class PropagationMessageProductNavigationControlMenuEntry
 
 		Layout layout = themeDisplay.getLayout();
 
+		if (layout.isTypeControlPanel()) {
+			return false;
+		}
+
 		Group group = layout.getGroup();
 
 		if ((group == null) || !group.isLayoutSetPrototype()) {
