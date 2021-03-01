@@ -154,6 +154,7 @@ const CreationMenu = ({
 						<ClayButtonWithIcon
 							className="nav-btn nav-btn-monospaced"
 							symbol="plus"
+							title={primaryItems[0].label}
 						/>
 					}
 				>
@@ -217,6 +218,7 @@ const CreationMenu = ({
 						onCreateButtonClick(event, {item: primaryItems[0]});
 					}}
 					symbol="plus"
+					title={primaryItems[0].label}
 				/>
 			)}
 		</>
