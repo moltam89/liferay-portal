@@ -20,7 +20,7 @@
 
 <liferay-ui:error exception="<%= RequiredLayoutSetPrototypeException.class %>" message="you-cannot-delete-site-templates-that-are-used-by-a-site" />
 
-<clay:management-toolbar-v2
+<clay:management-toolbar
 	actionDropdownItems="<%= layoutSetPrototypeDisplayContext.getActionDropdownItems() %>"
 	clearResultsURL="<%= layoutSetPrototypeDisplayContext.getClearResultsURL() %>"
 	componentId="layoutSetPrototypeWebManagementToolbar"
@@ -28,6 +28,7 @@
 	filterDropdownItems="<%= layoutSetPrototypeDisplayContext.getFilterDropdownItems() %>"
 	infoPanelId="infoPanelId"
 	itemsTotal="<%= layoutSetPrototypeDisplayContext.getTotalItems() %>"
+	propsTransformer="js/LayoutSetManagementToolbarPropsTransformer"
 	searchActionURL="<%= layoutSetPrototypeDisplayContext.getSearchActionURL() %>"
 	searchContainerId="layoutSetPrototype"
 	searchFormName="searchFm"
@@ -187,31 +188,3 @@
 		/>
 	</liferay-ui:search-container>
 </aui:form>
-
-<aui:script sandbox="<%= true %>">
-	var deleteLayoutSetPrototypes = function () {
-		if (
-			confirm(
-				'<liferay-ui:message key="are-you-sure-you-want-to-delete-this" />'
-			)
-		) {
-			submitForm(document.querySelector('#<portlet:namespace />fm'));
-		}
-	};
-
-	var ACTIONS = {
-		deleteLayoutSetPrototypes: deleteLayoutSetPrototypes,
-	};
-
-	Liferay.componentReady('layoutSetPrototypeWebManagementToolbar').then(
-		(managementToolbar) => {
-			managementToolbar.on('actionItemClicked', (event) => {
-				var itemData = event.data.item.data;
-
-				if (itemData && itemData.action && ACTIONS[itemData.action]) {
-					ACTIONS[itemData.action]();
-				}
-			});
-		}
-	);
-</aui:script>
