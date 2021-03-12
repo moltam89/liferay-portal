@@ -23,10 +23,9 @@ PropagationMessageDisplayContext propagationMessageDisplayContext = new Propagat
 <li class="control-menu-nav-item">
 	<liferay-ui:icon
 		cssClass="control-menu-icon icon-monospaced"
-		icon="information-live"
+		icon="merge"
 		label="<%= false %>"
 		markupView="lexicon"
-		message="additional-information"
 	/>
 
 	<react:component

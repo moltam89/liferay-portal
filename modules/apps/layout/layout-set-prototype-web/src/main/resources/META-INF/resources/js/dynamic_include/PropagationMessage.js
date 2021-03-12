@@ -66,8 +66,7 @@ export default function ({
 						ref.current = node;
 					}}
 					small
-					symbol="information-live"
-					title={Liferay.Language.get('additional-information')}
+					symbol="merge"
 				/>
 			}
 		>
