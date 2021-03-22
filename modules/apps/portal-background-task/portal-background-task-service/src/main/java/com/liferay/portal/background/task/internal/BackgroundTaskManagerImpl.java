@@ -638,7 +638,9 @@ public class BackgroundTaskManagerImpl implements BackgroundTaskManager {
 		backgroundTaskStatusDestination.register(
 			removeOnCompletionBackgroundTaskStatusMessageListener);
 
-		if (!_clusterMasterExecutor.isEnabled()) {
+		if (!_clusterMasterExecutor.isEnabled() ||
+			_clusterMasterExecutor.isMaster()) {
+
 			cleanUpBackgroundTasks();
 		}
 	}
