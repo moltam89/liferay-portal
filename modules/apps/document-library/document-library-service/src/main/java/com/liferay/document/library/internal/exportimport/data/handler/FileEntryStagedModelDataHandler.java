@@ -480,13 +480,14 @@ public class FileEntryStagedModelDataHandler
 
 						FileEntry existingTitleFileEntry =
 							FileEntryUtil.fetchByR_F_T(
-								repositoryId, folderId, fileEntry.getTitle());
+								portletDataContext.getScopeGroupId(), folderId,
+								fileEntry.getTitle());
 
 						if (existingTitleFileEntry == null) {
 							existingTitleFileEntry =
 								FileEntryUtil.fetchByR_F_FN(
-									repositoryId, folderId,
-									fileEntry.getFileName());
+									portletDataContext.getScopeGroupId(),
+									folderId, fileEntry.getFileName());
 						}
 
 						if (existingTitleFileEntry != null) {
