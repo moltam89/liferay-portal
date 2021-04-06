@@ -42,6 +42,7 @@ import com.liferay.portal.kernel.service.persistence.LayoutUtil;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntry;
 import com.liferay.portal.kernel.systemevent.SystemEventHierarchyEntryThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.kernel.util.CopyLayoutThreadLocal;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
@@ -364,7 +365,9 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 
 		serviceContext.setAttribute("revisionInProgress", hasWorkflowTask);
 
-		if (!MergeLayoutPrototypesThreadLocal.isInProgress()) {
+		if (!MergeLayoutPrototypesThreadLocal.isInProgress() &&
+			!CopyLayoutThreadLocal.isCopyLayout()) {
+
 			serviceContext.setWorkflowAction(
 				WorkflowConstants.ACTION_SAVE_DRAFT);
 		}
@@ -669,11 +672,14 @@ public class LayoutLocalServiceStagingAdvice implements BeanFactoryAware {
 		public Object invoke(Object proxy, Method method, Object[] arguments)
 			throws Throwable {
 
-			if (!StagingAdvicesThreadLocal.isEnabled()) {
+			String methodName = method.getName();
+
+			if (!StagingAdvicesThreadLocal.isEnabled() &&
+				!(CopyLayoutThreadLocal.isCopyLayout() &&
+				  methodName.equals("updateLookAndFeel"))) {
+
 				return _invoke(method, arguments);
 			}
-
-			String methodName = method.getName();
 
 			if (!_layoutLocalServiceStagingAdviceMethodNames.contains(
 					methodName)) {
