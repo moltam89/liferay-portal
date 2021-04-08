@@ -16,7 +16,6 @@ package com.liferay.exportimport.internal.background.task;
 
 import com.liferay.changeset.service.ChangesetEntryLocalServiceUtil;
 import com.liferay.changeset.util.ChangesetThreadLocal;
-import com.liferay.exportimport.configuration.ExportImportServiceConfiguration;
 import com.liferay.exportimport.kernel.lar.MissingReference;
 import com.liferay.exportimport.kernel.lar.MissingReferences;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
@@ -41,6 +40,7 @@ import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.staging.configuration.StagingConfiguration;
 
 import java.io.File;
 import java.io.Serializable;
@@ -79,11 +79,10 @@ public abstract class BaseStagingBackgroundTaskExecutor
 	}
 
 	protected void deleteTempLarOnFailure(File file) {
-		ExportImportServiceConfiguration exportImportServiceConfiguration =
-			getExportImportServiceConfiguration();
+		StagingConfiguration stagingConfiguration = getStagingConfiguration();
 
-		if ((exportImportServiceConfiguration == null) ||
-			exportImportServiceConfiguration.stagingDeleteTempLarOnFailure()) {
+		if ((stagingConfiguration == null) ||
+			stagingConfiguration.stagingDeleteTempLarOnFailure()) {
 
 			FileUtil.delete(file);
 		}
@@ -93,11 +92,10 @@ public abstract class BaseStagingBackgroundTaskExecutor
 	}
 
 	protected void deleteTempLarOnSuccess(File file) {
-		ExportImportServiceConfiguration exportImportServiceConfiguration =
-			getExportImportServiceConfiguration();
+		StagingConfiguration stagingConfiguration = getStagingConfiguration();
 
-		if ((exportImportServiceConfiguration == null) ||
-			exportImportServiceConfiguration.stagingDeleteTempLarOnSuccess()) {
+		if ((stagingConfiguration == null) ||
+			stagingConfiguration.stagingDeleteTempLarOnSuccess()) {
 
 			FileUtil.delete(file);
 		}
@@ -106,18 +104,14 @@ public abstract class BaseStagingBackgroundTaskExecutor
 		}
 	}
 
-	protected ExportImportServiceConfiguration
-		getExportImportServiceConfiguration() {
-
+	protected StagingConfiguration getStagingConfiguration() {
 		try {
 			return ConfigurationProviderUtil.getCompanyConfiguration(
-				ExportImportServiceConfiguration.class,
-				CompanyThreadLocal.getCompanyId());
+				StagingConfiguration.class, CompanyThreadLocal.getCompanyId());
 		}
 		catch (ConfigurationException configurationException) {
 			_log.error(
-				"Unable to load export import service configuration",
-				configurationException);
+				"Unable to load staging configuration", configurationException);
 		}
 
 		return null;
