@@ -87,9 +87,9 @@
 				if (action.equals(Constants.PUBLISH)) {
 					childPageHelpMessage = "child-page-publish-process-warning";
 
-					ExportImportServiceConfiguration exportImportServiceConfiguration = ConfigurationProviderUtil.getCompanyConfiguration(ExportImportServiceConfiguration.class, company.getCompanyId());
+					StagingConfiguration stagingConfiguration = ConfigurationProviderUtil.getCompanyConfiguration(StagingConfiguration.class, company.getCompanyId());
 
-					if (!exportImportServiceConfiguration.publishParentLayoutsByDefault()) {
+					if (!stagingConfiguration.publishParentLayoutsByDefault()) {
 						childPageHelpMessage = null;
 					}
 				}
