@@ -192,12 +192,16 @@ public class PortletExportControllerImpl implements PortletExportController {
 
 			List<AssetLink> assetLinks = new ArrayList<>();
 
-			assetLinks.addAll(
-				_assetLinkLocalService.getLinks(
-					portletDataContext.getGroupId(),
-					portletDataContext.getStartDate(),
-					portletDataContext.getEndDate(), QueryUtil.ALL_POS,
-					QueryUtil.ALL_POS));
+			if (ExportImportThreadLocal.isLayoutExportInProcess() ||
+				ExportImportThreadLocal.isLayoutStagingInProcess()) {
+
+				assetLinks.addAll(
+					_assetLinkLocalService.getLinks(
+						portletDataContext.getGroupId(),
+						portletDataContext.getStartDate(),
+						portletDataContext.getEndDate(), QueryUtil.ALL_POS,
+						QueryUtil.ALL_POS));
+			}
 
 			Set<Long> assetLinkIds = portletDataContext.getAssetLinkIds();
 
