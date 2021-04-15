@@ -391,6 +391,23 @@ public class AssetCategoriesSelectorTag extends IncludeTag {
 
 		return vocabulariesList;
 	}
+	
+	protected List<Map<String, String>> myCategories() {
+
+		List<Map<String, String>> myCategoryList = new ArrayList<Map<String, String>>();
+
+		myCategoryList.add(HashMapBuilder.<String, String>put(
+					"id", "1"
+				).put(
+					"inputName", "mycategory01"
+				).put(
+					"group", "MyGroup"
+				).put(
+					"title", "My Title"
+				).build());
+
+		return myCategoryList;
+	}
 
 	@Override
 	protected void setAttributes(HttpServletRequest httpServletRequest) {
@@ -425,6 +442,8 @@ public class AssetCategoriesSelectorTag extends IncludeTag {
 					}
 				).put(
 					"portletURL", getPortletURL().toString()
+				).put(
+					"myCategories", myCategories()
 				).put(
 					"vocabularies", getVocabularies()
 				).build());
