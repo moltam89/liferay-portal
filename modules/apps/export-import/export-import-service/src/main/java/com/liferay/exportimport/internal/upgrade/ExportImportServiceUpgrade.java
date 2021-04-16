@@ -15,14 +15,17 @@
 package com.liferay.exportimport.internal.upgrade;
 
 import com.liferay.exportimport.internal.upgrade.v1_0_0.PublisherRequestUpgradeProcess;
+import com.liferay.exportimport.internal.upgrade.v1_0_2.UpgradeExportImportServiceConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalService;
 import com.liferay.portal.kernel.model.Release;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.scheduler.SchedulerEngineHelper;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.upgrade.DummyUpgradeStep;
 import com.liferay.portal.upgrade.registry.UpgradeStepRegistrator;
 
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -51,6 +54,11 @@ public class ExportImportServiceUpgrade implements UpgradeStepRegistrator {
 			"1.0.0", "1.0.1",
 			new com.liferay.exportimport.internal.upgrade.v1_0_1.
 				UpgradeBackgroundTaskExecutorClassNames());
+
+		registry.register(
+			"1.0.1", "1.0.2",
+			new UpgradeExportImportServiceConfiguration(
+				_configurationAdmin, _configurationProvider));
 	}
 
 	@Reference(unbind = "-")
@@ -85,6 +93,12 @@ public class ExportImportServiceUpgrade implements UpgradeStepRegistrator {
 	protected void setUserLocalService(UserLocalService userLocalService) {
 		_userLocalService = userLocalService;
 	}
+
+	@Reference
+	private ConfigurationAdmin _configurationAdmin;
+
+	@Reference
+	private ConfigurationProvider _configurationProvider;
 
 	private ExportImportConfigurationLocalService
 		_exportImportConfigurationLocalService;

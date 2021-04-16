@@ -178,12 +178,29 @@ definition {
 	}
 
 	@description = "This is a test for COMMERCE-5808. EditAProduct"
-	@ignore = "true"
 	@priority = "3"
 	test EditAProduct {
 		property portal.acceptance = "false";
 
-		// TODO COMMERCE-5808 EditAProduct
+		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
+
+		CommerceNavigator.gotoPortlet(
+			category = "Product Management",
+			portlet = "Products");
+
+		CommerceNavigator.gotoEntry(entryName = "ABS Sensor");
+
+		Type(
+			locator1 = "CommerceEntry#NAME_FIELD",
+			value1 = "ABS");
+
+		Button.clickPublish();
+
+		Alert.viewSuccessMessage();
+
+		AssertTextEquals(
+			locator1 = "CommerceEntry#NAME_FIELD",
+			value1 = "ABS");
 	}
 
 	@description = "This is a test for COMMERCE-6022. EditASKU"
@@ -196,12 +213,43 @@ definition {
 	}
 
 	@description = "This is a test for COMMERCE-5807. EditSkuAndDelete"
-	@ignore = "true"
 	@priority = "3"
 	test EditSkuAndDelete {
 		property portal.acceptance = "false";
 
-		// TODO COMMERCE-5807 EditSkuAndDelete
+		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
+
+		CommerceNavigator.gotoPortlet(
+			category = "Product Management",
+			portlet = "Products");
+
+		CommerceEntry.gotoMenuTab(menuTab = "SKUs");
+
+		CommerceNavigator.searchEntry(entryName = "MIN93017");
+
+		CommerceNavigator.gotoEntry(entryName = "MIN93017");
+
+		SelectFrame.selectFrameNoLoading(locator1 = "CommerceEntry#IFRAME_SIDE_PANEL");
+
+		Type(
+			locator1 = "CommerceEntry#SKU_FIELD",
+			value1 = "MIN930178");
+
+		Button.clickPublish();
+
+		AssertVisible(locator1 = "Message#SUCCESS");
+
+		Click(locator1 = "Icon#CLOSE");
+
+		Refresh();
+
+		CommerceNavigator.searchEntry(entryName = "MIN930178");
+
+		if (IsElementPresent(locator1 = "CommerceNavigation#ANY_ENTRY_NAME")) {
+			CommerceEntry.deleteCommerceEntry();
+
+			AssertVisible(locator1 = "Message#SUCCESS");
+		}
 	}
 
 	test ProductPublishing {
@@ -366,12 +414,30 @@ definition {
 	}
 
 	@description = "This is a test for COMMERCE-5803. UseSortingByNameAndDate"
-	@ignore = "true"
 	@priority = "3"
 	test UseSortingByNameAndDate {
 		property portal.acceptance = "false";
 
-		// TODO COMMERCE-5803 UseSortingByNameAndDate
+		CommerceAccelerators.initializeNewSiteViaAccelerator(siteName = "Minium");
+
+		CommerceNavigator.gotoPortlet(
+			category = "Product Management",
+			portlet = "Products");
+		CommerceNavigator.sortField(sortFieldName = "Name");
+
+		CommerceNavigator.viewFilterResultsSpecificOrder(resultsList = "ABS Sensor,Ball Joints,Bearings");
+
+		CommerceNavigator.sortField(sortFieldName = "Name");
+
+		CommerceNavigator.viewFilterResultsSpecificOrder(resultsList = "Wheel Seal - Front,Wheel Bearing Grease,Wear Sensors");
+
+		CommerceNavigator.sortField(sortFieldName = "Modified Date");
+
+		CommerceNavigator.viewFilterResultsSpecificOrder(resultsList = "ABS Sensor,Brake Fluid,Premium Brake Fluid");
+
+		CommerceNavigator.sortField(sortFieldName = "Modified Date");
+
+		CommerceNavigator.viewFilterResultsSpecificOrder(resultsList = "U-Joint,Transmission Cooler Line Assembly,Torque Converters");
 	}
 
 }

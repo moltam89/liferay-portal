@@ -20,7 +20,6 @@ import com.liferay.asset.kernel.model.AssetVocabulary;
 import com.liferay.asset.kernel.service.AssetCategoryLocalServiceUtil;
 import com.liferay.asset.kernel.service.AssetVocabularyLocalServiceUtil;
 import com.liferay.exportimport.changeset.constants.ChangesetPortletKeys;
-import com.liferay.exportimport.configuration.ExportImportServiceConfiguration;
 import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationParameterMapFactoryUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportDateUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportHelperUtil;
@@ -74,6 +73,7 @@ import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 import com.liferay.portal.test.rule.PermissionCheckerMethodTestRule;
 import com.liferay.portal.util.PropsValues;
+import com.liferay.staging.configuration.StagingConfiguration;
 
 import java.io.File;
 import java.io.Serializable;
@@ -184,19 +184,19 @@ public class StagingImplTest {
 	public void testInitialPublication() throws Exception {
 		long companyId = _group.getCompanyId();
 
-		ExportImportServiceConfiguration exportImportServiceConfiguration =
+		StagingConfiguration stagingConfiguration =
 			ConfigurationProviderUtil.getCompanyConfiguration(
-				ExportImportServiceConfiguration.class, companyId);
+				StagingConfiguration.class, companyId);
 
 		boolean stagingDeleteTempLarOnSuccess =
-			exportImportServiceConfiguration.stagingDeleteTempLarOnSuccess();
+			stagingConfiguration.stagingDeleteTempLarOnSuccess();
 
 		Dictionary<String, Object> properties = new Hashtable<>();
 
 		properties.put("stagingDeleteTempLarOnSuccess", false);
 
 		ConfigurationProviderUtil.saveCompanyConfiguration(
-			ExportImportServiceConfiguration.class, companyId, properties);
+			StagingConfiguration.class, companyId, properties);
 
 		try {
 			doTestInitialPublication();
@@ -206,7 +206,7 @@ public class StagingImplTest {
 				"stagingDeleteTempLarOnSuccess", stagingDeleteTempLarOnSuccess);
 
 			ConfigurationProviderUtil.saveCompanyConfiguration(
-				ExportImportServiceConfiguration.class, companyId, properties);
+				StagingConfiguration.class, companyId, properties);
 		}
 	}
 

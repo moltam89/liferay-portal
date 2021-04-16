@@ -15,7 +15,6 @@
 package com.liferay.exportimport.internal.lar;
 
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
-import com.liferay.exportimport.configuration.ExportImportServiceConfiguration;
 import com.liferay.exportimport.constants.ExportImportBackgroundTaskContextMapConstants;
 import com.liferay.exportimport.kernel.lar.DefaultConfigurationPortletDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportHelper;
@@ -99,6 +98,7 @@ import com.liferay.portal.kernel.zip.ZipReaderFactoryUtil;
 import com.liferay.portal.kernel.zip.ZipWriter;
 import com.liferay.portal.kernel.zip.ZipWriterFactoryUtil;
 import com.liferay.portal.model.impl.LayoutImpl;
+import com.liferay.staging.configuration.StagingConfiguration;
 
 import java.io.File;
 import java.io.InputStream;
@@ -133,7 +133,7 @@ import org.xml.sax.XMLReader;
  * @author Máté Thurzó
  */
 @Component(
-	configurationPid = "com.liferay.exportimport.configuration.ExportImportServiceConfiguration",
+	configurationPid = "com.liferay.staging.configuration.StagingConfiguration",
 	immediate = true, service = ExportImportHelper.class
 )
 public class ExportImportHelperImpl implements ExportImportHelper {
@@ -1013,8 +1013,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	@Activate
 	@Modified
 	protected void activate(Map<String, Object> properties) {
-		_exportImportServiceConfiguration = ConfigurableUtil.createConfigurable(
-			ExportImportServiceConfiguration.class, properties);
+		_stagingConfiguration = ConfigurableUtil.createConfigurable(
+			StagingConfiguration.class, properties);
 	}
 
 	protected void addCreateDateProperty(
@@ -1243,9 +1243,9 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		long companyId = CompanyThreadLocal.getCompanyId();
 
 		try {
-			_exportImportServiceConfiguration =
+			_stagingConfiguration =
 				_configurationProvider.getCompanyConfiguration(
-					ExportImportServiceConfiguration.class, companyId);
+					StagingConfiguration.class, companyId);
 		}
 		catch (ConfigurationException configurationException) {
 			if (_log.isWarnEnabled()) {
@@ -1254,10 +1254,8 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 		}
 
 		if (!ExportImportThreadLocal.isStagingInProcess() ||
-			(_exportImportServiceConfiguration.
-				stagingDeleteTempLarOnFailure() &&
-			 _exportImportServiceConfiguration.
-				 stagingDeleteTempLarOnSuccess())) {
+			(_stagingConfiguration.stagingDeleteTempLarOnFailure() &&
+			 _stagingConfiguration.stagingDeleteTempLarOnSuccess())) {
 
 			return ZipWriterFactoryUtil.getZipWriter();
 		}
@@ -1502,8 +1500,6 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	private ConfigurationProvider _configurationProvider;
 
 	private DLFileEntryLocalService _dlFileEntryLocalService;
-	private volatile ExportImportServiceConfiguration
-		_exportImportServiceConfiguration;
 	private GroupLocalService _groupLocalService;
 	private LayoutLocalService _layoutLocalService;
 	private LayoutRevisionLocalService _layoutRevisionLocalService;
@@ -1516,6 +1512,7 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 	private PortletDataHandlerProvider _portletDataHandlerProvider;
 
 	private PortletLocalService _portletLocalService;
+	private volatile StagingConfiguration _stagingConfiguration;
 	private SystemEventLocalService _systemEventLocalService;
 	private UserLocalService _userLocalService;
 

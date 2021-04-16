@@ -17,7 +17,7 @@ package com.liferay.layout.page.template.internal.upgrade.v2_1_0;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
-import com.liferay.layout.page.template.internal.upgrade.v2_0_0.util.LayoutPageTemplateEntryTable;
+import com.liferay.layout.page.template.internal.upgrade.v2_1_0.util.LayoutPageTemplateEntryTable;
 import com.liferay.layout.page.template.model.LayoutPageTemplateEntry;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
@@ -135,9 +135,11 @@ public class LayoutUpgradeProcess extends UpgradeProcess {
 	}
 
 	protected void upgradeSchema() throws Exception {
-		alter(
-			LayoutPageTemplateEntryTable.class,
-			new AlterTableAddColumn("plid", "LONG"));
+		if (!hasColumn(LayoutPageTemplateEntryTable.TABLE_NAME, "plid")) {
+			alter(
+				LayoutPageTemplateEntryTable.class,
+				new AlterTableAddColumn("plid", "LONG"));
+		}
 	}
 
 	private long _getPlid(
