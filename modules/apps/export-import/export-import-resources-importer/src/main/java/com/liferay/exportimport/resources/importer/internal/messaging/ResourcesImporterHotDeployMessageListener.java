@@ -178,7 +178,7 @@ public class ResourcesImporterHotDeployMessageListener
 	}
 
 	@Reference(
-		target = "(&(release.bundle.symbolic.name=com.liferay.exportimport.service)(release.schema.version=1.0.1))",
+		target = "(&(release.bundle.symbolic.name=com.liferay.exportimport.service)(release.schema.version=1.0.2))",
 		unbind = "-"
 	)
 	protected void setRelease(Release release) {
