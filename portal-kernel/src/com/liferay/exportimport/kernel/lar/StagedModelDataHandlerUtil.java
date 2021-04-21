@@ -71,10 +71,19 @@ public class StagedModelDataHandlerUtil {
 				extraData);
 		}
 	}
-
+	
 	public static <T extends StagedModel> Element exportReferenceStagedModel(
 			PortletDataContext portletDataContext, String referrerPortletId,
 			T stagedModel)
+		throws PortletDataException {
+		
+		return exportReferenceStagedModel(
+			portletDataContext,  referrerPortletId, stagedModel, false);
+	}
+
+	public static <T extends StagedModel> Element exportReferenceStagedModel(
+			PortletDataContext portletDataContext, String referrerPortletId,
+			T stagedModel, boolean displayPortlet)
 		throws PortletDataException {
 
 		Portlet referrerPortlet = PortletLocalServiceUtil.getPortletById(
@@ -83,12 +92,22 @@ public class StagedModelDataHandlerUtil {
 		if (!ExportImportHelperUtil.isAlwaysIncludeReference(
 				portletDataContext, stagedModel) ||
 			!ExportImportHelperUtil.isReferenceWithinExportScope(
-				portletDataContext, stagedModel)) {
+				portletDataContext, stagedModel) ||
+			(displayPortlet &&
+			 ExportImportThreadLocal.isLayoutStagingInProcess())) {
+			
+			String referenceType = PortletDataContext.REFERENCE_TYPE_DEPENDENCY;
+
+			if (displayPortlet &&
+				ExportImportThreadLocal.isLayoutStagingInProcess()) {
+
+				referenceType =
+					PortletDataContext.REFERENCE_TYPE_DEPENDENCY_DISPOSABLE;
+			}
 
 			return portletDataContext.addReferenceElement(
 				referrerPortlet, portletDataContext.getExportDataRootElement(),
-				stagedModel, PortletDataContext.REFERENCE_TYPE_DEPENDENCY,
-				true);
+				stagedModel, referenceType, true);
 		}
 
 		exportStagedModel(portletDataContext, stagedModel);
