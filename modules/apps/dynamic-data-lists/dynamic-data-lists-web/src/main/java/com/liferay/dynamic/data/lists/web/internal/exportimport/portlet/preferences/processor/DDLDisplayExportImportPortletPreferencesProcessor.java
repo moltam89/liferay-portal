@@ -102,7 +102,7 @@ public class DDLDisplayExportImportPortletPreferencesProcessor
 
 		if (recordSet != null) {
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
-				portletDataContext, portletId, recordSet);
+				portletDataContext, portletId, recordSet, true);
 
 			ActionableDynamicQuery recordActionableDynamicQuery =
 				getRecordActionableDynamicQuery(
@@ -215,7 +215,7 @@ public class DDLDisplayExportImportPortletPreferencesProcessor
 		recordActionableDynamicQuery.setPerformActionMethod(
 			(DDLRecord record) ->
 				StagedModelDataHandlerUtil.exportReferenceStagedModel(
-					portletDataContext, portletId, record));
+					portletDataContext, portletId, record, true));
 
 		return recordActionableDynamicQuery;
 	}
@@ -266,7 +266,7 @@ public class DDLDisplayExportImportPortletPreferencesProcessor
 		}
 
 		StagedModelDataHandlerUtil.exportReferenceStagedModel(
-			portletDataContext, portletId, ddmTemplate);
+			portletDataContext, portletId, ddmTemplate, true);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

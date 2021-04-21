@@ -106,7 +106,7 @@ public class PollsDisplayExportImportPortletPreferencesProcessor
 		}
 
 		StagedModelDataHandlerUtil.exportReferenceStagedModel(
-			portletDataContext, portletId, question);
+			portletDataContext, portletId, question, true);
 
 		return portletPreferences;
 	}

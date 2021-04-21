@@ -118,7 +118,7 @@ public class WikiDisplayExportImportPortletPreferencesProcessor
 		}
 
 		StagedModelDataHandlerUtil.exportReferenceStagedModel(
-			portletDataContext, portletId, node);
+			portletDataContext, portletId, node, true);
 
 		ActionableDynamicQuery actionableDynamicQuery =
 			getPageActionableDynamicQuery(
@@ -196,7 +196,7 @@ public class WikiDisplayExportImportPortletPreferencesProcessor
 		actionableDynamicQuery.setPerformActionMethod(
 			(WikiPage page) ->
 				StagedModelDataHandlerUtil.exportReferenceStagedModel(
-					portletDataContext, portletId, page));
+					portletDataContext, portletId, page, true));
 
 		return actionableDynamicQuery;
 	}

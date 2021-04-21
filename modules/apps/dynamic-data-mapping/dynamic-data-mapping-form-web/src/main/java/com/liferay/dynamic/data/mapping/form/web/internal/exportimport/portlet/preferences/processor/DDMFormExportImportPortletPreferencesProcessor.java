@@ -137,7 +137,7 @@ public class DDMFormExportImportPortletPreferencesProcessor
 
 		if (ddmFormInstance != null) {
 			StagedModelDataHandlerUtil.exportReferenceStagedModel(
-				portletDataContext, portletId, ddmFormInstance);
+				portletDataContext, portletId, ddmFormInstance, true);
 		}
 
 		return portletPreferences;

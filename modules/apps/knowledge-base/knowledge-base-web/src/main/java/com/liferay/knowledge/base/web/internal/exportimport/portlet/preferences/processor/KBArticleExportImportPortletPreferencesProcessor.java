@@ -79,7 +79,7 @@ public class KBArticleExportImportPortletPreferencesProcessor
 			for (KBArticle kbArticle : kbArticles) {
 				StagedModelDataHandlerUtil.exportReferenceStagedModel(
 					portletDataContext, portletDataContext.getPortletId(),
-					kbArticle);
+					kbArticle, true);
 			}
 		}
 

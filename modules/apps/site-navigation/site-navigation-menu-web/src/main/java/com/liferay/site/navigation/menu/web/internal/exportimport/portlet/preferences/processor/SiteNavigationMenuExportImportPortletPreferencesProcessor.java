@@ -93,7 +93,7 @@ public class SiteNavigationMenuExportImportPortletPreferencesProcessor
 				if (siteNavigationMenuToExport != null) {
 					StagedModelDataHandlerUtil.exportReferenceStagedModel(
 						portletDataContext, portletDataContext.getPortletId(),
-						siteNavigationMenuToExport);
+						siteNavigationMenuToExport, true);
 				}
 			}
 		}

@@ -121,7 +121,7 @@ public class KBDisplayExportImportPortletPreferencesProcessor
 				for (KBArticle kbArticle : kbArticles) {
 					StagedModelDataHandlerUtil.exportReferenceStagedModel(
 						portletDataContext, portletDataContext.getPortletId(),
-						kbArticle);
+						kbArticle, true);
 				}
 			}
 		}
@@ -143,7 +143,7 @@ public class KBDisplayExportImportPortletPreferencesProcessor
 
 				StagedModelDataHandlerUtil.exportReferenceStagedModel(
 					portletDataContext, portletDataContext.getPortletId(),
-					rootFolder);
+					rootFolder, true);
 			}
 		}
 
