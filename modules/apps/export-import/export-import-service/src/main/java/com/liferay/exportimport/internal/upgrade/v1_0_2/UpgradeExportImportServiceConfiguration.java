@@ -83,7 +83,7 @@ public class UpgradeExportImportServiceConfiguration extends UpgradeProcess {
 				"stagingDeleteTempLAROnSuccess",
 				GetterUtil.getBoolean(
 					exportImportProperties.remove(
-						"stagingDeleteTempLAROnSuccess"),
+						"stagingDeleteTempLarOnSuccess"),
 					true));
 			stagingProperties.put(
 				"stagingUseVirtualHostForRemoteSite",
