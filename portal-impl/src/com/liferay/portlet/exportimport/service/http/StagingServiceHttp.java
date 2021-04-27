@@ -129,7 +129,7 @@ public class StagingServiceHttp {
 
 	public static void enableLocalStaging(
 			HttpPrincipal httpPrincipal, long groupId, boolean branchingPublic,
-			boolean branchingPrivate,
+			boolean branchingPrivate, String typeSettings,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -140,7 +140,7 @@ public class StagingServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, groupId, branchingPublic, branchingPrivate,
-				serviceContext);
+				typeSettings, serviceContext);
 
 			try {
 				TunnelUtil.invoke(httpPrincipal, methodHandler);
@@ -375,7 +375,7 @@ public class StagingServiceHttp {
 		new Class[] {long.class, String.class};
 	private static final Class<?>[] _enableLocalStagingParameterTypes2 =
 		new Class[] {
-			long.class, boolean.class, boolean.class,
+			long.class, boolean.class, boolean.class, String.class,
 			com.liferay.portal.kernel.service.ServiceContext.class
 		};
 	private static final Class<?>[] _enableRemoteStagingParameterTypes3 =

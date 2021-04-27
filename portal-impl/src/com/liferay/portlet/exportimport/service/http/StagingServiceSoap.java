@@ -83,12 +83,14 @@ public class StagingServiceSoap {
 
 	public static void enableLocalStaging(
 			long groupId, boolean branchingPublic, boolean branchingPrivate,
+			String typeSettings,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws RemoteException {
 
 		try {
 			StagingServiceUtil.enableLocalStaging(
-				groupId, branchingPublic, branchingPrivate, serviceContext);
+				groupId, branchingPublic, branchingPrivate, typeSettings,
+				serviceContext);
 		}
 		catch (Exception exception) {
 			_log.error(exception, exception);

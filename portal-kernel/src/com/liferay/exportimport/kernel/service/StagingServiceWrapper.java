@@ -47,11 +47,13 @@ public class StagingServiceWrapper
 	@Override
 	public void enableLocalStaging(
 			long groupId, boolean branchingPublic, boolean branchingPrivate,
+			String typeSettings,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		_stagingService.enableLocalStaging(
-			groupId, branchingPublic, branchingPrivate, serviceContext);
+			groupId, branchingPublic, branchingPrivate, typeSettings,
+			serviceContext);
 	}
 
 	@Override

@@ -63,7 +63,7 @@ public interface StagingService extends BaseService {
 
 	public void enableLocalStaging(
 			long groupId, boolean branchingPublic, boolean branchingPrivate,
-			ServiceContext serviceContext)
+			String typeSettings, ServiceContext serviceContext)
 		throws PortalException;
 
 	public void enableRemoteStaging(

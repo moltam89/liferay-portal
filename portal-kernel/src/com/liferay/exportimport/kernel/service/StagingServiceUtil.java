@@ -53,11 +53,13 @@ public class StagingServiceUtil {
 
 	public static void enableLocalStaging(
 			long groupId, boolean branchingPublic, boolean branchingPrivate,
+			String typeSettings,
 			com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws PortalException {
 
 		getService().enableLocalStaging(
-			groupId, branchingPublic, branchingPrivate, serviceContext);
+			groupId, branchingPublic, branchingPrivate, typeSettings,
+			serviceContext);
 	}
 
 	public static void enableRemoteStaging(
