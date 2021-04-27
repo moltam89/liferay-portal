@@ -118,6 +118,21 @@ public class StagingServiceImpl extends StagingServiceBaseImpl {
 		GroupPermissionUtil.check(
 			getPermissionChecker(), groupId, ActionKeys.MANAGE_STAGING);
 
+		serviceContext.setAttribute(
+			"staged--staged-portlet_" + _PORTLET_ID_BLOGS + "--", "true");
+		serviceContext.setAttribute(
+			"staged--staged-portlet_" + _PORTLET_ID_BOOKMARKS + "--", "true");
+		serviceContext.setAttribute(
+			"staged--staged-portlet_" + _PORTLET_ID_DDM_DATA_PROVIDE + "--",
+			"true");
+		serviceContext.setAttribute(
+			"staged--staged-portlet_" + _PORTLET_ID_DISPLAY_TEMPLATE + "--",
+			"true");
+		serviceContext.setAttribute(
+			"staged--staged-portlet_" + _PORTLET_ID_SEGMENTS + "--", "true");
+		serviceContext.setAttribute(
+			"staged--staged-portlet_" + _PORTLET_ID_WIKI + "--", "true");
+
 		stagingLocalService.enableLocalStaging(
 			getUserId(), liveGroup, branchingPublic, branchingPrivate,
 			serviceContext);
@@ -301,6 +316,26 @@ public class StagingServiceImpl extends StagingServiceBaseImpl {
 			getPermissionChecker(), folder.getGroupId(),
 			ActionKeys.EXPORT_IMPORT_LAYOUTS);
 	}
+
+	private static final String _PORTLET_ID_BLOGS =
+		"com_liferay_blogs_web_portlet_BlogsAdminPortlet";
+
+	private static final String _PORTLET_ID_BOOKMARKS =
+		"com_liferay_bookmarks_web_portlet_BookmarksAdminPortlet";
+
+	private static final String _PORTLET_ID_DDM_DATA_PROVIDE =
+		"com_liferay_dynamic_data_mapping_data_provider_web_" +
+			"portlet_DDMDataProviderPortlet";
+
+	private static final String _PORTLET_ID_DISPLAY_TEMPLATE =
+		"com_liferay_dynamic_data_mapping_web_portlet_" +
+			"PortletDisplayTemplatePortlet";
+
+	private static final String _PORTLET_ID_SEGMENTS =
+		"com_liferay_segments_web_internal_portlet_SegmentsPortlet";
+
+	private static final String _PORTLET_ID_WIKI =
+		"com_liferay_wiki_web_portlet_WikiAdminPortlet";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		StagingServiceImpl.class);
