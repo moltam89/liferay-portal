@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portlet.exportimport.service.base.StagingServiceBaseImpl;
 
 import java.io.Serializable;
@@ -110,13 +111,20 @@ public class StagingServiceImpl extends StagingServiceBaseImpl {
 	@Override
 	public void enableLocalStaging(
 			long groupId, boolean branchingPublic, boolean branchingPrivate,
-			ServiceContext serviceContext)
+			String typeSettings, ServiceContext serviceContext)
 		throws PortalException {
 
 		Group liveGroup = groupLocalService.getGroup(groupId);
 
 		GroupPermissionUtil.check(
 			getPermissionChecker(), groupId, ActionKeys.MANAGE_STAGING);
+
+		UnicodeProperties typeSettingsUnicodeProperties =
+			liveGroup.getTypeSettingsProperties();
+
+		typeSettingsUnicodeProperties.fastLoad(typeSettings);
+
+		liveGroup.setTypeSettingsProperties(typeSettingsUnicodeProperties);
 
 		stagingLocalService.enableLocalStaging(
 			getUserId(), liveGroup, branchingPublic, branchingPrivate,
