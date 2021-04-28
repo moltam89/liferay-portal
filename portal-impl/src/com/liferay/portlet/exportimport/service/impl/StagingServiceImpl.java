@@ -32,6 +32,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.GroupPermissionUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portlet.exportimport.service.base.StagingServiceBaseImpl;
 
 import java.io.Serializable;
@@ -119,19 +120,21 @@ public class StagingServiceImpl extends StagingServiceBaseImpl {
 			getPermissionChecker(), groupId, ActionKeys.MANAGE_STAGING);
 
 		serviceContext.setAttribute(
-			"staged--staged-portlet_" + _PORTLET_ID_BLOGS + "--", "true");
-		serviceContext.setAttribute(
-			"staged--staged-portlet_" + _PORTLET_ID_BOOKMARKS + "--", "true");
-		serviceContext.setAttribute(
 			"staged--staged-portlet_" + _PORTLET_ID_DDM_DATA_PROVIDE + "--",
-			"true");
-		serviceContext.setAttribute(
-			"staged--staged-portlet_" + _PORTLET_ID_DISPLAY_TEMPLATE + "--",
 			"true");
 		serviceContext.setAttribute(
 			"staged--staged-portlet_" + _PORTLET_ID_SEGMENTS + "--", "true");
 		serviceContext.setAttribute(
-			"staged--staged-portlet_" + _PORTLET_ID_WIKI + "--", "true");
+			"staged--staged-portlet_" + PortletKeys.BLOGS_ADMIN + "--", "true");
+		serviceContext.setAttribute(
+			"staged--staged-portlet_" + PortletKeys.BOOKMARKS_ADMIN + "--",
+			"true");
+		serviceContext.setAttribute(
+			"staged--staged-portlet_" + PortletKeys.PORTLET_DISPLAY_TEMPLATE +
+				"--",
+			"true");
+		serviceContext.setAttribute(
+			"staged--staged-portlet_" + PortletKeys.WIKI_ADMIN + "--", "true");
 
 		stagingLocalService.enableLocalStaging(
 			getUserId(), liveGroup, branchingPublic, branchingPrivate,
@@ -317,25 +320,12 @@ public class StagingServiceImpl extends StagingServiceBaseImpl {
 			ActionKeys.EXPORT_IMPORT_LAYOUTS);
 	}
 
-	private static final String _PORTLET_ID_BLOGS =
-		"com_liferay_blogs_web_portlet_BlogsAdminPortlet";
-
-	private static final String _PORTLET_ID_BOOKMARKS =
-		"com_liferay_bookmarks_web_portlet_BookmarksAdminPortlet";
-
 	private static final String _PORTLET_ID_DDM_DATA_PROVIDE =
 		"com_liferay_dynamic_data_mapping_data_provider_web_" +
 			"portlet_DDMDataProviderPortlet";
 
-	private static final String _PORTLET_ID_DISPLAY_TEMPLATE =
-		"com_liferay_dynamic_data_mapping_web_portlet_" +
-			"PortletDisplayTemplatePortlet";
-
 	private static final String _PORTLET_ID_SEGMENTS =
 		"com_liferay_segments_web_internal_portlet_SegmentsPortlet";
-
-	private static final String _PORTLET_ID_WIKI =
-		"com_liferay_wiki_web_portlet_WikiAdminPortlet";
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		StagingServiceImpl.class);
