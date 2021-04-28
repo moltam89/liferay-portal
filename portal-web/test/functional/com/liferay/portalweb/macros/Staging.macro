@@ -681,10 +681,10 @@ definition {
 			Click(locator1 = "Link#REFRESH_COUNTS");
 		}
 
-		if (isSet(assetTypeLists)) {
-			for (var assetType : list "${assetTypeLists}") {
+		if (isSet(checkContentNameList)) {
+			for (var contentName : list "${checkContentNameList}") {
 				Check(
-					key_contentName = "${assetType}",
+					key_contentName = "${contentName}",
 					locator1 = "Staging#STAGING_CONTENT_CHECKBOX");
 			}
 		}
