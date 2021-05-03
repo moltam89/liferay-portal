@@ -62,7 +62,9 @@ export default function (props) {
 			vocabulary.visibilityType ===
 			ASSET_VOCABULARY_VISIBILITY_TYPES.internal
 	);
-
+	
+	const myCategoryVocabularies = props.myCategories;
+	
 	return (
 		<>
 			{props.learnHowURL && (
@@ -118,6 +120,27 @@ export default function (props) {
 						/>
 					</>
 				)}
+				
+			{myCategoryVocabularies &&
+				myCategoryVocabularies.length > 0 && (
+					<>
+						<div className="border-0 mb-0 sheet-subtitle text-uppercase">
+							{Liferay.Language.get('My Categories')}
+						</div>
+
+						<p className="text-secondary">
+							{Liferay.Language.get(
+								'They are displayed here'
+							)}
+						</p>
+
+						<AssetCategoriesSelectorTag
+							{...props}
+							initialVocabularies={myCategoryVocabularies}
+						/>
+					</>
+				)}
+				
 		</>
 	);
 }
