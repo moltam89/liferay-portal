@@ -32,7 +32,7 @@ import org.osgi.annotation.versioning.ProviderType;
 	description = "export-import-service-configuration-description",
 	id = "com.liferay.exportimport.configuration.ExportImportServiceConfiguration",
 	localization = "content/Language",
-	name = "export-import-service-configuration-name"
+	name = "break tests"
 )
 @ProviderType
 public interface ExportImportServiceConfiguration {
