@@ -834,9 +834,32 @@ public class PortletDataContextImpl implements PortletDataContext {
 	public Element getImportDataElement(
 		String name, String attribute, String value) {
 
+		ImportDataElementCache importDataElementCache =
+			ImportDataElementCache.getImportDataElementCache();
+
+		Element importDataElement = null;
+		String key = StringPool.BLANK;
+
+		if (importDataElementCache.isEnabled()) {
+			key = ImportDataElementCache.getKey(
+				_importDataRootElement, name, attribute, value);
+
+			importDataElement = importDataElementCache.getElement(key);
+
+			if (importDataElement != null) {
+				return importDataElement;
+			}
+		}
+
 		Element groupElement = getImportDataGroupElement(name);
 
-		return getDataElement(groupElement, attribute, value);
+		importDataElement = getDataElement(groupElement, attribute, value);
+
+		if (importDataElementCache.isEnabled()) {
+			importDataElementCache.put(key, importDataElement);
+		}
+
+		return importDataElement;
 	}
 
 	@Override
@@ -1676,6 +1699,18 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	@Override
+	public void setImportDataElementCacheEnabled(boolean enabled) {
+		ImportDataElementCache importDataElementCache =
+			ImportDataElementCache.getImportDataElementCache();
+
+		importDataElementCache.setEnabled(enabled);
+
+		if (!enabled) {
+			importDataElementCache.clear();
+		}
+	}
+
+	@Override
 	public void setImportDataRootElement(Element importDataRootElement) {
 		_importDataRootElement = importDataRootElement;
 	}
@@ -2181,11 +2216,31 @@ public class PortletDataContextImpl implements PortletDataContext {
 			return SAXReaderUtil.createElement("EMPTY-ELEMENT");
 		}
 
-		Element groupElement = _deepSearchForFirstChildElement(
+		Element groupElement = null;
+		String key = StringPool.BLANK;
+
+		ImportDataElementCache importDataElementCache =
+			ImportDataElementCache.getImportDataElementCache();
+
+		if (importDataElementCache.isEnabled()) {
+			key = ImportDataElementCache.getKey(_importDataRootElement, name);
+
+			groupElement = importDataElementCache.getElement(key);
+
+			if (groupElement != null) {
+				return groupElement;
+			}
+		}
+
+		groupElement = _deepSearchForFirstChildElement(
 			_importDataRootElement, name);
 
 		if (groupElement == null) {
-			return SAXReaderUtil.createElement("EMPTY-ELEMENT");
+			groupElement = SAXReaderUtil.createElement("EMPTY-ELEMENT");
+		}
+
+		if (importDataElementCache.isEnabled()) {
+			importDataElementCache.put(key, groupElement);
 		}
 
 		return groupElement;
