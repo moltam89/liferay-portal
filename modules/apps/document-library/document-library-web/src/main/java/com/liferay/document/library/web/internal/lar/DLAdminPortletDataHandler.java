@@ -28,15 +28,15 @@ import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.document.library.kernel.service.DLFileEntryTypeLocalService;
 import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
-import com.liferay.exportimport.kernel.lar.BasePortletDataHandler;
+import com.liferay.exportimport.data.handler.base.BasePortletDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportDateUtil;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerControl;
-import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.exportimport.kernel.staging.Staging;
+import com.liferay.exportimport.lar.ImportPortletDataThreadLocal;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepository;
 import com.liferay.exportimport.staged.model.repository.StagedModelRepositoryRegistryUtil;
 import com.liferay.petra.string.StringPool;
@@ -44,6 +44,8 @@ import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.ExportActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
 import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.RepositoryEntry;
 import com.liferay.portal.kernel.util.Portal;
@@ -308,10 +310,8 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 
 			List<Element> folderElements = foldersElement.elements();
 
-			for (Element folderElement : folderElements) {
-				StagedModelDataHandlerUtil.importStagedModel(
-					portletDataContext, folderElement);
-			}
+			doLoggedImportData(
+				portletDataContext, portletId + "#folders", folderElements);
 		}
 
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "documents")) {
@@ -320,10 +320,16 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 
 			List<Element> fileEntryElements = fileEntriesElement.elements();
 
-			for (Element fileEntryElement : fileEntryElements) {
-				StagedModelDataHandlerUtil.importStagedModel(
-					portletDataContext, fileEntryElement);
-			}
+			ImportPortletDataThreadLocal portletDataThreadLocal =
+				ImportPortletDataThreadLocal.getPortletDataThreadLocal();
+
+			portletDataThreadLocal.setEnabled(true, true);
+
+			doLoggedImportData(
+				portletDataContext, portletId + "#documents",
+				fileEntryElements);
+
+			portletDataThreadLocal.setEnabled(false, true);
 		}
 
 		if (portletDataContext.getBooleanParameter(
@@ -336,10 +342,9 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 			List<Element> fileEntryTypeElements =
 				fileEntryTypesElement.elements();
 
-			for (Element fileEntryTypeElement : fileEntryTypeElements) {
-				StagedModelDataHandlerUtil.importStagedModel(
-					portletDataContext, fileEntryTypeElement);
-			}
+			doLoggedImportData(
+				portletDataContext, portletId + "#document-types",
+				fileEntryTypeElements);
 		}
 
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "metadata")) {
@@ -350,10 +355,9 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 			List<Element> ddmStructureElements =
 				ddmStructuresElement.elements();
 
-			for (Element ddmStructureElement : ddmStructureElements) {
-				StagedModelDataHandlerUtil.importStagedModel(
-					portletDataContext, ddmStructureElement);
-			}
+			doLoggedImportData(
+				portletDataContext, portletId + "#metadata",
+				ddmStructureElements);
 		}
 
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "repositories")) {
@@ -362,10 +366,9 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 
 			List<Element> repositoryElements = repositoriesElement.elements();
 
-			for (Element repositoryElement : repositoryElements) {
-				StagedModelDataHandlerUtil.importStagedModel(
-					portletDataContext, repositoryElement);
-			}
+			doLoggedImportData(
+				portletDataContext, portletId + "#repositories",
+				repositoryElements);
 		}
 
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "shortcuts")) {
@@ -376,10 +379,9 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 			List<Element> fileShortcutElements =
 				fileShortcutsElement.elements();
 
-			for (Element fileShortcutElement : fileShortcutElements) {
-				StagedModelDataHandlerUtil.importStagedModel(
-					portletDataContext, fileShortcutElement);
-			}
+			doLoggedImportData(
+				portletDataContext, portletId + "#shortcuts",
+				fileShortcutElements);
 		}
 
 		return portletPreferences;
@@ -460,6 +462,14 @@ public class DLAdminPortletDataHandler extends BasePortletDataHandler {
 
 		repositoryActionableDynamicQuery.performCount();
 	}
+
+	@Override
+	protected Log getLog() {
+		return _log;
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		DLAdminPortletDataHandler.class);
 
 	@Reference
 	private DDMStructureLocalService _ddmStructureLocalService;

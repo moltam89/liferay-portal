@@ -21,7 +21,7 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
-import com.liferay.exportimport.kernel.lar.BasePortletDataHandler;
+import com.liferay.exportimport.data.handler.base.BasePortletDataHandler;
 import com.liferay.exportimport.kernel.lar.ExportImportDateUtil;
 import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.exportimport.kernel.lar.ManifestSummary;
@@ -34,6 +34,7 @@ import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
 import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.exportimport.kernel.staging.constants.StagingConstants;
+import com.liferay.exportimport.lar.ImportPortletDataThreadLocal;
 import com.liferay.journal.configuration.JournalServiceConfiguration;
 import com.liferay.journal.constants.JournalConstants;
 import com.liferay.journal.constants.JournalPortletKeys;
@@ -325,10 +326,8 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 			List<Element> feedElements = feedsElement.elements();
 
-			for (Element feedElement : feedElements) {
-				StagedModelDataHandlerUtil.importStagedModel(
-					portletDataContext, feedElement);
-			}
+			doLoggedImportData(
+				portletDataContext, portletId + "#feeds", feedElements);
 		}
 
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "folders")) {
@@ -338,10 +337,8 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 			List<Element> folderElements = foldersElement.elements();
 
-			for (Element folderElement : folderElements) {
-				StagedModelDataHandlerUtil.importStagedModel(
-					portletDataContext, folderElement);
-			}
+			doLoggedImportData(
+				portletDataContext, portletId + "#folders", folderElements);
 		}
 
 		Element articlesElement = portletDataContext.getImportDataGroupElement(
@@ -357,12 +354,13 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 			List<Element> ddmStructureElements =
 				ddmStructuresElement.elements();
 
-			for (Element ddmStructureElement : ddmStructureElements) {
-				StagedModelDataHandlerUtil.importStagedModel(
-					portletDataContext, ddmStructureElement);
-			}
+			doLoggedImportData(
+				portletDataContext, portletId + "#structures",
+				ddmStructureElements);
 
 			// Importing DDM structure default values
+
+			_log.info("	" + portletId + "#structureDefaults");
 
 			for (Element articleElement : articleElements) {
 				String className = articleElement.attributeValue(
@@ -375,6 +373,8 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 						portletDataContext, articleElement);
 				}
 			}
+
+			_log.info("	" + portletId + "#structureDefaults done");
 		}
 
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "templates")) {
@@ -383,17 +383,22 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 			List<Element> ddmTemplateElements = ddmTemplatesElement.elements();
 
-			for (Element ddmTemplateElement : ddmTemplateElements) {
-				StagedModelDataHandlerUtil.importStagedModel(
-					portletDataContext, ddmTemplateElement);
-			}
+			doLoggedImportData(
+				portletDataContext, portletId + "#templates",
+				ddmTemplateElements);
 		}
 
 		if (portletDataContext.getBooleanParameter(NAMESPACE, "web-content")) {
-			for (Element articleElement : articleElements) {
-				StagedModelDataHandlerUtil.importStagedModel(
-					portletDataContext, articleElement);
-			}
+			ImportPortletDataThreadLocal portletDataThreadLocal =
+				ImportPortletDataThreadLocal.getPortletDataThreadLocal();
+
+			portletDataThreadLocal.setEnabled(true, true);
+
+			doLoggedImportData(
+				portletDataContext, portletId + "#web-content",
+				articleElements, 100);
+
+			portletDataThreadLocal.setEnabled(false, true);
 
 			_journalContent.clearCache();
 		}
@@ -614,6 +619,11 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 				DDMTemplate.class.getName(), DDMStructure.class.getName()));
 
 		return exportActionableDynamicQuery;
+	}
+
+	@Override
+	protected Log getLog() {
+		return _log;
 	}
 
 	@Reference(unbind = "-")
