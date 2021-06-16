@@ -659,6 +659,10 @@ public class LayoutStagedModelDataHandler
 			}
 		}
 
+		if (existingLayout != null) {
+			_addMasterLayoutRevision(existingLayout);
+		}
+
 		if (_log.isDebugEnabled()) {
 			StringBundler sb = new StringBundler(7);
 
@@ -1007,11 +1011,11 @@ public class LayoutStagedModelDataHandler
 		importedLayout = _updateCollectionLayoutTypeSettings(
 			portletDataContext, layout, importedLayout);
 
-		privateLayout = portletDataContext.isPrivateLayout();
-
-		if (LayoutStagingUtil.isBranchingLayout(importedLayout)) {
-			fixLayoutBranching(serviceContext, importedLayout);
+		if (existingLayout == null) {
+			_addMasterLayoutRevision(importedLayout);
 		}
+
+		privateLayout = portletDataContext.isPrivateLayout();
 
 		try {
 			if (layout.isTypeAssetDisplay()) {
@@ -1383,37 +1387,6 @@ public class LayoutStagedModelDataHandler
 		typeSettingsUnicodeProperties.setProperty(
 			"url",
 			url.substring(0, x) + group.getFriendlyURL() + url.substring(y));
-	}
-
-	protected void fixLayoutBranching(
-			ServiceContext serviceContext, Layout layout)
-		throws Exception {
-
-		LayoutSetBranch layoutSetBranch =
-			_layoutSetBranchLocalService.getMasterLayoutSetBranch(
-				layout.getGroupId(), layout.isPrivateLayout());
-
-		LayoutBranch layoutBranch =
-			_layoutBranchLocalService.getMasterLayoutBranch(
-				layoutSetBranch.getLayoutSetBranchId(), layout.getPlid(),
-				serviceContext);
-
-		LayoutRevision layoutRevision =
-			_layoutRevisionLocalService.addLayoutRevision(
-				layout.getUserId(), layoutSetBranch.getLayoutSetBranchId(),
-				layoutBranch.getLayoutBranchId(),
-				LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID,
-				false, layout.getPlid(), LayoutConstants.DEFAULT_PLID,
-				layout.isPrivateLayout(), layout.getName(), layout.getTitle(),
-				layout.getDescription(), layout.getKeywords(),
-				layout.getRobots(), layout.getTypeSettings(),
-				layout.isIconImage(), layout.getIconImageId(),
-				layout.getThemeId(), layout.getColorSchemeId(), layout.getCss(),
-				serviceContext);
-
-		_layoutRevisionLocalService.updateStatus(
-			layout.getUserId(), layoutRevision.getLayoutRevisionId(),
-			WorkflowConstants.STATUS_APPROVED, serviceContext);
 	}
 
 	protected Map<String, Object[]> getPortletIds(
@@ -2418,6 +2391,64 @@ public class LayoutStagedModelDataHandler
 
 		if (!layout.isPending()) {
 			super.validateExport(portletDataContext, layout);
+		}
+	}
+
+	private void _addMasterLayoutRevision(Layout layout) throws Exception {
+		if (ExportImportThreadLocal.isStagingInProcess() ||
+			!LayoutStagingUtil.isBranchingLayout(layout)) {
+
+			return;
+		}
+
+		LayoutSetBranch masterLayoutSetBranch =
+			_layoutSetBranchLocalService.getMasterLayoutSetBranch(
+				layout.getGroupId(), layout.isPrivateLayout());
+
+		LayoutBranch masterLayoutBranch =
+			_layoutBranchLocalService.getMasterLayoutBranch(
+				masterLayoutSetBranch.getLayoutSetBranchId(), layout.getPlid(),
+				ServiceContextThreadLocal.getServiceContext());
+
+		LayoutRevision latestMasterLayoutRevision =
+			_layoutRevisionLocalService.fetchLatestLayoutRevision(
+				masterLayoutSetBranch.getLayoutSetBranchId(),
+				masterLayoutBranch.getLayoutBranchId(), layout.getPlid());
+
+		long parentLayoutRevisionId =
+			LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID;
+		long portletPreferencesPlid = layout.getPlid();
+
+		if (latestMasterLayoutRevision != null) {
+			parentLayoutRevisionId =
+				latestMasterLayoutRevision.getLayoutRevisionId();
+			portletPreferencesPlid =
+				latestMasterLayoutRevision.getLayoutRevisionId();
+		}
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		int workflowAction = serviceContext.getWorkflowAction();
+
+		try {
+			serviceContext.setWorkflowAction(
+				WorkflowConstants.ACTION_SAVE_DRAFT);
+
+			_layoutRevisionLocalService.addLayoutRevision(
+				layout.getUserId(),
+				masterLayoutSetBranch.getLayoutSetBranchId(),
+				masterLayoutBranch.getLayoutBranchId(), parentLayoutRevisionId,
+				false, layout.getPlid(), portletPreferencesPlid,
+				layout.isPrivateLayout(), layout.getName(), layout.getTitle(),
+				layout.getDescription(), layout.getKeywords(),
+				layout.getRobots(), layout.getTypeSettings(),
+				layout.isIconImage(), layout.getIconImageId(),
+				layout.getThemeId(), layout.getColorSchemeId(), layout.getCss(),
+				serviceContext);
+		}
+		finally {
+			serviceContext.setWorkflowAction(workflowAction);
 		}
 	}
 
