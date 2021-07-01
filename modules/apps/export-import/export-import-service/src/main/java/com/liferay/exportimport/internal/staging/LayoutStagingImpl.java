@@ -27,12 +27,14 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
 import com.liferay.portal.kernel.model.LayoutSetStagingHandler;
 import com.liferay.portal.kernel.model.LayoutStagingHandler;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutRevisionLocalService;
 import com.liferay.portal.kernel.service.LayoutSetBranchLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
+import com.liferay.portlet.exportimport.staging.StagingAdvicesThreadLocal;
 
 import java.lang.reflect.InvocationHandler;
 
@@ -287,6 +289,21 @@ public class LayoutStagingImpl implements LayoutStaging {
 		return true;
 	}
 
+	@Override
+	public long swapPlidForRevisionId(long plid) {
+		if (!StagingAdvicesThreadLocal.isEnabled()) {
+			return plid;
+		}
+
+		LayoutRevision layoutRevision = _getLayoutRevision(plid);
+
+		if (layoutRevision == null) {
+			return plid;
+		}
+
+		return layoutRevision.getLayoutRevisionId();
+	}
+
 	@Reference(unbind = "-")
 	protected void setLayoutSetBranchLocalService(
 		LayoutSetBranchLocalService layoutSetBranchLocalService) {
@@ -294,12 +311,44 @@ public class LayoutStagingImpl implements LayoutStaging {
 		_layoutSetBranchLocalService = layoutSetBranchLocalService;
 	}
 
+	private LayoutRevision _getLayoutRevision(long plid) {
+		if (plid <= 0) {
+			return null;
+		}
+
+		LayoutRevision layoutRevision =
+			_layoutRevisionLocalService.fetchLayoutRevision(plid);
+
+		if (layoutRevision != null) {
+			return layoutRevision;
+		}
+
+		Layout layout = _layoutLocalService.fetchLayout(plid);
+
+		if (layout == null) {
+			return null;
+		}
+
+		if (LayoutStagingUtil.isBranchingLayout(layout)) {
+			LayoutStagingHandler layoutStagingHandler =
+				new LayoutStagingHandler(layout);
+
+			return layoutStagingHandler.getLayoutRevision();
+		}
+
+		return null;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutStagingImpl.class);
 
 	@Reference
+	private LayoutLocalService _layoutLocalService;
+
+	@Reference
 	private LayoutRevisionLocalService _layoutRevisionLocalService;
 
+	@Reference
 	private LayoutSetBranchLocalService _layoutSetBranchLocalService;
 
 }

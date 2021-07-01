@@ -51,4 +51,6 @@ public interface LayoutStaging {
 	public boolean prepareLayoutStagingHandler(
 		PortletDataContext portletDataContext, Layout layout);
 
+	public long swapPlidForRevisionId(long plid);
+
 }
