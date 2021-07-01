@@ -17,17 +17,34 @@ package com.liferay.exportimport.kernel.staging;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutBranch;
 import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
 import com.liferay.portal.kernel.model.LayoutSetStagingHandler;
 import com.liferay.portal.kernel.model.LayoutStagingHandler;
+import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ServiceProxyFactory;
 
 /**
  * @author Raymond Augé
  */
 public class LayoutStagingUtil {
+
+	public static Layout copyLayout(
+			long sourceLayoutRevisionId, long targetLayoutRevisionId)
+		throws Exception {
+
+		return _layoutStaging.copyLayout(
+			sourceLayoutRevisionId, targetLayoutRevisionId);
+	}
+
+	public static void copyLayoutBranch(
+			LayoutBranch layoutBranch, long layoutRevisionId)
+		throws Exception {
+
+		_layoutStaging.copyLayoutBranch(layoutBranch, layoutRevisionId);
+	}
 
 	public static LayoutRevision getLayoutRevision(Layout layout) {
 		return _layoutStaging.getLayoutRevision(layout);
@@ -72,6 +89,19 @@ public class LayoutStagingUtil {
 
 		return _layoutStaging.prepareLayoutStagingHandler(
 			portletDataContext, layout);
+	}
+
+	public static long swapPlidForRevisionId(long plid) {
+		return _layoutStaging.swapPlidForRevisionId(plid);
+	}
+
+	public Layout publishLayout(
+			Layout dratLayout, Layout layout, ServiceContext serviceContext,
+			long userId)
+		throws Exception {
+
+		return _layoutStaging.publishLayout(
+			dratLayout, layout, serviceContext, userId);
 	}
 
 	private static volatile LayoutStaging _layoutStaging =
