@@ -173,7 +173,7 @@ else {
 					</a>
 				</li>
 
-				<c:if test="<%= !layoutRevision.isIncomplete() && !layout.isTypeContent() %>">
+				<c:if test="<%= !layoutRevision.isIncomplete() %>">
 					<li>
 						<a class="dropdown-item" href="javascript:;" id="manageLayoutRevisions" onclick="<%= liferayPortletResponse.getNamespace() + "openPageVariationsDialog();" %>">
 							<liferay-ui:message key="page-variations" />
@@ -186,7 +186,7 @@ else {
 					</li>
 				</c:if>
 
-				<c:if test="<%= !hasWorkflowTask && !layout.isTypeContent() %>">
+				<c:if test="<%= !hasWorkflowTask %>">
 					<c:if test="<%= !layoutRevision.isMajor() && (layoutRevision.getParentLayoutRevisionId() != LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID) %>">
 						<li>
 							<a class="dropdown-item" href="javascript:Liferay.fire('<%= liferayPortletResponse.getNamespace() %>undo', {layoutRevisionId: '<%= layoutRevision.getLayoutRevisionId() %>', layoutSetBranchId: '<%= layoutRevision.getLayoutSetBranchId() %>'}); void(0);" id="undoLink">
