@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
 import com.liferay.portal.kernel.model.LayoutSetStagingHandler;
 import com.liferay.portal.kernel.model.LayoutStagingHandler;
-import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.util.ServiceProxyFactory;
 
 /**
@@ -95,8 +94,7 @@ public class LayoutStagingUtil {
 			Layout dratLayout, Layout layout, long userId)
 		throws Exception {
 
-		return _layoutStaging.publishLayout(
-			dratLayout, layout, userId);
+		return _layoutStaging.publishLayout(dratLayout, layout, userId);
 	}
 
 	public static long swapPlidForRevisionId(long plid) {
