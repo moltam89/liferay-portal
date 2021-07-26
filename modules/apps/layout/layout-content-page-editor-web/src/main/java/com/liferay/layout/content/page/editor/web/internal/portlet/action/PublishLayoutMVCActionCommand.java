@@ -14,6 +14,7 @@
 
 package com.liferay.layout.content.page.editor.web.internal.portlet.action;
 
+import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.layout.content.page.editor.constants.ContentPageEditorPortletKeys;
 import com.liferay.layout.content.page.editor.listener.ContentPageEditorListenerTracker;
@@ -149,7 +150,13 @@ public class PublishLayoutMVCActionCommand
 				serviceContext, Collections.emptyMap());
 		}
 		else {
-			layout = _layoutCopyHelper.copyLayout(draftLayout, layout);
+			if (LayoutStagingUtil.isBranchingLayout(layout)) {
+				layout = LayoutStagingUtil.publishLayout(
+					draftLayout, layout, userId);
+			}
+			else {
+				layout = _layoutCopyHelper.copyLayout(draftLayout, layout);
+			}
 
 			layout.setType(draftLayout.getType());
 			layout.setStatus(WorkflowConstants.STATUS_APPROVED);
