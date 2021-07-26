@@ -17,6 +17,7 @@ package com.liferay.layout.internal.util;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.counter.kernel.service.CounterLocalService;
+import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
@@ -38,6 +39,8 @@ import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Image;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.LayoutConstants;
+import com.liferay.portal.kernel.model.LayoutRevision;
+import com.liferay.portal.kernel.model.LayoutStagingHandler;
 import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.model.ResourceConstants;
@@ -589,6 +592,20 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 			long targetSegmentsExperienceId, ServiceContext serviceContext)
 		throws Exception {
 
+		long targetLayoutPlid = targetLayout.getPlid();
+
+		if (LayoutStagingUtil.isBranchingLayout(targetLayout)) {
+			LayoutStagingHandler targetLayoutStagingHandler =
+				new LayoutStagingHandler(targetLayout);
+
+			LayoutRevision targetLayoutRevision =
+				targetLayoutStagingHandler.getLayoutRevision();
+
+			if (targetLayoutRevision != null) {
+				targetLayoutPlid = targetLayoutRevision.getLayoutRevisionId();
+			}
+		}
+
 		LayoutStructure layoutStructure = LayoutStructure.of(data);
 
 		for (LayoutStructureItem layoutStructureItem :
@@ -627,8 +644,8 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 				targetSegmentsExperienceId);
 			newFragmentEntryLink.setClassNameId(
 				_portal.getClassNameId(Layout.class));
-			newFragmentEntryLink.setClassPK(targetLayout.getPlid());
-			newFragmentEntryLink.setPlid(targetLayout.getPlid());
+			newFragmentEntryLink.setClassPK(targetLayoutPlid);
+			newFragmentEntryLink.setPlid(targetLayoutPlid);
 			newFragmentEntryLink.setLastPropagationDate(
 				serviceContext.getCreateDate(new Date()));
 

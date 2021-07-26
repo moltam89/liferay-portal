@@ -15,6 +15,7 @@
 package com.liferay.layout.page.template.service.impl;
 
 import com.liferay.exportimport.kernel.lar.ExportImportThreadLocal;
+import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
 import com.liferay.layout.page.template.constants.LayoutPageTemplateEntryTypeConstants;
@@ -33,6 +34,7 @@ import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.auth.PrincipalThreadLocal;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.LayoutRevisionLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
@@ -69,7 +71,8 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 		throws PortalException {
 
 		return addLayoutPageTemplateStructure(
-			userId, groupId, classPK, data, serviceContext);
+			userId, groupId, LayoutStagingUtil.swapPlidForRevisionId(classPK),
+			data, serviceContext);
 	}
 
 	@Override
@@ -99,7 +102,8 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 			serviceContext.getModifiedDate(new Date()));
 		layoutPageTemplateStructure.setClassNameId(
 			_portal.getClassNameId(Layout.class));
-		layoutPageTemplateStructure.setClassPK(plid);
+		layoutPageTemplateStructure.setClassPK(
+			LayoutStagingUtil.swapPlidForRevisionId(plid));
 
 		layoutPageTemplateStructure =
 			layoutPageTemplateStructurePersistence.update(
@@ -107,7 +111,7 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 
 		int count =
 			_fragmentEntryLinkLocalService.getFragmentEntryLinksCountByPlid(
-				groupId, plid);
+				groupId, LayoutStagingUtil.swapPlidForRevisionId(plid));
 
 		if (count > 0) {
 			_fragmentEntryLinkLocalService.updateClassedModel(plid);
@@ -162,7 +166,8 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 
 		LayoutPageTemplateStructure layoutPageTemplateStructure =
 			layoutPageTemplateStructurePersistence.findByG_C_C(
-				groupId, _portal.getClassNameId(Layout.class), plid);
+				groupId, _portal.getClassNameId(Layout.class),
+				LayoutStagingUtil.swapPlidForRevisionId(plid));
 
 		layoutPageTemplateStructureLocalService.
 			deleteLayoutPageTemplateStructure(layoutPageTemplateStructure);
@@ -188,7 +193,8 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 		long groupId, long plid) {
 
 		return layoutPageTemplateStructurePersistence.fetchByG_C_C(
-			groupId, _portal.getClassNameId(Layout.class), plid);
+			groupId, _portal.getClassNameId(Layout.class),
+			LayoutStagingUtil.swapPlidForRevisionId(plid));
 	}
 
 	@Override
@@ -315,7 +321,8 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 
 		LayoutPageTemplateStructure layoutPageTemplateStructure =
 			layoutPageTemplateStructurePersistence.findByG_C_C(
-				groupId, _portal.getClassNameId(Layout.class), plid);
+				groupId, _portal.getClassNameId(Layout.class),
+				LayoutStagingUtil.swapPlidForRevisionId(plid));
 
 		layoutPageTemplateStructure.setModifiedDate(new Date());
 
@@ -410,6 +417,9 @@ public class LayoutPageTemplateStructureLocalServiceImpl
 	@Reference
 	private LayoutPageTemplateStructureRelLocalService
 		_layoutPageTemplateStructureRelLocalService;
+
+	@Reference
+	private LayoutRevisionLocalService _layoutRevisionLocalService;
 
 	@Reference
 	private Portal _portal;

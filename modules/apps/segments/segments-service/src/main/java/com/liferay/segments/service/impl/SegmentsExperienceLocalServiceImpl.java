@@ -14,12 +14,17 @@
 
 package com.liferay.segments.service.impl;
 
+import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutRevision;
+import com.liferay.portal.kernel.model.LayoutStagingHandler;
 import com.liferay.portal.kernel.model.ResourceConstants;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.LayoutRevisionLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
 import com.liferay.portal.kernel.util.GroupThreadLocal;
@@ -28,6 +33,7 @@ import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
+import com.liferay.portlet.exportimport.staging.StagingAdvicesThreadLocal;
 import com.liferay.segments.constants.SegmentsExperienceConstants;
 import com.liferay.segments.exception.LockedSegmentsExperimentException;
 import com.liferay.segments.exception.RequiredSegmentsExperienceException;
@@ -47,6 +53,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author David Arques
@@ -568,6 +575,34 @@ public class SegmentsExperienceLocalServiceImpl
 		);
 	}
 
+	private LayoutRevision _getLayoutRevision(long plid) {
+		if (plid <= 0) {
+			return null;
+		}
+
+		LayoutRevision layoutRevision =
+			_layoutRevisionLocalService.fetchLayoutRevision(plid);
+
+		if (layoutRevision != null) {
+			return layoutRevision;
+		}
+
+		Layout layout = _layoutLocalService.fetchLayout(plid);
+
+		if (layout == null) {
+			return null;
+		}
+
+		if (LayoutStagingUtil.isBranchingLayout(layout)) {
+			LayoutStagingHandler layoutStagingHandler =
+				new LayoutStagingHandler(layout);
+
+			return layoutStagingHandler.getLayoutRevision();
+		}
+
+		return null;
+	}
+
 	private int _getLowestPriority(
 		long groupId, long classNameId, long classPK) {
 
@@ -584,7 +619,21 @@ public class SegmentsExperienceLocalServiceImpl
 	private long _getPublishedLayoutClassPK(long classPK) {
 		Layout layout = layoutLocalService.fetchLayout(classPK);
 
+<<<<<<< HEAD
 		if ((layout != null) && layout.isDraftLayout()) {
+=======
+		if (LayoutStagingUtil.isBranchingLayout(layout) &&
+			StagingAdvicesThreadLocal.isEnabled()) {
+
+			return _swapPlidForRevision(classPK);
+		}
+
+		if ((layout != null) &&
+			(layout.getClassNameId() == classNameLocalService.getClassNameId(
+				Layout.class)) &&
+			(layout.getClassPK() != 0)) {
+
+>>>>>>> Replace plid for revisionId in SegmentsExperienceLocalServiceImpl
 			return layout.getClassPK();
 		}
 
@@ -616,6 +665,20 @@ public class SegmentsExperienceLocalServiceImpl
 		).collect(
 			Collectors.toList()
 		);
+	}
+
+	private long _swapPlidForRevision(long plid) {
+		if (!StagingAdvicesThreadLocal.isEnabled()) {
+			return plid;
+		}
+
+		LayoutRevision layoutRevision = _getLayoutRevision(plid);
+
+		if (layoutRevision == null) {
+			return plid;
+		}
+
+		return layoutRevision.getLayoutRevisionId();
 	}
 
 	private SegmentsExperience _swapSegmentsExperience(
@@ -768,5 +831,11 @@ public class SegmentsExperienceLocalServiceImpl
 					" already exists");
 		}
 	}
+
+	@Reference
+	private LayoutLocalService _layoutLocalService;
+
+	@Reference
+	private LayoutRevisionLocalService _layoutRevisionLocalService;
 
 }

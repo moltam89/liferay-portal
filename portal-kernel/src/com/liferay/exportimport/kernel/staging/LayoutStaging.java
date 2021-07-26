@@ -17,11 +17,13 @@ package com.liferay.exportimport.kernel.staging;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutBranch;
 import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
 import com.liferay.portal.kernel.model.LayoutSetStagingHandler;
 import com.liferay.portal.kernel.model.LayoutStagingHandler;
+import com.liferay.portal.kernel.service.ServiceContext;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -30,6 +32,17 @@ import org.osgi.annotation.versioning.ProviderType;
  */
 @ProviderType
 public interface LayoutStaging {
+
+	public Layout copyLayout(
+			long sourceLayoutRevisionId, long targetLayoutRevisionId) 
+		throws Exception;
+	
+	public Layout copyLayout(
+		Layout sourceLayout, Layout targetLayout) throws Exception;
+
+	public void copyLayoutBranch(
+			LayoutBranch layoutBranch, long layoutRevisionId)
+		throws Exception;
 
 	public LayoutRevision getLayoutRevision(Layout layout);
 
@@ -50,5 +63,12 @@ public interface LayoutStaging {
 
 	public boolean prepareLayoutStagingHandler(
 		PortletDataContext portletDataContext, Layout layout);
+
+	public Layout publishLayout(
+			Layout draftLayout, Layout layout,
+			ServiceContext serviceContext, long userId) 
+		throws Exception;
+
+	public long swapPlidForRevisionId(long plid);
 
 }

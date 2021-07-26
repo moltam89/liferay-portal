@@ -19,9 +19,11 @@ import com.liferay.layout.page.template.service.base.LayoutPageTemplateStructure
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.BaseModelPermissionCheckerUtil;
+import com.liferay.portal.kernel.service.LayoutRevisionLocalService;
 import com.liferay.portal.kernel.util.Portal;
 
 import org.osgi.service.component.annotations.Component;
@@ -61,6 +63,13 @@ public class LayoutPageTemplateStructureServiceImpl
 			long groupId, long plid, long segmentsExperienceId, String data)
 		throws PortalException {
 
+		LayoutRevision layoutRevision =
+			_layoutRevisionLocalService.fetchLayoutRevision(plid);
+
+		if (layoutRevision != null) {
+			plid = layoutRevision.getPlid();
+		}
+
 		Boolean containsPermission =
 			BaseModelPermissionCheckerUtil.containsBaseModelPermission(
 				getPermissionChecker(), groupId, Layout.class.getName(), plid,
@@ -75,6 +84,9 @@ public class LayoutPageTemplateStructureServiceImpl
 			updateLayoutPageTemplateStructureData(
 				groupId, plid, segmentsExperienceId, data);
 	}
+
+	@Reference
+	private LayoutRevisionLocalService _layoutRevisionLocalService;
 
 	@Reference
 	private Portal _portal;

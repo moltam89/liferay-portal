@@ -14,13 +14,16 @@
 
 package com.liferay.portal.kernel.model;
 
+import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.LayoutBranchLocalServiceUtil;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutRevisionLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetBranchLocalServiceUtil;
+import com.liferay.portal.kernel.service.RecentLayoutRevisionLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
@@ -29,6 +32,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+//import com.liferay.portlet.exportimport.staging.StagingAdvicesThreadLocal;
 
 import java.io.Serializable;
 
@@ -149,12 +153,63 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 				(LayoutRevision)_layoutRevision.clone()));
 	}
 
+	private LayoutRevision _getSystemLayoutRevision(Layout layout) 
+		throws PortalException {
+
+		Layout publishedLayout = LayoutLocalServiceUtil.getLayout(
+			layout.getClassPK());
+
+		LayoutStagingHandler publishedLayoutStagingHandler =
+			new LayoutStagingHandler(publishedLayout);
+
+		LayoutRevision publishedLayoutRevision =
+			publishedLayoutStagingHandler.getLayoutRevision();
+
+		LayoutSetBranch masterLayoutSetBranch =
+			LayoutSetBranchLocalServiceUtil.getMasterLayoutSetBranch(
+				layout.getGroupId(),
+				layout.isPrivateLayout());
+
+		LayoutRevision layoutRevision = LayoutRevisionLocalServiceUtil.fetchLayoutRevision(
+			masterLayoutSetBranch.getLayoutSetBranchId(),
+			publishedLayoutRevision.getParentLayoutRevisionId(),
+			layout.getPlid());
+
+		if (layoutRevision == null) {
+			layoutRevision = LayoutRevisionLocalServiceUtil.fetchLayoutRevision(
+				masterLayoutSetBranch.getLayoutSetBranchId(),
+				LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID,
+				layout.getPlid());
+		}
+
+		return layoutRevision;
+	}
+
 	private LayoutRevision _getLayoutRevision(
 			Layout layout, LayoutRevision layoutRevision)
 		throws PortalException {
 
 		if (layoutRevision != null) {
 			return layoutRevision;
+		}
+
+		User defaultUser = UserLocalServiceUtil.getDefaultUser(
+			layout.getCompanyId());
+		
+		RecentLayoutRevision recentLayoutRevision =
+			RecentLayoutRevisionLocalServiceUtil.fetchRecentLayoutRevision(
+				defaultUser.getUserId(),
+				RecentLayoutRevisionConstants.
+					DEFAULT_RECENT_LAYOUT_SET_BRANCH_ID,
+				layout.getPlid());
+		
+		if (recentLayoutRevision != null) {
+			return LayoutRevisionLocalServiceUtil.getLayoutRevision(
+				recentLayoutRevision.getLayoutRevisionId());
+		}
+
+		if (layout.isSystem()) {
+			return _getSystemLayoutRevision(layout);
 		}
 
 		ServiceContext serviceContext =
