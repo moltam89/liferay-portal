@@ -17,19 +17,26 @@ package com.liferay.exportimport.internal.staging;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.staging.LayoutStaging;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
+import com.liferay.layout.util.LayoutCopyHelper;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutBranch;
 import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
 import com.liferay.portal.kernel.model.LayoutSetStagingHandler;
 import com.liferay.portal.kernel.model.LayoutStagingHandler;
+import com.liferay.portal.kernel.model.RecentLayoutRevision;
+import com.liferay.portal.kernel.model.RecentLayoutRevisionConstants;
 import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.LayoutRevisionLocalService;
 import com.liferay.portal.kernel.service.LayoutSetBranchLocalService;
+import com.liferay.portal.kernel.service.RecentLayoutRevisionLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
@@ -48,6 +55,78 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(immediate = true, service = LayoutStaging.class)
 public class LayoutStagingImpl implements LayoutStaging {
+
+	@Override
+	public Layout copyLayout(
+			long sourceLayoutRevisionId, long targetLayoutRevisionId)
+		throws Exception {
+
+		LayoutRevision sourceLayoutRevision =
+			_layoutRevisionLocalService.getLayoutRevision(
+				sourceLayoutRevisionId);
+
+		LayoutRevision targetLayoutRevision =
+			_layoutRevisionLocalService.getLayoutRevision(
+				targetLayoutRevisionId);
+
+		long defaultUserId = _userLocalService.getDefaultUserId(
+			sourceLayoutRevision.getCompanyId());
+
+		RecentLayoutRevision sourceRecentLayoutRevision =
+			_recentLayoutRevisionLocalService.addRecentLayoutRevision(
+				defaultUserId, sourceLayoutRevisionId,
+				RecentLayoutRevisionConstants.
+					DEFAULT_RECENT_LAYOUT_SET_BRANCH_ID,
+				sourceLayoutRevision.getPlid());
+
+		RecentLayoutRevision targetRecentLayoutRevision =
+			_recentLayoutRevisionLocalService.addRecentLayoutRevision(
+				defaultUserId, targetLayoutRevisionId,
+				RecentLayoutRevisionConstants.
+					DEFAULT_RECENT_LAYOUT_SET_BRANCH_ID,
+				targetLayoutRevision.getPlid());
+
+		Layout sourceLayout = _layoutLocalService.getLayout(
+			sourceLayoutRevision.getPlid());
+
+		Layout targetLayout = _layoutLocalService.getLayout(
+			targetLayoutRevision.getPlid());
+
+		targetLayout = _layoutCopyHelper.copyLayout(sourceLayout, targetLayout);
+
+		_recentLayoutRevisionLocalService.deleteRecentLayoutRevision(
+			sourceRecentLayoutRevision);
+		_recentLayoutRevisionLocalService.deleteRecentLayoutRevision(
+			targetRecentLayoutRevision);
+
+		return targetLayout;
+	}
+
+	@Override
+	public void copyLayoutBranch(
+			LayoutBranch layoutBranch, long layoutRevisionId)
+		throws Exception {
+
+		LayoutRevision newLayoutRevision =
+			_layoutRevisionLocalService.fetchLatestLayoutRevision(
+				layoutBranch.getLayoutSetBranchId(),
+				layoutBranch.getLayoutBranchId(), layoutBranch.getPlid());
+
+		Layout layout = _layoutLocalService.getLayout(layoutBranch.getPlid());
+
+		Layout draftLayout = _layoutLocalService.fetchDraftLayout(
+			layout.getPlid());
+
+		LayoutRevision newDraftRevision =
+			_layoutRevisionLocalService.fetchLastLayoutRevision(
+				draftLayout.getPlid(), false);
+
+		copyLayout(layoutRevisionId, newDraftRevision.getLayoutRevisionId());
+
+		copyLayout(
+			newDraftRevision.getLayoutRevisionId(),
+			newLayoutRevision.getLayoutRevisionId());
+	}
 
 	@Override
 	public LayoutRevision getLayoutRevision(Layout layout) {
@@ -290,6 +369,48 @@ public class LayoutStagingImpl implements LayoutStaging {
 	}
 
 	@Override
+	public Layout publishLayout(Layout draftLayout, Layout layout, long userId)
+		throws Exception {
+
+		LayoutRevision layoutRevision = LayoutStagingUtil.getLayoutRevision(
+			layout);
+
+		LayoutRevision draftLayoutRevision = getLayoutRevision(draftLayout);
+
+		LayoutRevision newLayoutRevision =
+			_layoutRevisionLocalService.addLayoutRevision(
+				userId, layoutRevision.getLayoutSetBranchId(),
+				layoutRevision.getLayoutBranchId(),
+				layoutRevision.getLayoutRevisionId(), false, layout.getPlid(),
+				layoutRevision.getLayoutRevisionId(),
+				layoutRevision.isPrivateLayout(), layoutRevision.getName(),
+				layoutRevision.getTitle(), layoutRevision.getDescription(),
+				layoutRevision.getKeywords(), layoutRevision.getRobots(),
+				layoutRevision.getTypeSettings(), layoutRevision.getIconImage(),
+				layoutRevision.getIconImageId(), layoutRevision.getThemeId(),
+				layoutRevision.getColorSchemeId(), layoutRevision.getCss(),
+				new ServiceContext());
+
+		copyLayout(
+			draftLayoutRevision.getLayoutRevisionId(),
+			newLayoutRevision.getLayoutRevisionId());
+
+		LayoutRevision newDraftLayoutRevision =
+			_layoutRevisionLocalService.fetchLastLayoutRevision(
+				draftLayout.getPlid(), false);
+
+		copyLayout(
+			newLayoutRevision.getLayoutRevisionId(),
+			newDraftLayoutRevision.getLayoutRevisionId());
+
+		copyLayout(
+			layoutRevision.getLayoutRevisionId(),
+			draftLayoutRevision.getLayoutRevisionId());
+
+		return _layoutLocalService.getLayout(layout.getPlid());
+	}
+
+	@Override
 	public long swapPlidForRevisionId(long plid) {
 		if (!StagingAdvicesThreadLocal.isEnabled()) {
 			return plid;
@@ -343,12 +464,20 @@ public class LayoutStagingImpl implements LayoutStaging {
 		LayoutStagingImpl.class);
 
 	@Reference
+	private LayoutCopyHelper _layoutCopyHelper;
+
+	@Reference
 	private LayoutLocalService _layoutLocalService;
 
 	@Reference
 	private LayoutRevisionLocalService _layoutRevisionLocalService;
 
-	@Reference
 	private LayoutSetBranchLocalService _layoutSetBranchLocalService;
+
+	@Reference
+	private RecentLayoutRevisionLocalService _recentLayoutRevisionLocalService;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }
