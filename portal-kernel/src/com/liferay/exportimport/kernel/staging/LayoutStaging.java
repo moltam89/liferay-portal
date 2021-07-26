@@ -23,7 +23,6 @@ import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetBranch;
 import com.liferay.portal.kernel.model.LayoutSetStagingHandler;
 import com.liferay.portal.kernel.model.LayoutStagingHandler;
-import com.liferay.portal.kernel.service.ServiceContext;
 
 import org.osgi.annotation.versioning.ProviderType;
 
@@ -61,8 +60,7 @@ public interface LayoutStaging {
 	public boolean prepareLayoutStagingHandler(
 		PortletDataContext portletDataContext, Layout layout);
 
-	public Layout publishLayout(
-			Layout draftLayout, Layout layout, long userId)
+	public Layout publishLayout(Layout draftLayout, Layout layout, long userId)
 		throws Exception;
 
 	public long swapPlidForRevisionId(long plid);
