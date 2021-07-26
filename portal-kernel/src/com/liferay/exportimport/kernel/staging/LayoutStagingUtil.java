@@ -30,6 +30,21 @@ import com.liferay.portal.kernel.util.ServiceProxyFactory;
  * @author Raymond Augé
  */
 public class LayoutStagingUtil {
+	
+	public static Layout copyLayout(
+			long sourceLayoutRevisionId, long targetLayoutRevisionId)
+		throws Exception {
+
+		return _layoutStaging.copyLayout(
+			sourceLayoutRevisionId, targetLayoutRevisionId);
+	}
+
+	public static void copyLayoutBranch(
+			LayoutBranch layoutBranch, long layoutRevisionId)
+		throws Exception {
+
+		_layoutStaging.copyLayoutBranch(layoutBranch, layoutRevisionId);
+	}
 
 	public static Layout copyLayout(
 			long sourceLayoutRevisionId, long targetLayoutRevisionId)
@@ -91,7 +106,16 @@ public class LayoutStagingUtil {
 			portletDataContext, layout);
 	}
 
-	public static long swapPlidForRevisionId(long plid) {
+	public Layout publishLayout(
+			Layout dratLayout, Layout layout, ServiceContext serviceContext,
+			long userId) 
+		throws Exception {
+
+		return _layoutStaging.publishLayout(
+			dratLayout, layout, serviceContext, userId);
+	}
+
+	public static long swapPlidForRevisionId(long plid)  {
 		return _layoutStaging.swapPlidForRevisionId(plid);
 	}
 
