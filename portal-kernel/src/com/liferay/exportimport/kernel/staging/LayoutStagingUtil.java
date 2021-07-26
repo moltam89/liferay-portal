@@ -91,17 +91,16 @@ public class LayoutStagingUtil {
 			portletDataContext, layout);
 	}
 
-	public static long swapPlidForRevisionId(long plid) {
-		return _layoutStaging.swapPlidForRevisionId(plid);
-	}
-
-	public Layout publishLayout(
-			Layout dratLayout, Layout layout, ServiceContext serviceContext,
-			long userId)
+	public static Layout publishLayout(
+			Layout dratLayout, Layout layout, long userId)
 		throws Exception {
 
 		return _layoutStaging.publishLayout(
-			dratLayout, layout, serviceContext, userId);
+			dratLayout, layout, userId);
+	}
+
+	public static long swapPlidForRevisionId(long plid) {
+		return _layoutStaging.swapPlidForRevisionId(plid);
 	}
 
 	private static volatile LayoutStaging _layoutStaging =
