@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.LayoutBranchLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutRevisionLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetBranchLocalServiceUtil;
+import com.liferay.portal.kernel.service.RecentLayoutRevisionLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalServiceUtil;
@@ -155,6 +156,21 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 
 		if (layoutRevision != null) {
 			return layoutRevision;
+		}
+
+		User defaultUser = UserLocalServiceUtil.getDefaultUser(
+			layout.getCompanyId());
+
+		RecentLayoutRevision recentLayoutRevision =
+			RecentLayoutRevisionLocalServiceUtil.fetchRecentLayoutRevision(
+				defaultUser.getUserId(),
+				RecentLayoutRevisionConstants.
+					DEFAULT_RECENT_LAYOUT_SET_BRANCH_ID,
+				layout.getPlid());
+
+		if (recentLayoutRevision != null) {
+			return LayoutRevisionLocalServiceUtil.getLayoutRevision(
+				recentLayoutRevision.getLayoutRevisionId());
 		}
 
 		ServiceContext serviceContext =
