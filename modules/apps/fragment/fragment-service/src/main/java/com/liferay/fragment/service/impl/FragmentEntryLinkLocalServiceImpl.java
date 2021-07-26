@@ -15,6 +15,7 @@
 package com.liferay.fragment.service.impl;
 
 import com.liferay.document.library.util.DLURLHelper;
+import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.fragment.constants.FragmentEntryLinkConstants;
 import com.liferay.fragment.model.FragmentCollection;
 import com.liferay.fragment.model.FragmentEntry;
@@ -33,12 +34,14 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.SystemEventConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepositoryUtil;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.LayoutRevisionLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.systemevent.SystemEvent;
@@ -129,8 +132,10 @@ public class FragmentEntryLinkLocalServiceImpl
 		fragmentEntryLink.setFragmentEntryId(fragmentEntryId);
 		fragmentEntryLink.setSegmentsExperienceId(segmentsExperienceId);
 		fragmentEntryLink.setClassNameId(_portal.getClassNameId(Layout.class));
-		fragmentEntryLink.setClassPK(plid);
-		fragmentEntryLink.setPlid(plid);
+		fragmentEntryLink.setClassPK(
+			LayoutStagingUtil.swapPlidForRevisionId(plid));
+		fragmentEntryLink.setPlid(
+			LayoutStagingUtil.swapPlidForRevisionId(plid));
 		fragmentEntryLink.setCss(css);
 
 		html = _replaceResources(fragmentEntryId, html);
@@ -295,7 +300,8 @@ public class FragmentEntryLinkLocalServiceImpl
 		long groupId, long classNameId, long classPK) {
 
 		return fragmentEntryLinkPersistence.countByG_C_C(
-			groupId, classNameId, classPK);
+			groupId, classNameId,
+			LayoutStagingUtil.swapPlidForRevisionId(classPK));
 	}
 
 	@Override
@@ -332,7 +338,8 @@ public class FragmentEntryLinkLocalServiceImpl
 		long groupId, long classNameId, long classPK) {
 
 		return fragmentEntryLinkPersistence.findByG_C_C(
-			groupId, classNameId, classPK);
+			groupId, classNameId,
+			LayoutStagingUtil.swapPlidForRevisionId(classPK));
 	}
 
 	/**
@@ -385,7 +392,8 @@ public class FragmentEntryLinkLocalServiceImpl
 	public List<FragmentEntryLink> getFragmentEntryLinksByPlid(
 		long groupId, long plid) {
 
-		return fragmentEntryLinkPersistence.findByG_P(groupId, plid);
+		return fragmentEntryLinkPersistence.findByG_P(
+			groupId, LayoutStagingUtil.swapPlidForRevisionId(plid));
 	}
 
 	@Override
@@ -393,7 +401,8 @@ public class FragmentEntryLinkLocalServiceImpl
 		long groupId, long segmentsExperienceId, long plid) {
 
 		return fragmentEntryLinkPersistence.findByG_S_P(
-			groupId, segmentsExperienceId, plid);
+			groupId, segmentsExperienceId,
+			LayoutStagingUtil.swapPlidForRevisionId(plid));
 	}
 
 	/**
@@ -408,7 +417,8 @@ public class FragmentEntryLinkLocalServiceImpl
 		long classPK) {
 
 		return fragmentEntryLinkPersistence.findByG_S_C_C(
-			groupId, segmentsExperienceId, classNameId, classPK);
+			groupId, segmentsExperienceId, classNameId,
+			LayoutStagingUtil.swapPlidForRevisionId(classPK));
 	}
 
 	/**
@@ -459,7 +469,8 @@ public class FragmentEntryLinkLocalServiceImpl
 
 	@Override
 	public int getFragmentEntryLinksCountByPlid(long groupId, long plid) {
-		return fragmentEntryLinkPersistence.countByG_P(groupId, plid);
+		return fragmentEntryLinkPersistence.countByG_P(
+			groupId, LayoutStagingUtil.swapPlidForRevisionId(plid));
 	}
 
 	@Override
@@ -501,6 +512,13 @@ public class FragmentEntryLinkLocalServiceImpl
 
 	@Override
 	public void updateClassedModel(long plid) {
+		LayoutRevision layoutRevision =
+			_layoutRevisionLocalService.fetchLayoutRevision(plid);
+
+		if (layoutRevision != null) {
+			plid = layoutRevision.getPlid();
+		}
+
 		Layout layout = _layoutLocalService.fetchLayout(plid);
 
 		if (layout == null) {
@@ -581,8 +599,10 @@ public class FragmentEntryLinkLocalServiceImpl
 			originalFragmentEntryLinkId);
 		fragmentEntryLink.setFragmentEntryId(fragmentEntryId);
 		fragmentEntryLink.setClassNameId(_portal.getClassNameId(Layout.class));
-		fragmentEntryLink.setClassPK(plid);
-		fragmentEntryLink.setPlid(plid);
+		fragmentEntryLink.setClassPK(
+			LayoutStagingUtil.swapPlidForRevisionId(plid));
+		fragmentEntryLink.setPlid(
+			LayoutStagingUtil.swapPlidForRevisionId(plid));
 		fragmentEntryLink.setCss(css);
 		fragmentEntryLink.setHtml(html);
 		fragmentEntryLink.setJs(js);
@@ -877,6 +897,9 @@ public class FragmentEntryLinkLocalServiceImpl
 
 	@Reference
 	private LayoutLocalService _layoutLocalService;
+
+	@Reference
+	private LayoutRevisionLocalService _layoutRevisionLocalService;
 
 	@Reference
 	private Portal _portal;
