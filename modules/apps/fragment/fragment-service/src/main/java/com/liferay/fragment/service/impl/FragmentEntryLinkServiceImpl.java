@@ -21,10 +21,12 @@ import com.liferay.layout.page.template.service.LayoutPageTemplateEntryLocalServ
 import com.liferay.portal.aop.AopService;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.BaseModelPermissionCheckerUtil;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.LayoutRevisionLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
 
@@ -179,6 +181,13 @@ public class FragmentEntryLinkServiceImpl
 			long groupId, long plid, boolean checkUpdateLayoutContentPermission)
 		throws PortalException {
 
+		LayoutRevision layoutRevision =
+			_layoutRevisionLocalService.fetchLayoutRevision(plid);
+
+		if (layoutRevision != null) {
+			plid = layoutRevision.getPlid();
+		}
+
 		String className = Layout.class.getName();
 		long classPK = plid;
 
@@ -226,5 +235,8 @@ public class FragmentEntryLinkServiceImpl
 	@Reference
 	private LayoutPageTemplateEntryLocalService
 		_layoutPageTemplateEntryLocalService;
+
+	@Reference
+	private LayoutRevisionLocalService _layoutRevisionLocalService;
 
 }
