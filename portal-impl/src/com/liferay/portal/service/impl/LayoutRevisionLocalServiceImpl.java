@@ -467,7 +467,10 @@ public class LayoutRevisionLocalServiceImpl
 
 		LayoutRevision layoutRevision = null;
 
-		if (_layoutRevisionId.get() > 0) {
+		Layout layout = layoutLocalService.getLayout(
+			oldLayoutRevision.getPlid());
+
+		if ((_layoutRevisionId.get() > 0) && !layout.isTypeContent()) {
 			if (_layoutRevisionId.get() == layoutRevisionId) {
 				layoutRevision = oldLayoutRevision;
 			}
@@ -491,7 +494,8 @@ public class LayoutRevisionLocalServiceImpl
 
 		if (!MergeLayoutPrototypesThreadLocal.isInProgress() &&
 			(workflowAction != WorkflowConstants.ACTION_PUBLISH) &&
-			(layoutRevision == null) && !revisionInProgress) {
+			(layoutRevision == null) && !revisionInProgress &&
+			!layout.isTypeContent()) {
 
 			User user = userPersistence.findByPrimaryKey(userId);
 
