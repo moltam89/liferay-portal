@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutBranch;
 import com.liferay.portal.kernel.model.LayoutConstants;
 import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutRevisionConstants;
@@ -34,6 +35,7 @@ import com.liferay.portal.kernel.model.PortletPreferences;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -143,6 +145,12 @@ public class LayoutRevisionLocalServiceImpl
 		StagingUtil.setRecentLayoutRevisionId(
 			user, layoutSetBranchId, plid,
 			layoutRevision.getLayoutRevisionId());
+
+		Layout layout = layoutLocalService.getLayout(plid);
+
+		if (layout.isTypeContent() && !layout.isSystem()) {
+			_addDraftLayoutRevision(layoutRevision, serviceContext);
+		}
 
 		return layoutRevision;
 	}
@@ -456,7 +464,10 @@ public class LayoutRevisionLocalServiceImpl
 
 		LayoutRevision layoutRevision = null;
 
-		if (_layoutRevisionId.get() > 0) {
+		Layout layout = layoutLocalService.getLayout(
+			oldLayoutRevision.getPlid());
+
+		if ((_layoutRevisionId.get() > 0) && !layout.isTypeContent()) {
 			if (_layoutRevisionId.get() == layoutRevisionId) {
 				layoutRevision = oldLayoutRevision;
 			}
@@ -480,7 +491,8 @@ public class LayoutRevisionLocalServiceImpl
 
 		if (!MergeLayoutPrototypesThreadLocal.isInProgress() &&
 			(workflowAction != WorkflowConstants.ACTION_PUBLISH) &&
-			(layoutRevision == null) && !revisionInProgress) {
+			(layoutRevision == null) && !revisionInProgress &&
+			!layout.isTypeContent()) {
 
 			User user = userPersistence.findByPrimaryKey(userId);
 
@@ -776,6 +788,65 @@ public class LayoutRevisionLocalServiceImpl
 		}
 
 		return layoutRevision;
+	}
+
+	private void _addDraftLayoutRevision(
+			LayoutRevision layoutRevision, ServiceContext serviceContext)
+		throws PortalException {
+
+		Layout draftLayout = layoutLocalService.fetchDraftLayout(
+			layoutRevision.getPlid());
+
+		if (draftLayout == null) {
+			return;
+		}
+
+		User user = userPersistence.findByPrimaryKey(
+			layoutRevision.getUserId());
+
+		LayoutSetBranch draftMasterLayoutSetBranch =
+			layoutSetBranchLocalService.getMasterLayoutSetBranch(
+				draftLayout.getGroupId(), draftLayout.isPrivateLayout());
+
+		LayoutBranch draftMasterLayoutBranch =
+			layoutBranchLocalService.getMasterLayoutBranch(
+				draftMasterLayoutSetBranch.getLayoutSetBranchId(),
+				draftLayout.getPlid(),
+				ServiceContextThreadLocal.getServiceContext());
+
+		long layoutRevisionId = counterLocalService.increment();
+
+		LayoutRevision draftLayoutRevision = layoutRevisionPersistence.create(
+			layoutRevisionId);
+
+		draftLayoutRevision.setGroupId(layoutRevision.getGroupId());
+		draftLayoutRevision.setCompanyId(layoutRevision.getCompanyId());
+		draftLayoutRevision.setUserId(user.getUserId());
+		draftLayoutRevision.setUserName(user.getFullName());
+		draftLayoutRevision.setLayoutSetBranchId(
+			draftMasterLayoutSetBranch.getLayoutSetBranchId());
+		draftLayoutRevision.setLayoutBranchId(
+			draftMasterLayoutBranch.getLayoutBranchId());
+		draftLayoutRevision.setParentLayoutRevisionId(
+			layoutRevision.getLayoutRevisionId());
+		draftLayoutRevision.setHead(false);
+		draftLayoutRevision.setPlid(draftLayout.getPlid());
+		draftLayoutRevision.setPrivateLayout(draftLayout.isPrivateLayout());
+		draftLayoutRevision.setName(layoutRevision.getName());
+		draftLayoutRevision.setTitle(layoutRevision.getTitle());
+		draftLayoutRevision.setDescription(layoutRevision.getDescription());
+		draftLayoutRevision.setKeywords(layoutRevision.getKeywords());
+		draftLayoutRevision.setRobots(layoutRevision.getRobots());
+		draftLayoutRevision.setTypeSettings(layoutRevision.getTypeSettings());
+		draftLayoutRevision.setIconImageId(draftLayout.getIconImageId());
+		draftLayoutRevision.setThemeId(layoutRevision.getThemeId());
+		draftLayoutRevision.setColorSchemeId(layoutRevision.getColorSchemeId());
+		draftLayoutRevision.setCss(layoutRevision.getCss());
+		draftLayoutRevision.setStatus(WorkflowConstants.STATUS_APPROVED);
+		draftLayoutRevision.setStatusDate(
+			serviceContext.getModifiedDate(new Date()));
+
+		layoutRevisionPersistence.update(draftLayoutRevision);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
