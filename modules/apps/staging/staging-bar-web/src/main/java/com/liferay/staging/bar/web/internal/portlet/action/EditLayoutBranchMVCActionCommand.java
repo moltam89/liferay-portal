@@ -14,12 +14,18 @@
 
 package com.liferay.staging.bar.web.internal.portlet.action;
 
+import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
+import com.liferay.exportimport.kernel.staging.Staging;
 import com.liferay.portal.kernel.exception.LayoutBranchNameException;
+import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutBranch;
 import com.liferay.portal.kernel.portlet.bridges.mvc.BaseMVCActionCommand;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCActionCommand;
 import com.liferay.portal.kernel.service.LayoutBranchService;
+import com.liferay.portal.kernel.service.LayoutLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
+import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -62,8 +68,18 @@ public class EditLayoutBranchMVCActionCommand extends BaseMVCActionCommand {
 
 		try {
 			if (layoutBranchId <= 0) {
-				_layoutBranchService.addLayoutBranch(
-					layoutRevisionId, name, description, false, serviceContext);
+				LayoutBranch layoutBranch =
+					_layoutBranchService.addLayoutBranch(
+						layoutRevisionId, name, description, false,
+						serviceContext);
+
+				Layout layout = _layoutLocalService.getLayout(
+					layoutBranch.getPlid());
+
+				if (layout.isTypeContent()) {
+					LayoutStagingUtil.copyLayoutBranch(
+						layoutBranch, layoutRevisionId);
+				}
 
 				SessionMessages.add(actionRequest, "pageVariationAdded");
 			}
@@ -90,13 +106,16 @@ public class EditLayoutBranchMVCActionCommand extends BaseMVCActionCommand {
 		}
 	}
 
-	@Reference(unbind = "-")
-	protected void setLayoutBranchService(
-		LayoutBranchService layoutBranchService) {
-
-		_layoutBranchService = layoutBranchService;
-	}
-
+	@Reference
 	private LayoutBranchService _layoutBranchService;
+
+	@Reference
+	private LayoutLocalService _layoutLocalService;
+
+	@Reference
+	private Staging _staging;
+
+	@Reference
+	private UserLocalService _userLocalService;
 
 }
