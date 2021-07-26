@@ -19,6 +19,7 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.service.LayoutBranchLocalServiceUtil;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutRevisionLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetBranchLocalServiceUtil;
 import com.liferay.portal.kernel.service.RecentLayoutRevisionLocalServiceUtil;
@@ -173,6 +174,14 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 				recentLayoutRevision.getLayoutRevisionId());
 		}
 
+		if (layout.isSystem()) {
+			layoutRevision = _getSystemLayoutRevision(layout);
+
+			if (layoutRevision != null) {
+				return layoutRevision;
+			}
+		}
+
 		ServiceContext serviceContext =
 			ServiceContextThreadLocal.getServiceContext();
 
@@ -282,6 +291,38 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 				PortalClassLoaderUtil.getClassLoader(),
 				new Class<?>[] {Layout.class},
 				new LayoutStagingHandler(_layout, _layoutRevision)));
+	}
+
+	private LayoutRevision _getSystemLayoutRevision(Layout layout)
+		throws PortalException {
+
+		Layout publishedLayout = LayoutLocalServiceUtil.getLayout(
+			layout.getClassPK());
+
+		LayoutStagingHandler publishedLayoutStagingHandler =
+			new LayoutStagingHandler(publishedLayout);
+
+		LayoutRevision publishedLayoutRevision =
+			publishedLayoutStagingHandler.getLayoutRevision();
+
+		LayoutSetBranch masterLayoutSetBranch =
+			LayoutSetBranchLocalServiceUtil.getMasterLayoutSetBranch(
+				layout.getGroupId(), layout.isPrivateLayout());
+
+		LayoutRevision layoutRevision =
+			LayoutRevisionLocalServiceUtil.fetchLayoutRevision(
+				masterLayoutSetBranch.getLayoutSetBranchId(),
+				publishedLayoutRevision.getLayoutRevisionId(),
+				layout.getPlid());
+
+		if (layoutRevision == null) {
+			layoutRevision = LayoutRevisionLocalServiceUtil.fetchLayoutRevision(
+				masterLayoutSetBranch.getLayoutSetBranchId(),
+				LayoutRevisionConstants.DEFAULT_PARENT_LAYOUT_REVISION_ID,
+				layout.getPlid());
+		}
+
+		return layoutRevision;
 	}
 
 	private boolean _isBelongsToLayout(
