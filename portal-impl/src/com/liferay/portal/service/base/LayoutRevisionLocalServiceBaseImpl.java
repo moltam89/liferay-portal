@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.service.LayoutRevisionLocalService;
 import com.liferay.portal.kernel.service.LayoutRevisionLocalServiceUtil;
 import com.liferay.portal.kernel.service.PersistedModelLocalServiceRegistry;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
+import com.liferay.portal.kernel.service.persistence.LayoutBranchPersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutFinder;
 import com.liferay.portal.kernel.service.persistence.LayoutPersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutRevisionPersistence;
@@ -512,6 +513,49 @@ public abstract class LayoutRevisionLocalServiceBaseImpl
 	}
 
 	/**
+	 * Returns the layout branch local service.
+	 *
+	 * @return the layout branch local service
+	 */
+	public com.liferay.portal.kernel.service.LayoutBranchLocalService
+		getLayoutBranchLocalService() {
+
+		return layoutBranchLocalService;
+	}
+
+	/**
+	 * Sets the layout branch local service.
+	 *
+	 * @param layoutBranchLocalService the layout branch local service
+	 */
+	public void setLayoutBranchLocalService(
+		com.liferay.portal.kernel.service.LayoutBranchLocalService
+			layoutBranchLocalService) {
+
+		this.layoutBranchLocalService = layoutBranchLocalService;
+	}
+
+	/**
+	 * Returns the layout branch persistence.
+	 *
+	 * @return the layout branch persistence
+	 */
+	public LayoutBranchPersistence getLayoutBranchPersistence() {
+		return layoutBranchPersistence;
+	}
+
+	/**
+	 * Sets the layout branch persistence.
+	 *
+	 * @param layoutBranchPersistence the layout branch persistence
+	 */
+	public void setLayoutBranchPersistence(
+		LayoutBranchPersistence layoutBranchPersistence) {
+
+		this.layoutBranchPersistence = layoutBranchPersistence;
+	}
+
+	/**
 	 * Returns the layout set branch local service.
 	 *
 	 * @return the layout set branch local service
@@ -910,6 +954,15 @@ public abstract class LayoutRevisionLocalServiceBaseImpl
 
 	@BeanReference(type = LayoutFinder.class)
 	protected LayoutFinder layoutFinder;
+
+	@BeanReference(
+		type = com.liferay.portal.kernel.service.LayoutBranchLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.LayoutBranchLocalService
+		layoutBranchLocalService;
+
+	@BeanReference(type = LayoutBranchPersistence.class)
+	protected LayoutBranchPersistence layoutBranchPersistence;
 
 	@BeanReference(
 		type = com.liferay.portal.kernel.service.LayoutSetBranchLocalService.class

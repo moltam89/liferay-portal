@@ -285,6 +285,13 @@ public class LayoutRevisionLocalServiceUtil {
 			layoutSetBranchId, layoutBranchId, head, plid);
 	}
 
+	public static LayoutRevision fetchLayoutRevision(
+		long layoutSetBranchId, long parentLayoutRevisionId, long plid) {
+
+		return getService().fetchLayoutRevision(
+			layoutSetBranchId, parentLayoutRevisionId, plid);
+	}
+
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
 		getActionableDynamicQuery() {
 
