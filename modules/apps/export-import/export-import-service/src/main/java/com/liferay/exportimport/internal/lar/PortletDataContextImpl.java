@@ -41,6 +41,7 @@ import com.liferay.exportimport.kernel.lar.UserIdStrategy;
 import com.liferay.exportimport.kernel.xstream.XStreamAlias;
 import com.liferay.exportimport.kernel.xstream.XStreamConverter;
 import com.liferay.exportimport.kernel.xstream.XStreamType;
+import com.liferay.exportimport.lar.ImportPortletDataThreadLocal;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.dao.orm.Conjunction;
@@ -830,13 +831,45 @@ public class PortletDataContextImpl implements PortletDataContext {
 			"uuid", stagedModel.getUuid());
 	}
 
+	// TODO: SMC Shnages
 	@Override
 	public Element getImportDataElement(
 		String name, String attribute, String value) {
 
+		boolean attributeIsPath = "path".equals(attribute);
+
+		String key;
+
+		if (attributeIsPath) {
+			key = ImportPortletDataThreadLocal.buildkey(
+				_importDataRootElement, name, attribute, value);
+		}
+		else {
+			key = ImportPortletDataThreadLocal.buildkey(
+				_importDataRootElement, name + "." + attribute);
+		}
+
+		ImportPortletDataThreadLocal portletDataThreadLocal =
+				ImportPortletDataThreadLocal.getPortletDataThreadLocal();
+
+		if (attributeIsPath && Validator.isNotNull(key)) {
+			Element cachedElement = portletDataThreadLocal.getElement(key);
+
+			if (cachedElement != null) {
+				return cachedElement;
+			}
+		}
+
 		Element groupElement = getImportDataGroupElement(name);
 
-		return getDataElement(groupElement, attribute, value);
+		Element dataElement = getDataElement(
+			groupElement, attribute, value);
+
+		if (attributeIsPath && Validator.isNotNull(key)) {
+			portletDataThreadLocal.save(key, dataElement);
+		}
+
+		return dataElement;
 	}
 
 	@Override
@@ -1614,7 +1647,7 @@ public class PortletDataContextImpl implements PortletDataContext {
 			return true;
 		}
 		else if ((_startDate.compareTo(modifiedDate) <= 0) &&
-				 _endDate.after(modifiedDate)) {
+				_endDate.after(modifiedDate)) {
 
 			return true;
 		}
@@ -2181,11 +2214,42 @@ public class PortletDataContextImpl implements PortletDataContext {
 			return SAXReaderUtil.createElement("EMPTY-ELEMENT");
 		}
 
+		String key = ImportPortletDataThreadLocal.buildkey(
+			_importDataRootElement, name);
+
+		ImportPortletDataThreadLocal portletDataThreadLocal =
+				ImportPortletDataThreadLocal.getPortletDataThreadLocal();
+
+		Element cachedElement;
+
+		if (Validator.isNotNull(key)) {
+			cachedElement = portletDataThreadLocal.getElement(key);
+
+			if (cachedElement != null) {
+				if (_log.isDebugEnabled()) {
+					_log.debug("reuse " + key + " " + cachedElement);
+				}
+
+				return cachedElement;
+			}
+		}
+		else {
+			cachedElement = null;
+		}
+
 		Element groupElement = _deepSearchForFirstChildElement(
 			_importDataRootElement, name);
 
 		if (groupElement == null) {
-			return SAXReaderUtil.createElement("EMPTY-ELEMENT");
+			groupElement = SAXReaderUtil.createElement("EMPTY-ELEMENT");
+		}
+
+		if (Validator.isNotNull(key)) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("store " + key + " " + groupElement);
+			}
+
+			portletDataThreadLocal.save(key, groupElement);
 		}
 
 		return groupElement;
