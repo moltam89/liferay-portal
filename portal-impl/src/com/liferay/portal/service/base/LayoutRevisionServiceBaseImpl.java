@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.service.BaseServiceImpl;
 import com.liferay.portal.kernel.service.LayoutRevisionService;
 import com.liferay.portal.kernel.service.LayoutRevisionServiceUtil;
+import com.liferay.portal.kernel.service.persistence.LayoutBranchPersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutFinder;
 import com.liferay.portal.kernel.service.persistence.LayoutPersistence;
 import com.liferay.portal.kernel.service.persistence.LayoutRevisionPersistence;
@@ -226,6 +227,72 @@ public abstract class LayoutRevisionServiceBaseImpl
 	 */
 	public void setLayoutFinder(LayoutFinder layoutFinder) {
 		this.layoutFinder = layoutFinder;
+	}
+
+	/**
+	 * Returns the layout branch local service.
+	 *
+	 * @return the layout branch local service
+	 */
+	public com.liferay.portal.kernel.service.LayoutBranchLocalService
+		getLayoutBranchLocalService() {
+
+		return layoutBranchLocalService;
+	}
+
+	/**
+	 * Sets the layout branch local service.
+	 *
+	 * @param layoutBranchLocalService the layout branch local service
+	 */
+	public void setLayoutBranchLocalService(
+		com.liferay.portal.kernel.service.LayoutBranchLocalService
+			layoutBranchLocalService) {
+
+		this.layoutBranchLocalService = layoutBranchLocalService;
+	}
+
+	/**
+	 * Returns the layout branch remote service.
+	 *
+	 * @return the layout branch remote service
+	 */
+	public com.liferay.portal.kernel.service.LayoutBranchService
+		getLayoutBranchService() {
+
+		return layoutBranchService;
+	}
+
+	/**
+	 * Sets the layout branch remote service.
+	 *
+	 * @param layoutBranchService the layout branch remote service
+	 */
+	public void setLayoutBranchService(
+		com.liferay.portal.kernel.service.LayoutBranchService
+			layoutBranchService) {
+
+		this.layoutBranchService = layoutBranchService;
+	}
+
+	/**
+	 * Returns the layout branch persistence.
+	 *
+	 * @return the layout branch persistence
+	 */
+	public LayoutBranchPersistence getLayoutBranchPersistence() {
+		return layoutBranchPersistence;
+	}
+
+	/**
+	 * Sets the layout branch persistence.
+	 *
+	 * @param layoutBranchPersistence the layout branch persistence
+	 */
+	public void setLayoutBranchPersistence(
+		LayoutBranchPersistence layoutBranchPersistence) {
+
+		this.layoutBranchPersistence = layoutBranchPersistence;
 	}
 
 	/**
@@ -695,6 +762,21 @@ public abstract class LayoutRevisionServiceBaseImpl
 
 	@BeanReference(type = LayoutFinder.class)
 	protected LayoutFinder layoutFinder;
+
+	@BeanReference(
+		type = com.liferay.portal.kernel.service.LayoutBranchLocalService.class
+	)
+	protected com.liferay.portal.kernel.service.LayoutBranchLocalService
+		layoutBranchLocalService;
+
+	@BeanReference(
+		type = com.liferay.portal.kernel.service.LayoutBranchService.class
+	)
+	protected com.liferay.portal.kernel.service.LayoutBranchService
+		layoutBranchService;
+
+	@BeanReference(type = LayoutBranchPersistence.class)
+	protected LayoutBranchPersistence layoutBranchPersistence;
 
 	@BeanReference(
 		type = com.liferay.portal.kernel.service.LayoutSetBranchLocalService.class
