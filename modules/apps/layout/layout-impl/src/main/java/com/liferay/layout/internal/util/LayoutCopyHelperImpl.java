@@ -17,6 +17,7 @@ package com.liferay.layout.internal.util;
 import com.liferay.asset.kernel.service.AssetCategoryLocalService;
 import com.liferay.asset.kernel.service.AssetTagLocalService;
 import com.liferay.counter.kernel.service.CounterLocalService;
+import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.processor.PortletRegistry;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
@@ -627,8 +628,12 @@ public class LayoutCopyHelperImpl implements LayoutCopyHelper {
 				targetSegmentsExperienceId);
 			newFragmentEntryLink.setClassNameId(
 				_portal.getClassNameId(Layout.class));
-			newFragmentEntryLink.setClassPK(targetLayout.getPlid());
-			newFragmentEntryLink.setPlid(targetLayout.getPlid());
+			newFragmentEntryLink.setClassPK(
+				LayoutStagingUtil.swapPlidForRevisionId(
+					targetLayout.getPlid()));
+			newFragmentEntryLink.setPlid(
+				LayoutStagingUtil.swapPlidForRevisionId(
+					targetLayout.getPlid()));
 			newFragmentEntryLink.setLastPropagationDate(
 				serviceContext.getCreateDate(new Date()));
 
