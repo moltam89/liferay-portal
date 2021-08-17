@@ -3592,16 +3592,24 @@ public class StagingImpl implements Staging {
 			return 0;
 		}
 
+		long layoutBranchId = getRecentLayoutBranchId(
+			userId, layoutSetBranchId, plid);
+
 		RecentLayoutRevision recentLayoutRevision =
 			_recentLayoutRevisionLocalService.fetchRecentLayoutRevision(
 				userId, layoutSetBranchId, plid);
 
 		if (recentLayoutRevision != null) {
-			return recentLayoutRevision.getLayoutRevisionId();
-		}
+			LayoutRevision layoutRevision =
+				_layoutRevisionLocalService.fetchLayoutRevision(
+					recentLayoutRevision.getLayoutRevisionId());
 
-		long layoutBranchId = getRecentLayoutBranchId(
-			userId, layoutSetBranchId, plid);
+			if ((layoutRevision != null) &&
+				(layoutRevision.getLayoutBranchId() == layoutBranchId)) {
+
+				return layoutRevision.getLayoutRevisionId();
+			}
+		}
 
 		LayoutBranch layoutBranch = _layoutBranchLocalService.fetchLayoutBranch(
 			layoutBranchId);
