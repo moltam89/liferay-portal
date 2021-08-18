@@ -25,6 +25,8 @@ AUI.add(
 
 		var RENDER_INTERVAL_IN_PROGRESS = 2000;
 
+		var STR_CHANGE = 'change'
+
 		var STR_CHECKED = 'checked';
 
 		var STR_CLICK = 'click';
@@ -221,6 +223,16 @@ AUI.add(
 					if (changeToPublicLayoutsButton) {
 						changeToPublicLayoutsButton.on(STR_CLICK, () => {
 							instance._changeLayouts(false);
+						});
+					}
+					
+					var layoutSetBranchId = instance.byId(
+						'layoutSetBranchId'
+					);
+
+					if (layoutSetBranchId) {
+						layoutSetBranchId.on(STR_CHANGE, () => {
+							instance._reloadForm();
 						});
 					}
 
@@ -855,6 +867,12 @@ AUI.add(
 
 						if (rootNodeNameNode) {
 							params.rootNodeName = rootNodeNameNode.val();
+						}
+						
+						var layoutSetBranchId = instance.byId('layoutSetBranchId');
+
+						if (layoutSetBranchId) {
+							params.layoutSetBranchId = layoutSetBranchId.val();
 						}
 
 						var portletURL = Liferay.Util.PortletURL.createPortletURL(

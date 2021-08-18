@@ -54,7 +54,7 @@
 							}
 							%>
 
-							<aui:select disabled="<%= disableInputs %>" label="site-pages-variation" name="layoutSetBranchId">
+							<aui:select id="layoutSetBranchId" disabled="<%= disableInputs %>" label="site-pages-variation" name="layoutSetBranchId">
 
 								<%
 								for (LayoutSetBranch layoutSetBranch : layoutSetBranches) {
