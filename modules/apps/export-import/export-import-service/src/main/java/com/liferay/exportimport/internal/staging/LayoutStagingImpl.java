@@ -14,10 +14,12 @@
 
 package com.liferay.exportimport.internal.staging;
 
+import com.liferay.exportimport.internal.configuration.FFContentTypeLayoutVersioningConfiguration;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.exportimport.kernel.staging.LayoutStaging;
 import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.layout.util.LayoutCopyHelper;
+import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -46,14 +48,20 @@ import com.liferay.portlet.exportimport.staging.StagingAdvicesThreadLocal;
 import java.lang.reflect.InvocationHandler;
 
 import java.util.List;
+import java.util.Map;
 
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Raymond Augé
  */
-@Component(immediate = true, service = LayoutStaging.class)
+@Component(
+	configurationPid = "com.liferay.exportimport.internal.configuration.FFContentTypeLayoutVersioningConfiguration",
+	immediate = true, service = LayoutStaging.class
+)
 public class LayoutStagingImpl implements LayoutStaging {
 
 	@Override
@@ -106,6 +114,10 @@ public class LayoutStagingImpl implements LayoutStaging {
 	public void copyLayoutBranch(
 			LayoutBranch layoutBranch, long layoutRevisionId)
 		throws Exception {
+
+		if (!_isLayoutVersioningEnabled()) {
+			return;
+		}
 
 		LayoutRevision newLayoutRevision =
 			_layoutRevisionLocalService.fetchLatestLayoutRevision(
@@ -188,7 +200,7 @@ public class LayoutStagingImpl implements LayoutStaging {
 
 	@Override
 	public boolean isBranchingLayout(Layout layout) {
-		if (layout == null) {
+		if ((layout == null) || !_isLayoutVersioningEnabled(layout)) {
 			return false;
 		}
 
@@ -372,6 +384,10 @@ public class LayoutStagingImpl implements LayoutStaging {
 	public Layout publishLayout(Layout draftLayout, Layout layout, long userId)
 		throws Exception {
 
+		if (!_isLayoutVersioningEnabled()) {
+			return _layoutCopyHelper.copyLayout(draftLayout, layout);
+		}
+
 		LayoutRevision layoutRevision = LayoutStagingUtil.getLayoutRevision(
 			layout);
 
@@ -412,7 +428,9 @@ public class LayoutStagingImpl implements LayoutStaging {
 
 	@Override
 	public long swapPlidForRevisionId(long plid) {
-		if (!StagingAdvicesThreadLocal.isEnabled()) {
+		if (!_isLayoutVersioningEnabled() &&
+			!StagingAdvicesThreadLocal.isEnabled()) {
+
 			return plid;
 		}
 
@@ -423,6 +441,14 @@ public class LayoutStagingImpl implements LayoutStaging {
 		}
 
 		return layoutRevision.getLayoutRevisionId();
+	}
+
+	@Activate
+	@Modified
+	protected void activate(Map<String, Object> properties) {
+		_ffContentTypeLayoutVersioningConfiguration =
+			ConfigurableUtil.createConfigurable(
+				FFContentTypeLayoutVersioningConfiguration.class, properties);
 	}
 
 	@Reference(unbind = "-")
@@ -460,8 +486,23 @@ public class LayoutStagingImpl implements LayoutStaging {
 		return null;
 	}
 
+	private boolean _isLayoutVersioningEnabled() {
+		return _ffContentTypeLayoutVersioningConfiguration.enabled();
+	}
+
+	private boolean _isLayoutVersioningEnabled(Layout layout) {
+		if (!layout.isTypeContent()) {
+			return true;
+		}
+
+		return _ffContentTypeLayoutVersioningConfiguration.enabled();
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutStagingImpl.class);
+
+	private volatile FFContentTypeLayoutVersioningConfiguration
+		_ffContentTypeLayoutVersioningConfiguration;
 
 	@Reference
 	private LayoutCopyHelper _layoutCopyHelper;

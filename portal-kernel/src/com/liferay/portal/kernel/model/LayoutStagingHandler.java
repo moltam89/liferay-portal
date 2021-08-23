@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.model;
 
+import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -174,7 +175,7 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 				recentLayoutRevision.getLayoutRevisionId());
 		}
 
-		if (layout.isSystem()) {
+		if (layout.isSystem() && LayoutStagingUtil.isBranchingLayout(layout)) {
 			layoutRevision = _getSystemLayoutRevision(layout);
 
 			if (layoutRevision != null) {

@@ -14,6 +14,7 @@
 
 package com.liferay.portal.service.impl;
 
+import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.petra.lang.CentralizedThreadLocal;
@@ -790,7 +791,7 @@ public class LayoutRevisionLocalServiceImpl
 		Layout draftLayout = layoutLocalService.fetchDraftLayout(
 			layoutRevision.getPlid());
 
-		if (draftLayout == null) {
+		if (!LayoutStagingUtil.isBranchingLayout(draftLayout)) {
 			return;
 		}
 
