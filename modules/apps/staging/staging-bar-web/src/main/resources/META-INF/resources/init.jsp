@@ -106,6 +106,20 @@ LayoutSetBranchDisplayContext layoutSetBranchDisplayContext = new LayoutSetBranc
 %>
 
 <%!
+private boolean _isShowLayoutVersioningOption(Layout layout) {
+	if (layout == null) {
+		return false;
+	}
+
+	if (!layout.isTypeContent()) {
+		return true;
+	}
+
+	Layout draftLayout = LayoutLocalServiceUtil.fetchDraftLayout(layout.getPlid());
+
+	return LayoutStagingUtil.isBranchingLayout(draftLayout);
+}
+
 private long _getLastImportLayoutRevisionId(Group group, Layout layout, User user) {
 	long lastImportLayoutRevisionId = 0;
 

@@ -14,6 +14,7 @@
 
 package com.liferay.portal.service.impl;
 
+import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.exportimport.kernel.staging.StagingUtil;
 import com.liferay.petra.lang.CentralizedThreadLocal;
@@ -460,7 +461,9 @@ public class LayoutRevisionLocalServiceImpl
 		Layout layout = layoutLocalService.getLayout(
 			oldLayoutRevision.getPlid());
 
-		if ((_layoutRevisionId.get() > 0) && !layout.isTypeContent()) {
+		if ((_layoutRevisionId.get() > 0) &&
+			!_isSystemLayoutVersioningEnabled(layout)) {
+
 			if (_layoutRevisionId.get() == layoutRevisionId) {
 				layoutRevision = oldLayoutRevision;
 			}
@@ -485,7 +488,7 @@ public class LayoutRevisionLocalServiceImpl
 		if (!MergeLayoutPrototypesThreadLocal.isInProgress() &&
 			(workflowAction != WorkflowConstants.ACTION_PUBLISH) &&
 			(layoutRevision == null) && !revisionInProgress &&
-			!layout.isTypeContent()) {
+			!_isSystemLayoutVersioningEnabled(layout)) {
 
 			User user = userPersistence.findByPrimaryKey(userId);
 
@@ -790,7 +793,7 @@ public class LayoutRevisionLocalServiceImpl
 		Layout draftLayout = layoutLocalService.fetchDraftLayout(
 			layoutRevision.getPlid());
 
-		if (draftLayout == null) {
+		if (!LayoutStagingUtil.isBranchingLayout(draftLayout)) {
 			return;
 		}
 
@@ -840,6 +843,17 @@ public class LayoutRevisionLocalServiceImpl
 			serviceContext.getModifiedDate(new Date()));
 
 		layoutRevisionPersistence.update(draftLayoutRevision);
+	}
+
+	private boolean _isSystemLayoutVersioningEnabled(Layout layout) {
+		if (!layout.isTypeContent()) {
+			return false;
+		}
+
+		Layout draftLayout = layoutLocalService.fetchDraftLayout(
+			layout.getPlid());
+
+		return LayoutStagingUtil.isBranchingLayout(draftLayout);
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
