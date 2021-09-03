@@ -124,6 +124,9 @@ public class LayoutSetPrototypeExportImportTest
 		Assert.assertEquals(
 			exportedLayoutSetPrototypeGroup.getPrivateLayoutsPageCount(),
 			importedLayoutSetPrototypeGroup.getPrivateLayoutsPageCount());
+
+		LayoutSetPrototypeLocalServiceUtil.deleteLayoutSetPrototype(
+			exportedLayoutSetPrototype);
 	}
 
 	@Override
