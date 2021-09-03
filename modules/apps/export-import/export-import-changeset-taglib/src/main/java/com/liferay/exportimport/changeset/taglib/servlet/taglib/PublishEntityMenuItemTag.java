@@ -36,7 +36,7 @@ public class PublishEntityMenuItemTag extends IncludeTag {
 
 	@Override
 	public int doStartTag() throws JspException {
-		Changeset.RawBuilder rawBuilder = Changeset.createRaw();
+		Changeset.RawBuilder rawBuilder = Changeset.createRaw(_uuid);
 
 		String className = _className;
 
