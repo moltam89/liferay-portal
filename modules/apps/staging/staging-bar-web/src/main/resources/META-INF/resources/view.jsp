@@ -122,18 +122,6 @@ if (liveLayout != null) {
 						</c:otherwise>
 					</c:choose>
 				</ul>
-
-				<button class="btn btn-monospaced staging-toggle" id="closeStagingOptions" title="<%= LanguageUtil.get(request, "view-page-staging-options") %>">
-					<liferay-ui:icon
-						icon="info-circle"
-						markupView="lexicon"
-					/>
-
-					<liferay-ui:icon
-						icon="times-circle"
-						markupView="lexicon"
-					/>
-				</button>
 			</clay:container-fluid>
 		</nav>
 
