@@ -307,6 +307,9 @@ public class PortletExportControllerImpl implements PortletExportController {
 			return;
 		}
 
+		PortletDataHandler portletDataHandler =
+			portlet.getPortletDataHandlerInstance();
+
 		if (BackgroundTaskThreadLocal.hasBackgroundTask()) {
 			PortletDataContext clonedPortletDataContext =
 				_portletDataContextFactory.clonePortletDataContext(
@@ -316,9 +319,6 @@ public class PortletExportControllerImpl implements PortletExportController {
 				clonedPortletDataContext.getManifestSummary();
 
 			manifestSummary.resetCounters();
-
-			PortletDataHandler portletDataHandler =
-				portlet.getPortletDataHandlerInstance();
 
 			portletDataHandler.prepareManifestSummary(clonedPortletDataContext);
 
@@ -525,6 +525,11 @@ public class PortletExportControllerImpl implements PortletExportController {
 		// Permissions
 
 		if (exportPermissions) {
+			if (Validator.isNotNull(portletDataHandler.getResourceName())) {
+				portletDataContext.addPortletPermissions(
+					portletDataHandler.getResourceName());
+			}
+
 			_permissionExporter.exportPortletPermissions(
 				portletDataContext, portlet.getPortletId(), layout,
 				portletElement);
@@ -538,9 +543,6 @@ public class PortletExportControllerImpl implements PortletExportController {
 		element.addAttribute("layout-id", String.valueOf(layoutId));
 		element.addAttribute("path", path);
 		element.addAttribute("portlet-data", String.valueOf(exportPortletData));
-
-		PortletDataHandler portletDataHandler =
-			portlet.getPortletDataHandlerInstance();
 
 		element.addAttribute(
 			"schema-version", portletDataHandler.getSchemaVersion());

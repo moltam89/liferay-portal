@@ -1055,6 +1055,18 @@ public class PortletImportControllerImpl implements PortletImportController {
 				_log.debug("Importing portlet permissions");
 			}
 
+			PortletDataHandler portletDataHandler =
+				_portletDataHandlerProvider.provide(
+					portletDataContext.getCompanyId(),
+					portletDataContext.getPortletId());
+
+			if ((portletDataHandler != null) &&
+				Validator.isNotNull(portletDataHandler.getResourceName())) {
+
+				portletDataContext.importPortletPermissions(
+					portletDataHandler.getResourceName());
+			}
+
 			_permissionImporter.importPortletPermissions(
 				portletDataContext.getCompanyId(),
 				portletDataContext.getGroupId(), userId, layout, portletElement,
