@@ -132,6 +132,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.function.Predicate;
 
 /**
@@ -834,9 +835,27 @@ public class PortletDataContextImpl implements PortletDataContext {
 	public Element getImportDataElement(
 		String name, String attribute, String value) {
 
+		Element importDataElement = null;
+		String importDataElementKey = getImportDataElementKeyString(
+			name, attribute, value);
+
+		if (_importDataElementCacheEnabled) {
+			importDataElement = _importDataElementMap.get(importDataElementKey);
+
+			if (importDataElement != null) {
+				return importDataElement;
+			}
+		}
+
 		Element groupElement = getImportDataGroupElement(name);
 
-		return getDataElement(groupElement, attribute, value);
+		importDataElement = getDataElement(groupElement, attribute, value);
+
+		if (_importDataElementCacheEnabled) {
+			_importDataElementMap.put(importDataElementKey, importDataElement);
+		}
+
+		return importDataElement;
 	}
 
 	@Override
@@ -1676,6 +1695,15 @@ public class PortletDataContextImpl implements PortletDataContext {
 	}
 
 	@Override
+	public void setImportDataElementCacheEnabled(boolean enabled) {
+		if (!enabled) {
+			_importDataElementMap.clear();
+		}
+
+		_importDataElementCacheEnabled = enabled;
+	}
+
+	@Override
 	public void setImportDataRootElement(Element importDataRootElement) {
 		_importDataRootElement = importDataRootElement;
 	}
@@ -2164,6 +2192,25 @@ public class PortletDataContextImpl implements PortletDataContext {
 		}
 
 		return groupElement;
+	}
+
+	protected String getImportDataElementKeyString(
+		String name, String attribute, String value) {
+
+		StringJoiner stringJoiner = new StringJoiner(StringPool.POUND);
+
+		String importDataRootElementName = StringPool.BLANK;
+
+		if (_importDataRootElement != null) {
+			importDataRootElementName = _importDataRootElement.getName();
+		}
+
+		stringJoiner.add(importDataRootElementName);
+		stringJoiner.add(name);
+		stringJoiner.add(attribute);
+		stringJoiner.add(value);
+
+		return stringJoiner.toString();
 	}
 
 	protected Element getImportDataGroupElement(String name) {
@@ -2722,6 +2769,9 @@ public class PortletDataContextImpl implements PortletDataContext {
 	private transient Element _exportDataRootElement;
 	private String _exportImportProcessId;
 	private long _groupId;
+	private transient boolean _importDataElementCacheEnabled;
+	private final transient Map<String, Element> _importDataElementMap =
+		new HashMap<>();
 	private transient Element _importDataRootElement;
 	private transient long[] _layoutIds;
 	private String _layoutSetPrototypeUuid;
