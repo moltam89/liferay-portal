@@ -573,6 +573,8 @@ public class PortletImportControllerImpl implements PortletImportController {
 				portletDataContext.getImportDataRootElement();
 
 			try {
+				portletDataContext.setImportDataElementCacheEnabled(true);
+
 				Element preferenceDataElement =
 					portletPreferencesElement.element("preference-data");
 
@@ -605,6 +607,7 @@ public class PortletImportControllerImpl implements PortletImportController {
 				}
 			}
 			finally {
+				portletDataContext.setImportDataElementCacheEnabled(false);
 				portletDataContext.setImportDataRootElement(
 					importDataRootElement);
 			}

@@ -381,6 +381,8 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 		Element rootElement = null;
 
 		try {
+			portletDataContext.setImportDataElementCacheEnabled(true);
+
 			if (Validator.isXml(data)) {
 				rootElement = portletDataContext.getImportDataRootElement();
 
@@ -395,6 +397,7 @@ public abstract class BasePortletDataHandler implements PortletDataHandler {
 				exception, PortletDataException.IMPORT_PORTLET_DATA, portletId);
 		}
 		finally {
+			portletDataContext.setImportDataElementCacheEnabled(false);
 			portletDataContext.setImportDataRootElement(rootElement);
 			portletDataContext.setSourceGroupId(sourceGroupId);
 
