@@ -158,6 +158,29 @@ public class PortletDataContextReferencesTest {
 	}
 
 	@Test
+	public void testImportDataElementCache() throws Exception {
+		_portletDataContext.setImportDataElementCacheEnabled(true);
+
+		_portletDataContext.addClassedModel(
+			_portletDataContext.getExportDataElement(_bookmarksEntry),
+			ExportImportPathUtil.getModelPath(_bookmarksEntry), _bookmarksEntry,
+			BookmarksEntry.class);
+
+		_portletDataContext.addClassedModel(
+			_portletDataContext.getExportDataElement(_bookmarksFolder),
+			ExportImportPathUtil.getModelPath(_bookmarksFolder),
+			_bookmarksFolder, BookmarksFolder.class);
+
+		Assert.assertTrue(
+			_portletDataContext.getImportDataElement(_bookmarksEntry) ==
+				_portletDataContext.getImportDataElement(_bookmarksEntry));
+
+		Assert.assertTrue(
+			_portletDataContext.getImportDataElement(_bookmarksFolder) ==
+				_portletDataContext.getImportDataElement(_bookmarksFolder));
+	}
+
+	@Test
 	public void testMissingNotMissingReference() throws Exception {
 		_portletDataContext.setPortletId(BookmarksPortletKeys.BOOKMARKS);
 
