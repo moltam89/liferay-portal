@@ -579,8 +579,21 @@ public class MillerColumnsDisplayContext {
 						_httpServletRequest, layoutSetBranch.getName())
 				).put(
 					"url",
-					PortletURLBuilder.create(
-						_layoutsAdminDisplayContext.getPortletURL()
+					PortletURLBuilder.createActionURL(
+						_liferayPortletResponse
+					).setActionName(
+						"/layout_admin/select_layout_set_branch"
+					).setRedirect(
+						PortletURLBuilder.create(
+							_layoutsAdminDisplayContext.getPortletURL()
+						).setParameter(
+							"layoutSetBranchId",
+							layoutSetBranch.getLayoutSetBranchId()
+						).setParameter(
+							"privateLayout", layoutSetBranch.isPrivateLayout()
+						).buildString()
+					).setParameter(
+						"groupId", layoutSetBranch.getGroupId()
 					).setParameter(
 						"layoutSetBranchId",
 						layoutSetBranch.getLayoutSetBranchId()
