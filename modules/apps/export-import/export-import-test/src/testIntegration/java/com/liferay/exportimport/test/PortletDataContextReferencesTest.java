@@ -158,7 +158,7 @@ public class PortletDataContextReferencesTest {
 	}
 
 	@Test
-	public void testImportDataElementCache() throws Exception {
+	public void testSetImportDataElementCacheEnabled() throws Exception {
 		_portletDataContext.setImportDataElementCacheEnabled(true);
 
 		_portletDataContext.addClassedModel(
