@@ -166,16 +166,25 @@ public class PortletDataContextReferencesTest {
 			ExportImportPathUtil.getModelPath(_bookmarksEntry), _bookmarksEntry,
 			BookmarksEntry.class);
 
+		Assert.assertTrue(
+			_portletDataContext.getImportDataElement(_bookmarksEntry) ==
+				_portletDataContext.getImportDataElement(_bookmarksEntry));
+
 		_portletDataContext.addClassedModel(
 			_portletDataContext.getExportDataElement(_bookmarksFolder),
 			ExportImportPathUtil.getModelPath(_bookmarksFolder),
 			_bookmarksFolder, BookmarksFolder.class);
 
 		Assert.assertTrue(
+			_portletDataContext.getImportDataElement(_bookmarksFolder) ==
+				_portletDataContext.getImportDataElement(_bookmarksFolder));
+
+		_portletDataContext.setImportDataElementCacheEnabled(false);
+
+		Assert.assertFalse(
 			_portletDataContext.getImportDataElement(_bookmarksEntry) ==
 				_portletDataContext.getImportDataElement(_bookmarksEntry));
-
-		Assert.assertTrue(
+		Assert.assertFalse(
 			_portletDataContext.getImportDataElement(_bookmarksFolder) ==
 				_portletDataContext.getImportDataElement(_bookmarksFolder));
 	}
