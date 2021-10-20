@@ -15,11 +15,14 @@
 package com.liferay.portal.kernel.theme;
 
 import com.liferay.expando.kernel.model.ExpandoBridge;
+import com.liferay.exportimport.kernel.staging.LayoutStagingUtil;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.model.LayoutRevision;
 import com.liferay.portal.kernel.model.LayoutType;
+import com.liferay.portal.kernel.model.LayoutTypeController;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.service.permission.LayoutPermissionUtil;
@@ -30,6 +33,7 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.webserver.WebServerServletTokenUtil;
+import com.liferay.portal.util.LayoutTypeControllerTracker;
 
 import java.io.Serializable;
 
@@ -71,6 +75,7 @@ public class NavItem implements Serializable {
 				Layout childLayout = iterator.next();
 
 				if (_isContentLayoutDraft(childLayout) ||
+					_isLayoutRevisionDisplayable(childLayout) ||
 					childLayout.isHidden() ||
 					!LayoutPermissionUtil.contains(
 						themeDisplay.getPermissionChecker(), childLayout,
@@ -87,7 +92,9 @@ public class NavItem implements Serializable {
 			List<Layout> childLayouts = layoutChildLayouts.get(
 				parentLayout.getPlid());
 
-			if (_isContentLayoutDraft(parentLayout)) {
+			if (_isContentLayoutDraft(parentLayout) ||
+				_isLayoutRevisionDisplayable(parentLayout)) {
+
 				continue;
 			}
 
@@ -406,6 +413,31 @@ public class NavItem implements Serializable {
 		}
 
 		return true;
+	}
+
+	private static boolean _isLayoutRevisionDisplayable(Layout layout) {
+		if (layout.isTypeContent() ||
+			!LayoutStagingUtil.isBranchingLayout(layout)) {
+
+			return true;
+		}
+		
+		LayoutRevision layoutRevision =
+			LayoutStagingUtil.getLayoutRevision(layout);
+
+		if (!layoutRevision.isIncomplete()) {
+			return true;
+		}
+		
+		LayoutTypeController layoutTypeController =
+			LayoutTypeControllerTracker.getLayoutTypeController(
+				layout.getType());
+
+		if (layoutTypeController.isWorkflowEnabled()) {
+			return true;
+		}
+
+		return false;
 	}
 
 	private NavItem(
