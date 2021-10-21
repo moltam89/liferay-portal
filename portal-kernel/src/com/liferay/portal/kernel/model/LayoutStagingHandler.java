@@ -251,7 +251,7 @@ public class LayoutStagingHandler implements InvocationHandler, Serializable {
 			serviceContext, "explicitCreation");
 
 		if (!explicitCreation) {
-			LayoutRevisionLocalServiceUtil.updateStatus(
+			layoutRevision = LayoutRevisionLocalServiceUtil.updateStatus(
 				serviceContext.getUserId(),
 				layoutRevision.getLayoutRevisionId(),
 				WorkflowConstants.STATUS_INCOMPLETE, serviceContext);
