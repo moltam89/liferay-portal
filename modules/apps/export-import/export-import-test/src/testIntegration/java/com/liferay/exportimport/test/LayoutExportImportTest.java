@@ -133,7 +133,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		long[] layoutIds = new long[0];
 
 		try {
-			exportImportLayouts(layoutIds, getImportParameterMap());
+			exportImportLayouts(layoutIds, getImportParameterMap(), true);
 
 			Assert.fail();
 		}
@@ -152,7 +152,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		importedGroup = originalGroup;
 
 		try {
-			exportImportLayouts(layoutIds, getImportParameterMap());
+			exportImportLayouts(layoutIds, getImportParameterMap(), true);
 
 			Assert.fail();
 		}
@@ -183,7 +183,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		long[] layoutIds = new long[0];
 
 		try {
-			exportImportLayouts(layoutIds, getImportParameterMap());
+			exportImportLayouts(layoutIds, getImportParameterMap(), true);
 
 			Assert.fail();
 		}
@@ -201,7 +201,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		importedGroup = layoutSetPrototype.getGroup();
 
 		try {
-			exportImportLayouts(layoutIds, getImportParameterMap());
+			exportImportLayouts(layoutIds, getImportParameterMap(), true);
 
 			Assert.fail();
 		}
@@ -247,7 +247,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		long[] layoutIds = new long[0];
 
 		try {
-			exportImportLayouts(layoutIds, getImportParameterMap());
+			exportImportLayouts(layoutIds, getImportParameterMap(), true);
 
 			Assert.fail();
 		}
@@ -265,7 +265,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		importedGroup = layoutSetPrototype.getGroup();
 
 		try {
-			exportImportLayouts(layoutIds, getImportParameterMap());
+			exportImportLayouts(layoutIds, getImportParameterMap(), true);
 
 			Assert.fail();
 		}
@@ -298,7 +298,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 			long[] layoutIds = new long[0];
 
 			try {
-				exportImportLayouts(layoutIds, getImportParameterMap());
+				exportImportLayouts(layoutIds, getImportParameterMap(), true);
 
 				Assert.fail();
 			}
@@ -316,7 +316,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 			importedGroup = layoutPrototype.getGroup();
 
 			try {
-				exportImportLayouts(layoutIds, getImportParameterMap());
+				exportImportLayouts(layoutIds, getImportParameterMap(), true);
 
 				Assert.fail();
 			}
@@ -493,7 +493,7 @@ public class LayoutExportImportTest extends BaseExportImportTestCase {
 		long[] layoutIds = new long[0];
 
 		try {
-			exportImportLayouts(layoutIds, getImportParameterMap());
+			exportImportLayouts(layoutIds, getImportParameterMap(), true);
 
 			Assert.assertFalse(expectFailure);
 		}
