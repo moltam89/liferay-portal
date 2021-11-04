@@ -241,6 +241,13 @@ public class ExportImportHelperUtil {
 		return _exportImportHelper.isLayoutRevisionInReview(layout);
 	}
 
+	public static boolean isPublishDisplayedContent(
+		long companyId, Portlet portlet) {
+
+		return _exportImportHelper.isPublishDisplayedContent(
+			companyId, portlet);
+	}
+
 	public static boolean isReferenceWithinExportScope(
 		PortletDataContext portletDataContext, StagedModel stagedModel) {
 
