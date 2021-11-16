@@ -168,9 +168,20 @@ public class DDMFormExportImportPortletPreferencesProcessor
 		long formInstanceId = MapUtil.getLong(
 			formInstanceIds, importedFormInstanceId, importedFormInstanceId);
 
+		long importedGroupId = GetterUtil.getLong(
+			portletPreferences.getValue("groupId", null));
+
+		Map<Long, Long> groupIds =
+			(Map<Long, Long>)portletDataContext.getNewPrimaryKeysMap(
+				Group.class);
+
+		long groupId = MapUtil.getLong(
+			groupIds, importedGroupId, importedGroupId);
+
 		try {
 			portletPreferences.setValue(
 				"formInstanceId", String.valueOf(formInstanceId));
+			portletPreferences.setValue("groupId", String.valueOf(groupId));
 		}
 		catch (ReadOnlyException readOnlyException) {
 			throw new PortletDataException(
