@@ -268,9 +268,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		Date date = new Date();
 
-		long plid = counterLocalService.increment(Layout.class.getName());
-
-		Layout layout = layoutPersistence.create(plid);
+		Layout layout = layoutPersistence.create(
+			layoutLocalServiceHelper.getUniquePlid());
 
 		String uuid = serviceContext.getUuid();
 

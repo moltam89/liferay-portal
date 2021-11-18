@@ -14,6 +14,7 @@
 
 package com.liferay.portal.service.impl;
 
+import com.liferay.counter.kernel.service.CounterLocalService;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.bean.BeanReference;
@@ -43,6 +44,7 @@ import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServic
 import com.liferay.portal.kernel.portlet.FriendlyURLMapper;
 import com.liferay.portal.kernel.portlet.FriendlyURLResolverRegistryUtil;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.LayoutRevisionLocalService;
 import com.liferay.portal.kernel.service.PortletLocalServiceUtil;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalService;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
@@ -225,6 +227,16 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 		}
 
 		return parentLayoutId;
+	}
+
+	public long getUniquePlid() {
+		long plid = counterLocalService.increment(Layout.class.getName());
+
+		while (layoutRevisionLocalService.fetchLayoutRevision(plid) != null) {
+			plid = counterLocalService.increment(Layout.class.getName());
+		}
+
+		return plid;
 	}
 
 	public boolean hasLayoutSetPrototypeLayout(
@@ -674,11 +686,17 @@ public class LayoutLocalServiceHelper implements IdentifiableOSGiService {
 			ActionKeys.VIEW);
 	}
 
+	@BeanReference(type = CounterLocalService.class)
+	protected CounterLocalService counterLocalService;
+
 	@BeanReference(type = LayoutFriendlyURLPersistence.class)
 	protected LayoutFriendlyURLPersistence layoutFriendlyURLPersistence;
 
 	@BeanReference(type = LayoutPersistence.class)
 	protected LayoutPersistence layoutPersistence;
+
+	@BeanReference(type = LayoutRevisionLocalService.class)
+	protected LayoutRevisionLocalService layoutRevisionLocalService;
 
 	@BeanReference(type = LayoutSetPersistence.class)
 	protected LayoutSetPersistence layoutSetPersistence;
