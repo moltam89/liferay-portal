@@ -14,6 +14,8 @@
 
 package com.liferay.portal.servlet;
 
+import com.liferay.exportimport.kernel.exception.MissingReferenceException;
+import com.liferay.exportimport.kernel.lar.MissingReferences;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
@@ -112,7 +114,17 @@ public class TunnelServlet extends HttpServlet {
 			if (throwable != null) {
 				Class<?> clazz = throwable.getClass();
 
-				if (throwable instanceof PortalException) {
+				if (throwable instanceof MissingReferenceException) {
+					MissingReferenceException missingReferenceException =
+						(MissingReferenceException)throwable;
+
+					MissingReferences missingReferences =
+						missingReferenceException.getMissingReferences();
+
+					returnObject = new MissingReferenceException(
+						missingReferences);
+				}
+				else if (throwable instanceof PortalException) {
 					returnObject = new PortalException(
 						"Invocation failed due to " + clazz.getName());
 				}
