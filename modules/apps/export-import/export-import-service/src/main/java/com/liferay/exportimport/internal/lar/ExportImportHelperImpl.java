@@ -746,6 +746,14 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				return true;
 			}
 
+			_stagingConfiguration =
+				_configurationProvider.getCompanyConfiguration(
+					StagingConfiguration.class, companyId);
+
+			if (_stagingConfiguration.publishDisplayedContent()) {
+				return true;
+			}
+
 			ExportImportPortletPreferencesProcessor
 				exportImportPortletPreferencesProcessor =
 					ExportImportPortletPreferencesProcessorRegistryUtil.
