@@ -61,6 +61,7 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.PortalUtil;
@@ -83,9 +84,7 @@ import java.lang.reflect.Modifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -182,31 +181,18 @@ public class StagingImplTest {
 
 	@Test
 	public void testInitialPublication() throws Exception {
-		long companyId = _group.getCompanyId();
-
-		StagingConfiguration stagingConfiguration =
-			ConfigurationProviderUtil.getCompanyConfiguration(
-				StagingConfiguration.class, companyId);
-
-		boolean stagingDeleteTempLAROnSuccess =
-			stagingConfiguration.stagingDeleteTempLAROnSuccess();
-
-		Dictionary<String, Object> properties = new Hashtable<>();
-
-		properties.put("stagingDeleteTempLAROnSuccess", false);
-
-		ConfigurationProviderUtil.saveCompanyConfiguration(
-			StagingConfiguration.class, companyId, properties);
-
 		try {
+			ConfigurationProviderUtil.saveCompanyConfiguration(
+				StagingConfiguration.class, _group.getCompanyId(),
+				HashMapDictionaryBuilder.<String, Object>put(
+					"stagingDeleteTempLAROnSuccess", false
+				).build());
+
 			doTestInitialPublication();
 		}
 		finally {
-			properties.put(
-				"stagingDeleteTempLAROnSuccess", stagingDeleteTempLAROnSuccess);
-
-			ConfigurationProviderUtil.saveCompanyConfiguration(
-				StagingConfiguration.class, companyId, properties);
+			ConfigurationProviderUtil.deleteCompanyConfiguration(
+				StagingConfiguration.class, _group.getCompanyId());
 		}
 	}
 
