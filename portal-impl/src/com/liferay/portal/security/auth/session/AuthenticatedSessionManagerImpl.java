@@ -265,21 +265,6 @@ public class AuthenticatedSessionManagerImpl
 			CookieKeys.addCookie(
 				httpServletRequest, httpServletResponse, rememberMeCookie,
 				secure);
-
-			Cookie screenNameCookie = new Cookie(
-				CookieKeys.SCREEN_NAME,
-				Encryptor.encrypt(company.getKeyObj(), user.getScreenName()));
-
-			if (domain != null) {
-				screenNameCookie.setDomain(domain);
-			}
-
-			screenNameCookie.setMaxAge(loginMaxAge);
-			screenNameCookie.setPath(StringPool.SLASH);
-
-			CookieKeys.addCookie(
-				httpServletRequest, httpServletResponse, screenNameCookie,
-				secure);
 		}
 
 		if (!PropsValues.AUTH_USER_UUID_STORE_ENABLED) {
