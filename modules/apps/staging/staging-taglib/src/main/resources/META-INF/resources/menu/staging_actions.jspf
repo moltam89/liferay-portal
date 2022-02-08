@@ -89,6 +89,7 @@
 				<portlet:param name="secureConnection" value='<%= liveGroupTypeSettings.getProperty("secureConnection") %>' />
 				<portlet:param name="sourceGroupId" value="<%= String.valueOf(stagingGroupId) %>" />
 				<portlet:param name="targetGroupId" value="<%= String.valueOf(liveGroupId) %>" />
+				<portlet:param name="currentPlid" value="<%= String.valueOf(plid) %>" />
 			</liferay-portlet:renderURL>
 
 			<%

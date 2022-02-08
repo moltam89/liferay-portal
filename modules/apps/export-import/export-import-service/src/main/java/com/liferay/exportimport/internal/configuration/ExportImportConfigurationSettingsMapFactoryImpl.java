@@ -21,8 +21,10 @@ import com.liferay.exportimport.kernel.lar.ExportImportHelper;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.service.GroupLocalService;
+import com.liferay.portal.kernel.service.LayoutLocalServiceUtil;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -336,6 +338,17 @@ public class ExportImportConfigurationSettingsMapFactoryImpl
 				layoutIdMap);
 
 			settingsMap.put("layoutIdMap", serializableLayoutIdMap);
+		}
+
+		long currentPlid = GetterUtil.get(
+			parameterMap.get("currentPlid")[0], 0);
+
+		if (currentPlid != 0) {
+			Layout layout = LayoutLocalServiceUtil.fetchLayout(currentPlid);
+
+			if (layout != null) {
+				layoutIds = new long[] {layout.getLayoutId()};
+			}
 		}
 
 		if (ArrayUtil.isNotEmpty(layoutIds)) {
