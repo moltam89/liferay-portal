@@ -26,5 +26,5 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface Cookie {
 	public void addCookie(
 		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, Cookie cookie);
+		HttpServletResponse httpServletResponse, javax.servlet.http.Cookie cookie);
 }

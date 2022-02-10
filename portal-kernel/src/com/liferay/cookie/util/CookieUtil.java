@@ -26,7 +26,8 @@ public class CookieUtil {
 
 	public static void addCookie(
 			HttpServletRequest httpServletRequest,
-			HttpServletResponse httpServletResponse, Cookie cookie) {
+			HttpServletResponse httpServletResponse,
+			javax.servlet.http.Cookie cookie) {
 
 		_cookie.addCookie(httpServletRequest, httpServletResponse, cookie);
 	}
