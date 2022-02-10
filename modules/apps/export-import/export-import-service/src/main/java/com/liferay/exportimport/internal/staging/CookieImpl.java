@@ -41,8 +41,15 @@ public class CookieImpl implements Cookie {
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse,
 		javax.servlet.http.Cookie cookie) {
+		
+		if (_stagingConfiguration.publishDisplayedContent()) {
+			System.out.println("publishDisplayedContent");
+		}
+		else {
+			System.out.println("nope");
+		}
 
-		httpServletResponse.addCookie(cookie);
+		//httpServletResponse.addCookie(cookie);
 	}
 
 	@Activate

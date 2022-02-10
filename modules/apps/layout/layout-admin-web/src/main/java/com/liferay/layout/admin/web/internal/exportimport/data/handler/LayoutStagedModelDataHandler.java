@@ -16,6 +16,7 @@ package com.liferay.layout.admin.web.internal.exportimport.data.handler;
 
 import com.liferay.asset.list.model.AssetListEntry;
 import com.liferay.asset.list.service.AssetListEntryLocalService;
+import com.liferay.cookie.util.CookieUtil;
 import com.liferay.counter.kernel.service.CounterLocalService;
 import com.liferay.exportimport.content.processor.ExportImportContentProcessor;
 import com.liferay.exportimport.controller.PortletExportController;
@@ -300,6 +301,8 @@ public class LayoutStagedModelDataHandler
 	protected void doExportStagedModel(
 			PortletDataContext portletDataContext, Layout layout)
 		throws Exception {
+		
+		CookieUtil.addCookie(null, null, null);
 
 		Element layoutElement = portletDataContext.getExportDataElement(layout);
 

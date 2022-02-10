@@ -14,6 +14,7 @@
 
 package com.liferay.portal.kernel.util;
 
+import com.liferay.cookie.util.CookieUtil;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.configuration.Filter;
@@ -73,6 +74,9 @@ public class CookieKeys {
 		HttpServletResponse httpServletResponse, Cookie cookie,
 		boolean secure) {
 
+			
+		CookieUtil.addCookie(httpServletRequest, httpServletResponse, cookie);
+		
 		if (!_SESSION_ENABLE_PERSISTENT_COOKIES) {
 			return;
 		}
