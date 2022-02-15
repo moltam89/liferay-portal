@@ -39,6 +39,8 @@ public class CookieKeys {
 
 	public static final String COMPANY_ID = "COMPANY_ID";
 
+	public static final String COOKIE_CONSENT = "COOKIE_CONSENT";
+
 	public static final String COOKIE_SUPPORT = "COOKIE_SUPPORT";
 
 	public static final String GUEST_LANGUAGE_ID = "GUEST_LANGUAGE_ID";
@@ -92,6 +94,12 @@ public class CookieKeys {
 		String type) {
 
 		if (!_SESSION_ENABLE_PERSISTENT_COOKIES) {
+			return;
+		}
+
+		if (!CookieConsentUtil.isCookieAllowed(
+				httpServletRequest, httpServletResponse, cookie, type)) {
+
 			return;
 		}
 
