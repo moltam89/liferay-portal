@@ -95,6 +95,10 @@ public class CookieKeys {
 			return;
 		}
 
+		if (!CookieConsentUtil.isCookieAllowed(cookie, type)) {
+			return;
+		}
+
 		// LEP-5175
 
 		String name = cookie.getName();
