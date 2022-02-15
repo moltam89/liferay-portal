@@ -57,6 +57,14 @@ public class CookieKeys {
 
 	public static final String REMOTE_PREFERENCE_PREFIX = "REMOTE_PREFERENCE_";
 
+	public static final String TYPE_FUNCTIONAL = "TYPE_FUNCTIONAL";
+
+	public static final String TYPE_NECESSARY = "TYPE_NECESSARY";
+
+	public static final String TYPE_PERFORMANCE = "TYPE_PERFORMANCE";
+
+	public static final String TYPE_PERSONALIZATION = "TYPE_PERSONALIZATION";
+
 	public static final String USER_UUID = "USER_UUID";
 
 	public static void addCookie(
@@ -72,6 +80,16 @@ public class CookieKeys {
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse, Cookie cookie,
 		boolean secure) {
+
+		addCookie(
+			httpServletRequest, httpServletResponse, cookie,
+			httpServletRequest.isSecure(), TYPE_NECESSARY);
+	}
+
+	public static void addCookie(
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse, Cookie cookie, boolean secure,
+		String type) {
 
 		if (!_SESSION_ENABLE_PERSISTENT_COOKIES) {
 			return;
