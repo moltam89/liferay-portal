@@ -82,8 +82,8 @@ public class CookieKeys {
 		boolean secure) {
 
 		addCookie(
-			httpServletRequest, httpServletResponse, cookie,
-			httpServletRequest.isSecure(), TYPE_NECESSARY);
+			httpServletRequest, httpServletResponse, cookie, secure,
+			TYPE_NECESSARY);
 	}
 
 	public static void addCookie(
