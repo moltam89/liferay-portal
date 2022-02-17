@@ -9,6 +9,6 @@ public class CookieConsentUtil {
 	}
 
 	private static volatile CookieConsent _cookieConsent =
-		ServiceProxyFactory.newServiceTrackedInstance(
+			ServiceProxyFactory.newServiceTrackedInstance(
 			CookieConsent.class, CookieUtil.class, "_cookieConsent", false);
 }
