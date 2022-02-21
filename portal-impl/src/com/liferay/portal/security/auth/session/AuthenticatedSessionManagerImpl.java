@@ -219,7 +219,8 @@ public class AuthenticatedSessionManagerImpl
 		}
 
 		CookieKeys.addCookie(
-			httpServletRequest, httpServletResponse, companyIdCookie, secure);
+			httpServletRequest, httpServletResponse, companyIdCookie, secure,
+			CookieKeys.TYPE_FUNCTIONAL);
 		CookieKeys.addCookie(
 			httpServletRequest, httpServletResponse, idCookie, secure);
 
