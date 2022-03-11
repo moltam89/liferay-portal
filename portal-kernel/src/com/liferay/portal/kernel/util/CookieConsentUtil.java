@@ -27,13 +27,26 @@ public class CookieConsentUtil {
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse, Cookie cookie, String type) {
 
-		return _cookieConsent.isCookieAllowed(
-			httpServletRequest, httpServletResponse, cookie, type);
+		boolean isCookieAllowed = true;
+		
+		if (_cookieConsent == null) {
+			return isCookieAllowed;
+		}
+		
+		try {
+			isCookieAllowed = _cookieConsent.isCookieAllowed(
+				httpServletRequest, httpServletResponse, cookie, type);
+		}
+		catch (Exception exception) {
+			
+		}
+		
+		return isCookieAllowed;
 	}
 
 	private static volatile CookieConsent _cookieConsent =
 		ServiceProxyFactory.newServiceTrackedInstance(
 			CookieConsent.class, CookieConsentUtil.class, "_cookieConsent",
-			true);
+			false);
 
 }
