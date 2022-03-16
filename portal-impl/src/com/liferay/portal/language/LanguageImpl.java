@@ -1713,7 +1713,8 @@ public class LanguageImpl implements Language, Serializable {
 		languageIdCookie.setPath(StringPool.SLASH);
 
 		CookieKeys.addCookie(
-			httpServletRequest, httpServletResponse, languageIdCookie);
+			httpServletRequest, httpServletResponse, languageIdCookie,
+			CookieKeys.TYPE_FUNCTIONAL);
 	}
 
 	private static CompanyLocalesBag _getCompanyLocalesBag() {
