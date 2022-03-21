@@ -97,8 +97,8 @@ public class CookieKeys {
 			return;
 		}
 
-		if (!CookieConsentUtil.isCookieAllowed(
-				httpServletRequest, cookie, type)) {
+		if ((cookie.getMaxAge() != 0) &&
+			!CookieConsentUtil.hasCookieTypeConsent(httpServletRequest, type)) {
 
 			return;
 		}

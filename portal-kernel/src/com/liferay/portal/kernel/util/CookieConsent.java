@@ -14,7 +14,6 @@
 
 package com.liferay.portal.kernel.util;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -25,7 +24,7 @@ import org.osgi.annotation.versioning.ProviderType;
 @ProviderType
 public interface CookieConsent {
 
-	public boolean isCookieAllowed(
-		HttpServletRequest httpServletRequest, Cookie cookie, String type);
+	public boolean hasCookieTypeConsent(
+		HttpServletRequest httpServletRequest, String type);
 
 }

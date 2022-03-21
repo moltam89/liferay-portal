@@ -17,7 +17,6 @@ package com.liferay.portal.kernel.util;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -25,16 +24,16 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class CookieConsentUtil {
 
-	public static boolean isCookieAllowed(
-		HttpServletRequest httpServletRequest, Cookie cookie, String type) {
+	public static boolean hasCookieTypeConsent(
+		HttpServletRequest httpServletRequest, String type) {
 
 		try {
 			if (_cookieConsent == null) {
 				return true;
 			}
 
-			return _cookieConsent.isCookieAllowed(
-				httpServletRequest, cookie, type);
+			return _cookieConsent.hasCookieTypeConsent(
+				httpServletRequest, type);
 		}
 		catch (Exception exception) {
 			_log.error(exception);

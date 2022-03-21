@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.util.CookieKeys;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.osgi.service.component.annotations.Component;
@@ -34,13 +33,12 @@ import org.osgi.service.component.annotations.Component;
 public class CookieConsentImpl implements CookieConsent {
 
 	@Override
-	public boolean isCookieAllowed(
-		HttpServletRequest httpServletRequest, Cookie cookie, String type) {
+	public boolean hasCookieTypeConsent(
+		HttpServletRequest httpServletRequest, String type) {
 
 		try {
 			if (Validator.isNull(type) ||
-				type.equals(CookieKeys.TYPE_NECESSARY) ||
-				(cookie.getMaxAge() <= 0)) {
+				type.equals(CookieKeys.TYPE_NECESSARY)) {
 
 				return true;
 			}
