@@ -38,6 +38,8 @@ public class CookieKeys {
 		"COMMERCE_CONTINUE_AS_GUEST";
 
 	public static final String COMPANY_ID = "COMPANY_ID";
+	
+	public static final String COOKIE_CONSENT = "COOKIE_CONSENT";
 
 	public static final String COOKIE_SUPPORT = "COOKIE_SUPPORT";
 
