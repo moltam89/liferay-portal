@@ -23,15 +23,15 @@ export default function () {
 		'.toggle-switch-check-personalization'
 	);
 
-	if (getCookie('liferay.cookie.consent.functional') === 'accepted') {
+	if (getCookie('COOKIE_CONSENT_TYPE_FUNCTIONAL') === 'true') {
 		toggleFunctional.checked = true;
 	}
 
-	if (getCookie('liferay.cookie.consent.performance') === 'accepted') {
+	if (getCookie('COOKIE_CONSENT_TYPE_PERFORMANCE') === 'true') {
 		togglePerformance.checked = true;
 	}
 
-	if (getCookie('liferay.cookie.consent.personalization') === 'accepted') {
+	if (getCookie('COOKIE_CONSENT_TYPE_PERSONALIZATION') === 'true') {
 		togglePersonalization.checked = true;
 	}
 
@@ -39,10 +39,10 @@ export default function () {
 		'click',
 		function handleToggleFunctional() {
 			if (toggleFunctional.checked) {
-				setCookie('liferay.cookie.consent.functional', 'accepted');
+				setCookie('COOKIE_CONSENT_TYPE_FUNCTIONAL', 'true');
 			}
 			else {
-				setCookie('liferay.cookie.consent.functional', 'decline');
+				setCookie('COOKIE_CONSENT_TYPE_FUNCTIONAL', 'false');
 			}
 		}
 	);
@@ -51,10 +51,10 @@ export default function () {
 		'click',
 		function handleTogglePerformance() {
 			if (togglePerformance.checked) {
-				setCookie('liferay.cookie.consent.performance', 'accepted');
+				setCookie('COOKIE_CONSENT_TYPE_PERFORMANCE', 'true');
 			}
 			else {
-				setCookie('liferay.cookie.consent.performance', 'decline');
+				setCookie('COOKIE_CONSENT_TYPE_PERFORMANCE', 'false');
 			}
 		}
 	);
@@ -63,10 +63,10 @@ export default function () {
 		'click',
 		function handleTogglePersonalization() {
 			if (togglePersonalization.checked) {
-				setCookie('liferay.cookie.consent.personalization', 'accepted');
+				setCookie('COOKIE_CONSENT_TYPE_PERSONALIZATION', 'true');
 			}
 			else {
-				setCookie('liferay.cookie.consent.personalization', 'decline');
+				setCookie('COOKIE_CONSENT_TYPE_PERSONALIZATION', 'false');
 			}
 		}
 	);
