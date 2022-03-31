@@ -111,12 +111,12 @@ export default function ({configurationUrl}) {
 
 function checkCookiesConsent(cookieBanner) {
 	if (
-		getCookie('liferay.cookie.consent.functional') === 'accepted' ||
-		getCookie('liferay.cookie.consent.functional') === 'decline' ||
-		getCookie('liferay.cookie.consent.performance') === 'accepted' ||
-		getCookie('liferay.cookie.consent.performance') === 'decline' ||
-		getCookie('liferay.cookie.consent.personalization') === 'accepted' ||
-		getCookie('liferay.cookie.consent.personalization') === 'decline'
+		getCookie('COOKIES_CONSENT_TYPE_FUNCTIONAL') === 'true' ||
+		getCookie('COOKIES_CONSENT_TYPE_FUNCTIONAL') === 'false' ||
+		getCookie('COOKIES_CONSENT_TYPE_PERFORMANCE') === 'true' ||
+		getCookie('COOKIES_CONSENT_TYPE_PERFORMANCE') === 'false' ||
+		getCookie('COOKIES_CONSENT_TYPE_PERSONALIZATION') === 'true' ||
+		getCookie('COOKIES_CONSENT_TYPE_PERSONALIZATION') === 'false'
 	) {
 		cookieBanner.style.display = 'none';
 	}
@@ -126,15 +126,15 @@ function checkCookiesConsent(cookieBanner) {
 }
 
 function cookiesAcceptAll() {
-	setCookie('liferay.cookie.consent.functional', 'accepted');
-	setCookie('liferay.cookie.consent.performance', 'accepted');
-	setCookie('liferay.cookie.consent.personalization', 'accepted');
+	setCookie('COOKIES_CONSENT_TYPE_FUNCTIONAL', 'true');
+	setCookie('COOKIES_CONSENT_TYPE_PERFORMANCE', 'true');
+	setCookie('COOKIES_CONSENT_TYPE_PERSONALIZATION', 'true');
 }
 
 function cookiesDeclineAll() {
-	setCookie('liferay.cookie.consent.functional', 'decline');
-	setCookie('liferay.cookie.consent.performance', 'decline');
-	setCookie('liferay.cookie.consent.personalization', 'decline');
+	setCookie('COOKIES_CONSENT_TYPE_FUNCTIONAL', 'false');
+	setCookie('COOKIES_CONSENT_TYPE_PERFORMANCE', 'false');
+	setCookie('COOKIES_CONSENT_TYPE_PERSONALIZATION', 'false');
 }
 
 function getCookie(name) {
