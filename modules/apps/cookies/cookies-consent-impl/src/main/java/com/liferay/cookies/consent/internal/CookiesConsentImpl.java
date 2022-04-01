@@ -12,13 +12,13 @@
  * details.
  */
 
-package com.liferay.cookie.consent.internal;
+package com.liferay.cookies.consent.internal;
 
 import com.liferay.petra.string.CharPool;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.CookieConsent;
 import com.liferay.portal.kernel.util.CookieKeys;
+import com.liferay.portal.kernel.util.CookiesConsent;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.Validator;
 
@@ -29,11 +29,11 @@ import org.osgi.service.component.annotations.Component;
 /**
  * @author Tamas Molnar
  */
-@Component(immediate = true, service = CookieConsent.class)
-public class CookieConsentImpl implements CookieConsent {
+@Component(immediate = true, service = CookiesConsent.class)
+public class CookiesConsentImpl implements CookiesConsent {
 
 	@Override
-	public boolean hasCookieTypeConsent(
+	public boolean hasCookiesConsentType(
 		HttpServletRequest httpServletRequest, String type) {
 
 		try {
@@ -43,11 +43,11 @@ public class CookieConsentImpl implements CookieConsent {
 				return true;
 			}
 
-			String cookieConsentString = CookieKeys.getCookie(
+			String cookiesConsentString = CookieKeys.getCookie(
 				httpServletRequest,
-				CookieKeys.COOKIE_CONSENT + CharPool.UNDERLINE + type);
+				CookieKeys.COOKIES_CONSENT + CharPool.UNDERLINE + type);
 
-			if (Validator.isNull(cookieConsentString)) {
+			if (Validator.isNull(cookiesConsentString)) {
 
 				// ToDo
 				// If Consent Cookie is missing, get group level OSGI
@@ -56,7 +56,7 @@ public class CookieConsentImpl implements CookieConsent {
 				return true;
 			}
 
-			return GetterUtil.getBoolean(cookieConsentString);
+			return GetterUtil.getBoolean(cookiesConsentString);
 		}
 		catch (Exception exception) {
 			_log.error(exception);
@@ -66,6 +66,6 @@ public class CookieConsentImpl implements CookieConsent {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		CookieConsentImpl.class);
+		CookiesConsentImpl.class);
 
 }

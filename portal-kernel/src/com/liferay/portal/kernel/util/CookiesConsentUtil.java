@@ -22,17 +22,17 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author Tamas Molnar
  */
-public class CookieConsentUtil {
+public class CookiesConsentUtil {
 
-	public static boolean hasCookieTypeConsent(
+	public static boolean hasCookiesConsentType(
 		HttpServletRequest httpServletRequest, String type) {
 
 		try {
-			if (_cookieConsent == null) {
+			if (_cookiesConsent == null) {
 				return true;
 			}
 
-			return _cookieConsent.hasCookieTypeConsent(
+			return _cookiesConsent.hasCookiesConsentType(
 				httpServletRequest, type);
 		}
 		catch (Exception exception) {
@@ -43,11 +43,11 @@ public class CookieConsentUtil {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		CookieConsentUtil.class);
+		CookiesConsentUtil.class);
 
-	private static volatile CookieConsent _cookieConsent =
+	private static volatile CookiesConsent _cookiesConsent =
 		ServiceProxyFactory.newServiceTrackedInstance(
-			CookieConsent.class, CookieConsentUtil.class, "_cookieConsent",
-			false);
+			CookiesConsent.class, CookiesConsentUtil.class, "_cookiesConsent",
+			false, true);
 
 }
