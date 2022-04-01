@@ -22,9 +22,9 @@ import org.osgi.annotation.versioning.ProviderType;
  * @author Tamas Molnar
  */
 @ProviderType
-public interface CookieConsent {
+public interface CookiesConsent {
 
-	public boolean hasCookieTypeConsent(
+	public boolean hasCookiesConsentType(
 		HttpServletRequest httpServletRequest, String type);
 
 }

@@ -39,9 +39,9 @@ public class CookieKeys {
 
 	public static final String COMPANY_ID = "COMPANY_ID";
 
-	public static final String COOKIE_CONSENT = "COOKIE_CONSENT";
-
 	public static final String COOKIE_SUPPORT = "COOKIE_SUPPORT";
+
+	public static final String COOKIES_CONSENT = "COOKIES_CONSENT";
 
 	public static final String GUEST_LANGUAGE_ID = "GUEST_LANGUAGE_ID";
 
@@ -98,7 +98,8 @@ public class CookieKeys {
 		}
 
 		if ((cookie.getMaxAge() != 0) &&
-			!CookieConsentUtil.hasCookieTypeConsent(httpServletRequest, type)) {
+			!CookiesConsentUtil.hasCookiesConsentType(
+				httpServletRequest, type)) {
 
 			return;
 		}

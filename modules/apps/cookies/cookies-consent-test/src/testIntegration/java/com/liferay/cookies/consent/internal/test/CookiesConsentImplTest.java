@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.cookie.consent.internal.test;
+package com.liferay.cookies.consent.internal.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.petra.string.CharPool;
@@ -33,7 +33,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
  * @author Tamas Molnar
  */
 @RunWith(Arquillian.class)
-public class CookieConsentImplTest {
+public class CookiesConsentImplTest {
 
 	@Before
 	public void setUp() throws Exception {
@@ -42,24 +42,24 @@ public class CookieConsentImplTest {
 	}
 
 	@Test
-	public void testCookieConsent() throws Exception {
-		testCookieConsentType(CookieKeys.TYPE_FUNCTIONAL);
-		testCookieConsentType(CookieKeys.TYPE_NECESSARY);
-		testCookieConsentType(CookieKeys.TYPE_PERFORMANCE);
-		testCookieConsentType(CookieKeys.TYPE_PERSONALIZATION);
+	public void testCookiesConsent() throws Exception {
+		testCookiesConsentType(CookieKeys.TYPE_FUNCTIONAL);
+		testCookiesConsentType(CookieKeys.TYPE_NECESSARY);
+		testCookiesConsentType(CookieKeys.TYPE_PERFORMANCE);
+		testCookiesConsentType(CookieKeys.TYPE_PERSONALIZATION);
 	}
 
-	protected void setCookieConsent(String type, boolean accepted) {
-		Cookie cookieConsent = new Cookie(
-			CookieKeys.COOKIE_CONSENT + CharPool.UNDERLINE + type,
+	protected void setCookiesConsent(String type, boolean accepted) {
+		Cookie cookiesConsent = new Cookie(
+			CookieKeys.COOKIES_CONSENT + CharPool.UNDERLINE + type,
 			String.valueOf(accepted));
 
 		CookieKeys.addCookie(
-			_mockHttpServletRequest, _mockHttpServletResponse, cookieConsent);
+			_mockHttpServletRequest, _mockHttpServletResponse, cookiesConsent);
 	}
 
-	protected void testCookieConsentType(String type) {
-		setCookieConsent(type, false);
+	protected void testCookiesConsentType(String type) {
+		setCookiesConsent(type, false);
 
 		Cookie cookie = new Cookie(
 			RandomTestUtil.randomString(), RandomTestUtil.randomString());
@@ -78,7 +78,7 @@ public class CookieConsentImplTest {
 					_mockHttpServletRequest, cookie.getName()));
 		}
 
-		setCookieConsent(type, true);
+		setCookiesConsent(type, true);
 
 		CookieKeys.addCookie(
 			_mockHttpServletRequest, _mockHttpServletResponse, cookie, type);
