@@ -19,13 +19,18 @@ import com.liferay.application.list.PanelCategoryRegistry;
 import com.liferay.application.list.constants.ApplicationListWebKeys;
 import com.liferay.application.list.display.context.logic.PanelCategoryHelper;
 import com.liferay.layout.set.prototype.constants.LayoutSetPrototypePortletKeys;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.NoSuchLayoutSetPrototypeException;
 import com.liferay.portal.kernel.exception.RequiredLayoutSetPrototypeException;
+import com.liferay.portal.kernel.model.LayoutConstants;
+import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.LayoutSetLocalService;
 import com.liferay.portal.kernel.service.LayoutSetPrototypeService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.service.ServiceContextFactory;
@@ -39,6 +44,7 @@ import com.liferay.sites.kernel.util.SitesUtil;
 
 import java.io.IOException;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -185,6 +191,10 @@ public class LayoutSetPrototypePortlet extends MVCPortlet {
 				layoutSetPrototypeService.updateLayoutSetPrototype(
 					layoutSetPrototypeId, nameMap, descriptionMap, active,
 					layoutsUpdateable, readyForPropagation, serviceContext);
+
+			triggerPropagation(
+				layoutSetPrototype, oldReadyForPropagation,
+				readyForPropagation);
 		}
 
 		// Custom JSPs
@@ -243,6 +253,9 @@ public class LayoutSetPrototypePortlet extends MVCPortlet {
 			layoutSetPrototypeId, layoutSetPrototype.getNameMap(),
 			layoutSetPrototype.getDescriptionMap(), active, layoutsUpdateable,
 			readyForPropagation, serviceContext);
+
+		triggerPropagation(
+			layoutSetPrototype, oldReadyForPropagation, readyForPropagation);
 	}
 
 	@Override
@@ -279,6 +292,20 @@ public class LayoutSetPrototypePortlet extends MVCPortlet {
 	}
 
 	@Reference(unbind = "-")
+	protected void setLayoutLocalService(
+		LayoutLocalService layoutLocalService) {
+
+		this.layoutLocalService = layoutLocalService;
+	}
+
+	@Reference(unbind = "-")
+	protected void setLayoutSetLocalService(
+		LayoutSetLocalService layoutSetLocalService) {
+
+		this.layoutSetLocalService = layoutSetLocalService;
+	}
+
+	@Reference(unbind = "-")
 	protected void setLayoutSetPrototypeService(
 		LayoutSetPrototypeService layoutSetPrototypeService) {
 
@@ -297,6 +324,26 @@ public class LayoutSetPrototypePortlet extends MVCPortlet {
 		this.panelCategoryRegistry = panelCategoryRegistry;
 	}
 
+	protected void triggerPropagation(
+		LayoutSetPrototype layoutSetPrototype, boolean oldReadyForPropagation,
+		boolean readyForPropagation) {
+
+		if (!oldReadyForPropagation && readyForPropagation) {
+			List<LayoutSet> layoutSets =
+				layoutSetLocalService.getLayoutSetsByLayoutSetPrototypeUuid(
+					layoutSetPrototype.getUuid());
+
+			for (LayoutSet layoutSet : layoutSets) {
+				layoutLocalService.getLayouts(
+					layoutSet.getGroupId(), layoutSet.isPrivateLayout(),
+					LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, true,
+					QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+			}
+		}
+	}
+
+	protected LayoutLocalService layoutLocalService;
+	protected LayoutSetLocalService layoutSetLocalService;
 	protected LayoutSetPrototypeService layoutSetPrototypeService;
 	protected PanelAppRegistry panelAppRegistry;
 	protected PanelCategoryRegistry panelCategoryRegistry;
