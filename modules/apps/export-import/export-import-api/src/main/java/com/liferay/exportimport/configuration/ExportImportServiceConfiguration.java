@@ -57,6 +57,12 @@ public interface ExportImportServiceConfiguration {
 	public boolean publishPermissionsByDefault();
 
 	@Meta.AD(
+		deflt = "false", description = "trigger-template-propagation-help",
+		name = "trigger-template-propagation", required = false
+	)
+	public boolean triggerTemplatePropagation();
+
+	@Meta.AD(
 		deflt = "true", description = "validate-file-entry-references-help",
 		name = "validate-file-entry-references", required = false
 	)
