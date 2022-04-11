@@ -1,4 +1,6 @@
 Bundle-Name: Liferay Layout Set Prototype API
 Bundle-SymbolicName: com.liferay.layout.set.prototype.api
 Bundle-Version: 5.0.5
-Export-Package: com.liferay.layout.set.prototype.constants
+Export-Package:\
+	com.liferay.layout.set.prototype.configuration,\
+	com.liferay.layout.set.prototype.constants
