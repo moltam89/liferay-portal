@@ -30,11 +30,12 @@ public interface CookiesManager {
 
 	public void addCookie(
 		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, Cookie cookie);
+		HttpServletResponse httpServletResponse, Cookie cookie, boolean secure,
+		int type);
 
 	public void addCookie(
 		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, Cookie cookie, boolean secure);
+		HttpServletResponse httpServletResponse, Cookie cookie, int type);
 
 	public void addSupportCookie(
 		HttpServletRequest httpServletRequest,

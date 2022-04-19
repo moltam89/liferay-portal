@@ -51,18 +51,8 @@ public class CookiesManagerImpl implements CookiesManager {
 	@Override
 	public void addCookie(
 		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, Cookie cookie) {
-
-		addCookie(
-			httpServletRequest, httpServletResponse, cookie,
-			_portal.isSecure(httpServletRequest));
-	}
-
-	@Override
-	public void addCookie(
-		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, Cookie cookie,
-		boolean secure) {
+		HttpServletResponse httpServletResponse, Cookie cookie, boolean secure,
+		int type) {
 
 		if (!_SESSION_ENABLE_PERSISTENT_COOKIES) {
 			return;
@@ -101,6 +91,16 @@ public class CookiesManagerImpl implements CookiesManager {
 	}
 
 	@Override
+	public void addCookie(
+		HttpServletRequest httpServletRequest,
+		HttpServletResponse httpServletResponse, Cookie cookie, int type) {
+
+		addCookie(
+			httpServletRequest, httpServletResponse, cookie,
+			_portal.isSecure(httpServletRequest), type);
+	}
+
+	@Override
 	public void addSupportCookie(
 		HttpServletRequest httpServletRequest,
 		HttpServletResponse httpServletResponse) {
@@ -113,7 +113,8 @@ public class CookiesManagerImpl implements CookiesManager {
 
 		addCookie(
 			null, httpServletResponse, cookieSupportCookie,
-			httpServletRequest.isSecure());
+			httpServletRequest.isSecure(),
+			CookiesConstants.CONSENT_TYPE_NECESSARY);
 	}
 
 	@Override
