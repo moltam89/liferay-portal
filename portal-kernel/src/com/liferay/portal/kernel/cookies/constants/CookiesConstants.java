@@ -21,10 +21,30 @@ import com.liferay.portal.kernel.util.Time;
  */
 public class CookiesConstants {
 
+	public static final int CONSENT_TYPE_FUNCTIONAL = 1;
+
+	public static final int CONSENT_TYPE_NECESSARY = 2;
+
+	public static final int CONSENT_TYPE_PERFORMANCE = 3;
+
+	public static final int CONSENT_TYPE_PERSONALIZATION = 4;
+
 	public static final String KEY_COMMERCE_CONTINUE_AS_GUEST =
 		"COMMERCE_CONTINUE_AS_GUEST";
 
 	public static final String KEY_COMPANY_ID = "COMPANY_ID";
+
+	public static final String KEY_CONSENT_TYPE_FUNCTIONAL =
+		"CONSENT_TYPE_FUNCTIONAL";
+
+	public static final String KEY_CONSENT_TYPE_NECESSARY =
+		"CONSENT_TYPE_NECESSARY";
+
+	public static final String KEY_CONSENT_TYPE_PERFORMANCE =
+		"CONSENT_TYPE_PERFORMANCE";
+
+	public static final String KEY_CONSENT_TYPE_PERSONALIZATION =
+		"CONSENT_TYPE_PERSONALIZATION";
 
 	public static final String KEY_COOKIE_SUPPORT = "COOKIE_SUPPORT";
 
