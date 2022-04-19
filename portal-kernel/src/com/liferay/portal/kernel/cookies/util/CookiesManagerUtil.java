@@ -29,19 +29,19 @@ public class CookiesManagerUtil {
 
 	public static void addCookie(
 		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, Cookie cookie) {
+		HttpServletResponse httpServletResponse, Cookie cookie, boolean secure,
+		int type) {
 
 		_cookiesManager.addCookie(
-			httpServletRequest, httpServletResponse, cookie);
+			httpServletRequest, httpServletResponse, cookie, secure, type);
 	}
 
 	public static void addCookie(
 		HttpServletRequest httpServletRequest,
-		HttpServletResponse httpServletResponse, Cookie cookie,
-		boolean secure) {
+		HttpServletResponse httpServletResponse, Cookie cookie, int type) {
 
 		_cookiesManager.addCookie(
-			httpServletRequest, httpServletResponse, cookie, secure);
+			httpServletRequest, httpServletResponse, cookie, type);
 	}
 
 	public static void addSupportCookie(
