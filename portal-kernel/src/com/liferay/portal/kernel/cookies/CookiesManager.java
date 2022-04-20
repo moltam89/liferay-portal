@@ -56,6 +56,9 @@ public interface CookiesManager {
 
 	public String getDomain(String host);
 
+	public boolean hasConsentType(
+		HttpServletRequest httpServletRequest, int type);
+
 	public boolean hasSessionId(HttpServletRequest httpServletRequest);
 
 	public boolean isEncodedCookie(String name);

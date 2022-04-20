@@ -250,6 +250,37 @@ public class CookiesManagerImpl implements CookiesManager {
 	}
 
 	@Override
+	public boolean hasConsentType(
+		HttpServletRequest httpServletRequest, int type) {
+
+		if (type == CookiesConstants.CONSENT_TYPE_NECESSARY) {
+			return true;
+		}
+
+		String consentCookieName = StringPool.BLANK;
+
+		if (type == CookiesConstants.CONSENT_TYPE_FUNCTIONAL) {
+			consentCookieName = CookiesConstants.KEY_CONSENT_TYPE_FUNCTIONAL;
+		}
+		else if (type == CookiesConstants.CONSENT_TYPE_PERFORMANCE) {
+			consentCookieName = CookiesConstants.KEY_CONSENT_TYPE_PERFORMANCE;
+		}
+		else if (type == CookiesConstants.CONSENT_TYPE_PERSONALIZATION) {
+			consentCookieName =
+				CookiesConstants.KEY_CONSENT_TYPE_PERSONALIZATION;
+		}
+
+		String consentCookieValue = getCookie(
+			httpServletRequest, consentCookieName);
+
+		if (Validator.isNull(consentCookieValue)) {
+			return true;
+		}
+
+		return GetterUtil.getBoolean(consentCookieValue);
+	}
+
+	@Override
 	public boolean hasSessionId(HttpServletRequest httpServletRequest) {
 		String jsessionid = getCookie(
 			httpServletRequest, CookiesConstants.KEY_JSESSIONID, false);
