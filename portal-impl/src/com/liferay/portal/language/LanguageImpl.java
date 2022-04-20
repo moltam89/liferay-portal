@@ -22,6 +22,8 @@ import com.liferay.portal.kernel.cache.PortalCacheHelperUtil;
 import com.liferay.portal.kernel.cache.PortalCacheManagerNames;
 import com.liferay.portal.kernel.cache.PortalCacheMapSynchronizeUtil;
 import com.liferay.portal.kernel.cache.PortalCacheMapSynchronizeUtil.Synchronizer;
+import com.liferay.portal.kernel.cookies.constants.CookiesConstants;
+import com.liferay.portal.kernel.cookies.util.CookiesManagerUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.language.Language;
@@ -1712,8 +1714,9 @@ public class LanguageImpl implements Language, Serializable {
 		languageIdCookie.setMaxAge(CookieKeys.MAX_AGE);
 		languageIdCookie.setPath(StringPool.SLASH);
 
-		CookieKeys.addCookie(
-			httpServletRequest, httpServletResponse, languageIdCookie);
+		CookiesManagerUtil.addCookie(
+			httpServletRequest, httpServletResponse, languageIdCookie,
+			CookiesConstants.CONSENT_TYPE_FUNCTIONAL);
 	}
 
 	private static CompanyLocalesBag _getCompanyLocalesBag() {
