@@ -82,6 +82,12 @@ public class CookiesManagerUtil {
 		return _cookiesManager.getDomain(host);
 	}
 
+	public static boolean hasConsentType(
+		HttpServletRequest httpServletRequest, int type) {
+
+		return _cookiesManager.hasConsentType(httpServletRequest, type);
+	}
+
 	public static boolean hasSessionId(HttpServletRequest httpServletRequest) {
 		return _cookiesManager.hasSessionId(httpServletRequest);
 	}
