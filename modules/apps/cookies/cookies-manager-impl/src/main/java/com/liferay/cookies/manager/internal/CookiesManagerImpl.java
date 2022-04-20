@@ -58,6 +58,12 @@ public class CookiesManagerImpl implements CookiesManager {
 			return;
 		}
 
+		if ((cookie.getMaxAge() != 0) &&
+			!hasConsentType(httpServletRequest, type)) {
+
+			return;
+		}
+
 		// LEP-5175
 
 		String name = cookie.getName();
