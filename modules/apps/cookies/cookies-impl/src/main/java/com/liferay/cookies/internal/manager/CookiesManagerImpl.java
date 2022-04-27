@@ -152,11 +152,9 @@ public class CookiesManagerImpl implements CookiesManager {
 			cookie.setValue(StringPool.BLANK);
 
 			httpServletResponse.addCookie(cookie);
-
-			return true;
 		}
 
-		return false;
+		return true;
 	}
 
 	@Override
