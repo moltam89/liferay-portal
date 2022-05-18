@@ -684,6 +684,13 @@ public class ExportImportHelperImpl implements ExportImportHelper {
 				portletDataHandler.getNamespace(),
 				"referenced-content-behavior"));
 
+		if (ArrayUtil.isEmpty(referencedContentBehaviorArray)) {
+			referencedContentBehaviorArray = parameterMap.get(
+				PortletDataHandlerControl.getNamespacedControlName(
+					"journal",
+					"referenced-content-behavior"));
+		}
+
 		String referencedContentBehavior = "include-always";
 
 		if (!ArrayUtil.isEmpty(referencedContentBehaviorArray)) {
