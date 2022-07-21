@@ -18,6 +18,7 @@ import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
 import com.liferay.exportimport.kernel.service.ExportImportLocalServiceUtil;
 import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
@@ -28,11 +29,13 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.repository.model.FileEntry;
+import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.kernel.transaction.TransactionInvokerUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MapUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.sites.kernel.util.Sites;
 import com.liferay.sites.kernel.util.SitesUtil;
@@ -122,14 +125,23 @@ public class LayoutSetPrototypeImportBackgroundTaskExecutor
 
 				mergeFailCount++;
 
+				layoutSetPrototypeSettingsUnicodeProperties.setProperty(
+					Sites.MERGE_FAIL_FRIENDLY_URL_LAYOUTS,
+					String.valueOf(mergeFailCount));
+				
+				layoutSetPrototypeSettingsUnicodeProperties.setProperty(
+					Sites.MERGE_FAIL_COUNT,
+					String.valueOf(mergeFailCount));
+
+				LayoutSetLocalServiceUtil.updateLayoutSet(
+					layoutSetPrototypeLayoutSet);
+
 				_log.error(
 					StringBundler.concat(
 						"Merge fail count increased to ", mergeFailCount,
 						" for layout set prototype ",
 						layoutSetPrototype.getLayoutSetPrototypeId()),
-					throwable);
-
-				SitesUtil.setMergeFailCount(layoutSetPrototype, mergeFailCount);
+					throwable);				
 			}
 			finally {
 				MergeLayoutPrototypesThreadLocal.setInProgress(false);
