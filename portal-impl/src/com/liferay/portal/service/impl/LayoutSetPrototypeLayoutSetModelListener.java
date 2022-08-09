@@ -24,8 +24,7 @@ import com.liferay.portal.kernel.model.LayoutSetPrototype;
 import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalServiceUtil;
 import com.liferay.portal.kernel.service.persistence.LayoutSetPrototypeUtil;
 import com.liferay.portal.kernel.util.UnicodeProperties;
-
-import java.util.Date;
+import com.liferay.sites.kernel.util.Sites;
 
 /**
  * @author Raymond Augé
@@ -34,25 +33,9 @@ public class LayoutSetPrototypeLayoutSetModelListener
 	extends BaseModelListener<LayoutSet> {
 
 	@Override
-	public void onAfterCreate(LayoutSet layoutSet) {
-		updateLayoutSetPrototype(layoutSet, layoutSet.getModifiedDate());
-	}
-
-	@Override
-	public void onAfterRemove(LayoutSet layoutSet) {
-		updateLayoutSetPrototype(layoutSet, new Date());
-	}
-
-	@Override
 	public void onAfterUpdate(
 		LayoutSet originalLayoutSet, LayoutSet layoutSet) {
-
-		updateLayoutSetPrototype(layoutSet, layoutSet.getModifiedDate());
-	}
-
-	protected void updateLayoutSetPrototype(
-		LayoutSet layoutSet, Date modifiedDate) {
-
+		
 		if (layoutSet == null) {
 			return;
 		}
@@ -82,12 +65,12 @@ public class LayoutSetPrototypeLayoutSetModelListener
 				LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(
 					group.getClassPK());
 
-			layoutSetPrototype.setModifiedDate(modifiedDate);
+			layoutSetPrototype.setModifiedDate(layoutSet.getModifiedDate());
 
 			UnicodeProperties settingsUnicodeProperties =
 				layoutSet.getSettingsProperties();
 
-			settingsUnicodeProperties.remove("merge-fail-count");
+			settingsUnicodeProperties.remove(Sites.MERGE_FAIL_COUNT);
 
 			LayoutSetPrototypeUtil.update(layoutSetPrototype);
 		}
@@ -95,6 +78,7 @@ public class LayoutSetPrototypeLayoutSetModelListener
 			_log.error(exception);
 		}
 	}
+
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		LayoutSetPrototypeLayoutSetModelListener.class);
