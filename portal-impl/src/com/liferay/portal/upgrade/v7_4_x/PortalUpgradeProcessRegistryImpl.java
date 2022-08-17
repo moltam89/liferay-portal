@@ -148,6 +148,10 @@ public class PortalUpgradeProcessRegistryImpl
 				}
 
 			});
+
+		upgradeProcesses.put(
+			new Version(16, 2, 0),
+			new CTModelUpgradeProcess("Address", "EmailAddress", "Phone"));
 	}
 
 }
