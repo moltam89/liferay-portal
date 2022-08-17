@@ -20,6 +20,7 @@ import com.liferay.change.tracking.spi.reference.builder.ParentTableReferenceInf
 import com.liferay.portal.kernel.model.ClassNameTable;
 import com.liferay.portal.kernel.model.CompanyTable;
 import com.liferay.portal.kernel.model.CountryTable;
+import com.liferay.portal.kernel.model.EmailAddressTable;
 import com.liferay.portal.kernel.model.GroupTable;
 import com.liferay.portal.kernel.model.ImageTable;
 import com.liferay.portal.kernel.model.ListTypeConstants;
@@ -77,6 +78,9 @@ public class OrganizationTableReferenceDefinition
 			OrganizationTable.INSTANCE.logoId, ImageTable.INSTANCE.imageId
 		).assetEntryReference(
 			OrganizationTable.INSTANCE.organizationId, Organization.class
+		).classNameReference(
+			OrganizationTable.INSTANCE.organizationId,
+			EmailAddressTable.INSTANCE.classPK, Organization.class
 		).resourcePermissionReference(
 			OrganizationTable.INSTANCE.organizationId, Organization.class
 		).systemEventReference(
