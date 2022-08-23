@@ -85,10 +85,11 @@ public abstract class BaseTableReferenceDefinitionTestCase {
 				_classNameLocalService.getClassNameId(ctModel.getModelClass()),
 				ctModel.getPrimaryKey());
 
-			count = _ctEntryLocalService.getCTCollectionCTEntriesCount(
-				_ctCollection.getCtCollectionId());
+			int discardedCount =
+				_ctEntryLocalService.getCTCollectionCTEntriesCount(
+					_ctCollection.getCtCollectionId());
 
-			Assert.assertEquals(0, count);
+			Assert.assertNotEquals(count, discardedCount);
 		}
 	}
 
