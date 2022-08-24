@@ -17,12 +17,10 @@ package com.liferay.change.tracking.internal.spi.reference;
 import com.liferay.change.tracking.spi.reference.TableReferenceDefinition;
 import com.liferay.change.tracking.spi.reference.builder.ChildTableReferenceInfoBuilder;
 import com.liferay.change.tracking.spi.reference.builder.ParentTableReferenceInfoBuilder;
-import com.liferay.portal.kernel.model.Address;
 import com.liferay.portal.kernel.model.AddressTable;
 import com.liferay.portal.kernel.model.ClassNameTable;
 import com.liferay.portal.kernel.model.CompanyTable;
 import com.liferay.portal.kernel.model.CountryTable;
-import com.liferay.portal.kernel.model.EmailAddress;
 import com.liferay.portal.kernel.model.EmailAddressTable;
 import com.liferay.portal.kernel.model.GroupTable;
 import com.liferay.portal.kernel.model.ImageTable;
@@ -30,7 +28,6 @@ import com.liferay.portal.kernel.model.ListTypeConstants;
 import com.liferay.portal.kernel.model.ListTypeTable;
 import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.model.OrganizationTable;
-import com.liferay.portal.kernel.model.Phone;
 import com.liferay.portal.kernel.model.PhoneTable;
 import com.liferay.portal.kernel.model.RegionTable;
 import com.liferay.portal.kernel.service.persistence.BasePersistence;
@@ -85,13 +82,13 @@ public class OrganizationTableReferenceDefinition
 			OrganizationTable.INSTANCE.organizationId, Organization.class
 		).classNameReference(
 			OrganizationTable.INSTANCE.organizationId,
-			AddressTable.INSTANCE.classPK, Address.class
+			AddressTable.INSTANCE.classPK, Organization.class
 		).classNameReference(
 			OrganizationTable.INSTANCE.organizationId,
-			EmailAddressTable.INSTANCE.classPK, EmailAddress.class
+			EmailAddressTable.INSTANCE.classPK, Organization.class
 		).classNameReference(
 			OrganizationTable.INSTANCE.organizationId,
-			PhoneTable.INSTANCE.classPK, Phone.class
+			PhoneTable.INSTANCE.classPK, Organization.class
 		).resourcePermissionReference(
 			OrganizationTable.INSTANCE.organizationId, Organization.class
 		).systemEventReference(
