@@ -86,19 +86,17 @@ public class AddressCTDisplayRenderer extends BaseCTDisplayRenderer<Address> {
 
 	@Override
 	public String getTitle(Locale locale, Address address) {
-		return address.getName();
+		return address.getCity();
 	}
 
 	@Override
 	protected void buildDisplay(DisplayBuilder<Address> displayBuilder)
 		throws PortalException {
 
-		//Organization organization = displayBuilder.getModel();
-
 		Address address = displayBuilder.getModel();
 
 		displayBuilder.display(
-			"name", address.getName()
+			"name", address.getCity()
 		).display(
 			"created-by",
 			() -> {
@@ -115,7 +113,52 @@ public class AddressCTDisplayRenderer extends BaseCTDisplayRenderer<Address> {
 		).display(
 			"last-modified", address.getModifiedDate()
 		).display(
+			"primary", address.isPrimary()
+		).display(
+			"type", address.getType()
+		).display(
+			"street1",
+			() -> {
+				String street1 = address.getStreet1();
+
+				if (Validator.isNotNull(street1)) {
+					return street1;
+				}
+
+				return null;
+			}
+		).display(
+			"street2",
+			() -> {
+				String street2 = address.getStreet2();
+
+				if (Validator.isNotNull(street2)) {
+					return street2;
+				}
+
+				return null;
+			}
+		).display(
+			"street3",
+			() -> {
+				String street3 = address.getStreet3();
+
+				if (Validator.isNotNull(street3)) {
+					return street3;
+				}
+
+				return null;
+			}
+		).display(
 			"city", address.getCity()
+		).display(
+			"country", address.getCountry()
+		).display(
+			"region", address.getRegion()
+		).display(
+			"postal-code", address.getRegion()
+		).display(
+			"mailing", address.isMailing()
 		);
 	}
 
