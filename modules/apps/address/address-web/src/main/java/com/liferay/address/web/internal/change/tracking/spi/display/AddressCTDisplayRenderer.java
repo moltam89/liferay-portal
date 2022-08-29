@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.change.tracking.web.internal.spi.display;
+package com.liferay.address.web.internal.change.tracking.spi.display;
 
 import com.liferay.change.tracking.spi.display.BaseCTDisplayRenderer;
 import com.liferay.change.tracking.spi.display.CTDisplayRenderer;
