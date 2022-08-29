@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 
 import java.util.Locale;
 
@@ -65,9 +66,8 @@ public class AddressCTDisplayRenderer extends BaseCTDisplayRenderer<Address> {
 
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
-				httpServletRequest, group,
-				"com_liferay_users_admin_web_portlet_UsersAdminPortlet", 0, 0,
-				PortletRequest.RENDER_PHASE)
+				httpServletRequest, group, UsersAdminPortletKeys.USERS_ADMIN, 0,
+				0, PortletRequest.RENDER_PHASE)
 		).setMVCRenderCommandName(
 			"/users_admin/edit_organization"
 		).setRedirect(
