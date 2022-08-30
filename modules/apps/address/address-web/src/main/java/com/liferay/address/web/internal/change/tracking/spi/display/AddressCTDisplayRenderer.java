@@ -18,9 +18,13 @@ import com.liferay.change.tracking.spi.display.BaseCTDisplayRenderer;
 import com.liferay.change.tracking.spi.display.CTDisplayRenderer;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
+import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.Address;
+import com.liferay.portal.kernel.model.Country;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.ListType;
 import com.liferay.portal.kernel.model.Organization;
+import com.liferay.portal.kernel.model.Region;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
@@ -96,7 +100,14 @@ public class AddressCTDisplayRenderer extends BaseCTDisplayRenderer<Address> {
 		Address address = displayBuilder.getModel();
 
 		displayBuilder.display(
-			"name", address.getCity()
+			"name",
+			() -> {
+				if (Validator.isNotNull(address.getName())) {
+					return address.getName();
+				}
+
+				return address.getCity();
+			}
 		).display(
 			"created-by",
 			() -> {
@@ -115,7 +126,17 @@ public class AddressCTDisplayRenderer extends BaseCTDisplayRenderer<Address> {
 		).display(
 			"primary", address.isPrimary()
 		).display(
-			"type", address.getType()
+			"type",
+			() -> {
+				ListType listType = address.getType();
+
+				if (listType != null) {
+					return _language.get(
+						displayBuilder.getLocale(), listType.getName());
+				}
+
+				return null;
+			}
 		).display(
 			"street1",
 			() -> {
@@ -152,11 +173,30 @@ public class AddressCTDisplayRenderer extends BaseCTDisplayRenderer<Address> {
 		).display(
 			"city", address.getCity()
 		).display(
-			"country", address.getCountry()
+			"country",
+			() -> {
+				Country country = address.getCountry();
+
+				if (country != null) {
+					return country.getTitle(displayBuilder.getLocale());
+				}
+
+				return null;
+			}
 		).display(
-			"region", address.getRegion()
+			"region",
+			() -> {
+				Region region = address.getRegion();
+
+				if (region != null) {
+					return region.getTitle(
+						_language.getLanguageId(displayBuilder.getLocale()));
+				}
+
+				return null;
+			}
 		).display(
-			"postal-code", address.getRegion()
+			"postal-code", address.getZip()
 		).display(
 			"mailing", address.isMailing()
 		);
@@ -164,6 +204,9 @@ public class AddressCTDisplayRenderer extends BaseCTDisplayRenderer<Address> {
 
 	@Reference
 	private GroupLocalService _groupLocalService;
+
+	@Reference
+	private Language _language;
 
 	@Reference
 	private OrganizationLocalService _organizationLocalService;
