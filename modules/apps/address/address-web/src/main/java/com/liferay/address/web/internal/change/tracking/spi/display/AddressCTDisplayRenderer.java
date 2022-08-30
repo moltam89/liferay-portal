@@ -72,14 +72,18 @@ public class AddressCTDisplayRenderer extends BaseCTDisplayRenderer<Address> {
 			_portal.getControlPanelPortletURL(
 				httpServletRequest, group, UsersAdminPortletKeys.USERS_ADMIN, 0,
 				0, PortletRequest.RENDER_PHASE)
-		).setMVCRenderCommandName(
-			"/users_admin/edit_organization"
+		).setMVCPath(
+			"/common/edit_address.jsp"
 		).setRedirect(
 			_portal.getCurrentURL(httpServletRequest)
 		).setBackURL(
 			ParamUtil.getString(httpServletRequest, "backURL")
 		).setParameter(
-			"organizationId", organization.getOrganizationId()
+			"className", address.getClassName()
+		).setParameter(
+			"classPK", address.getClassPK()
+		).setParameter(
+			"primaryKey", address.getAddressId()
 		).buildString();
 	}
 
@@ -90,6 +94,10 @@ public class AddressCTDisplayRenderer extends BaseCTDisplayRenderer<Address> {
 
 	@Override
 	public String getTitle(Locale locale, Address address) {
+		if (Validator.isNotNull(address.getName())) {
+			return address.getName();
+		}
+
 		return address.getCity();
 	}
 
