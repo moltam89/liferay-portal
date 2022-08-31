@@ -20,17 +20,13 @@ import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.model.EmailAddress;
-import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.ListType;
-import com.liferay.portal.kernel.model.Organization;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.OrganizationLocalService;
 import com.liferay.portal.kernel.service.UserLocalService;
-import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.users.admin.constants.UsersAdminPortletKeys;
 
 import java.util.Locale;
@@ -54,22 +50,9 @@ public class EmailAddressCTDisplayRenderer
 			HttpServletRequest httpServletRequest, EmailAddress emailAddress)
 		throws PortalException {
 
-		Organization organization = _organizationLocalService.getOrganization(
-			emailAddress.getClassPK());
-
-		Group group = _groupLocalService.getGroup(organization.getGroupId());
-
-		if (group.isCompany()) {
-			ThemeDisplay themeDisplay =
-				(ThemeDisplay)httpServletRequest.getAttribute(
-					WebKeys.THEME_DISPLAY);
-
-			group = themeDisplay.getScopeGroup();
-		}
-
 		return PortletURLBuilder.create(
 			_portal.getControlPanelPortletURL(
-				httpServletRequest, group, UsersAdminPortletKeys.USERS_ADMIN, 0,
+				httpServletRequest, null, UsersAdminPortletKeys.USERS_ADMIN, 0,
 				0, PortletRequest.RENDER_PHASE)
 		).setMVCPath(
 			"/common/edit_email_address.jsp"
