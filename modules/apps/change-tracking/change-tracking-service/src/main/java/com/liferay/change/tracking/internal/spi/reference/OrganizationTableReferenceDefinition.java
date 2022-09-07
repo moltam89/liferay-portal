@@ -78,9 +78,6 @@ public class OrganizationTableReferenceDefinition
 			OrganizationTable.INSTANCE.logoId, ImageTable.INSTANCE.imageId
 		).assetEntryReference(
 			OrganizationTable.INSTANCE.organizationId, Organization.class
-		).classNameReference(
-			OrganizationTable.INSTANCE.organizationId,
-			EmailAddressTable.INSTANCE.classPK, Organization.class
 		).resourcePermissionReference(
 			OrganizationTable.INSTANCE.organizationId, Organization.class
 		).systemEventReference(
