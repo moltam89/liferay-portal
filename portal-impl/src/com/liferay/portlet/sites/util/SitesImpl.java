@@ -2337,6 +2337,9 @@ public class SitesImpl implements Sites {
 
 		String owner = PortalUUIDUtil.generate();
 
+		long startTime = System.currentTimeMillis();
+        System.out.println("_acquireLock start " + startTime);
+
 		try {
 			Lock lock = LockManagerUtil.lock(
 				SitesImpl.class.getName(), String.valueOf(classPK), owner);
@@ -2381,6 +2384,10 @@ public class SitesImpl implements Sites {
 					"Acquired lock for ", SitesImpl.class.getName(),
 					" to update ", className, StringPool.POUND, classPK));
 		}
+
+		long endTime = System.currentTimeMillis();
+        long diff = endTime - startTime;
+        System.out.println("_acquireLock end " + diff + " " + startTime + " " + endTime);
 
 		return owner;
 	}
