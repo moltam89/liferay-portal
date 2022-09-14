@@ -121,6 +121,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -1868,7 +1869,8 @@ public class SitesImpl implements Sites {
 
 	protected File exportLayoutSetPrototype(
 		User user, LayoutSetPrototype layoutSetPrototype,
-		Map<String, String[]> parameterMap, String cacheFileName) {
+		Map<String, String[]> parameterMap, String cacheFileName,
+		long[] exportLayoutSetPrototypeLayoutIds) {
 
 		File cacheFile = null;
 
@@ -1900,16 +1902,20 @@ public class SitesImpl implements Sites {
 			return null;
 		}
 
-		List<Layout> layoutSetPrototypeLayouts =
-			LayoutLocalServiceUtil.getLayouts(layoutSetPrototypeGroupId, true);
+		if (exportLayoutSetPrototypeLayoutIds == null) {
+			List<Layout> layoutSetPrototypeLayouts =
+				LayoutLocalServiceUtil.getLayouts(
+					layoutSetPrototypeGroupId, true);
+
+			exportLayoutSetPrototypeLayoutIds =
+				ExportImportHelperUtil.getLayoutIds(layoutSetPrototypeLayouts);
+		}
 
 		Map<String, Serializable> exportLayoutSettingsMap =
 			ExportImportConfigurationSettingsMapFactoryUtil.
 				buildExportLayoutSettingsMap(
 					user, layoutSetPrototypeGroupId, true,
-					ExportImportHelperUtil.getLayoutIds(
-						layoutSetPrototypeLayouts),
-					parameterMap);
+					exportLayoutSetPrototypeLayoutIds, parameterMap);
 
 		ExportImportConfiguration exportImportConfiguration = null;
 
@@ -2088,17 +2094,83 @@ public class SitesImpl implements Sites {
 
 		if (importData) {
 			file = exportLayoutSetPrototype(
-				user, layoutSetPrototype, parameterMap, null);
+				user, layoutSetPrototype, parameterMap, null, null);
 		}
 		else {
+			List<Layout> exportLayoutSetPrototypeLayouts = null;
+
+			try {
+				long layoutSetPrototypeGroupId =
+					layoutSetPrototype.getGroupId();
+
+				List<Layout> layoutSetPrototypeLayouts =
+					LayoutLocalServiceUtil.getLayouts(
+						layoutSetPrototypeGroupId, true);
+
+				exportLayoutSetPrototypeLayouts = new ArrayList<>();
+
+				for (Layout layoutSetPrototypeLayout :
+						layoutSetPrototypeLayouts) {
+
+					Layout layout =
+						LayoutLocalServiceUtil.fetchLayoutByUuidAndGroupId(
+							layoutSetPrototypeLayout.getUuid(), groupId,
+							privateLayout);
+
+					if (_isLayoutOutdated(layout, layoutSetPrototypeLayout)) {
+						exportLayoutSetPrototypeLayouts.add(
+							layoutSetPrototypeLayout);
+					}
+				}
+			}
+			catch (PortalException portalException) {
+				_log.error(
+					"Unable to get groupId for layout set prototype " +
+						layoutSetPrototype.getLayoutSetPrototypeId(),
+					portalException);
+			}
+
+			long[] exportLayoutSetPrototypeLayoutIds = null;
+			String exportLayoutSetPrototypeLayoutIdsString = StringPool.BLANK;
+
+			if (exportLayoutSetPrototypeLayouts != null) {
+				exportLayoutSetPrototypeLayoutIds =
+					ExportImportHelperUtil.getLayoutIds(
+						exportLayoutSetPrototypeLayouts);
+
+				if (!ArrayUtil.isEmpty(exportLayoutSetPrototypeLayoutIds)) {
+					exportLayoutSetPrototypeLayoutIds = ArrayUtil.sortedUnique(
+						exportLayoutSetPrototypeLayoutIds);
+				}
+
+				exportLayoutSetPrototypeLayoutIdsString = StringBundler.concat(
+					StringPool.UNDERLINE,
+					Arrays.hashCode(exportLayoutSetPrototypeLayoutIds),
+					StringPool.UNDERLINE);
+			}
+
 			String cacheFileName = StringBundler.concat(
-				_TEMP_DIR, layoutSetPrototype.getUuid(), ".v", lastMergeVersion,
+				_TEMP_DIR, layoutSetPrototype.getUuid(),
+				exportLayoutSetPrototypeLayoutIdsString, ".v", lastMergeVersion,
 				".lar");
 
-			file = _exportInProgressMap.computeIfAbsent(
-				cacheFileName,
-				fileName -> exportLayoutSetPrototype(
-					user, layoutSetPrototype, parameterMap, fileName));
+			if (exportLayoutSetPrototypeLayoutIds == null) {
+				file = _exportInProgressMap.computeIfAbsent(
+					cacheFileName,
+					fileName -> exportLayoutSetPrototype(
+						user, layoutSetPrototype, parameterMap, fileName,
+						null));
+			}
+			else {
+				long[] exportLayoutSetPrototypeLayoutIdsClone =
+					exportLayoutSetPrototypeLayoutIds.clone();
+
+				file = _exportInProgressMap.computeIfAbsent(
+					cacheFileName,
+					fileName -> exportLayoutSetPrototype(
+						user, layoutSetPrototype, parameterMap, fileName,
+						exportLayoutSetPrototypeLayoutIdsClone));
+			}
 
 			_exportInProgressMap.remove(cacheFileName);
 		}
@@ -2383,6 +2455,31 @@ public class SitesImpl implements Sites {
 		}
 
 		return owner;
+	}
+
+	private boolean _isLayoutOutdated(
+		Layout layout, Layout layoutSetPrototypeLayout) {
+
+		if ((layoutSetPrototypeLayout == null) || (layout == null)) {
+			return true;
+		}
+
+		Date layoutModifiedDate = layout.getModifiedDate();
+		long lastMergeLayoutModifiedTime = GetterUtil.getLong(
+			layout.getTypeSettingsProperty(
+				Sites.LAST_MERGE_LAYOUT_MODIFIED_TIME));
+		Date layoutSetPrototypeLayoutModifiedDate =
+			layoutSetPrototypeLayout.getModifiedDate();
+
+		if ((layoutModifiedDate == null) ||
+			(layoutSetPrototypeLayoutModifiedDate == null) ||
+			(layoutSetPrototypeLayoutModifiedDate.getTime() >
+				lastMergeLayoutModifiedTime)) {
+
+			return true;
+		}
+
+		return false;
 	}
 
 	private void _releaseLock(String className, long classPK, String owner) {
