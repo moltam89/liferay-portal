@@ -1362,6 +1362,19 @@ public class SitesImpl implements Sites {
 			return;
 		}
 
+		Lock lock = LockManagerUtil.fetchLock(
+			LayoutSet.class.getName(), layoutSet.getLayoutSetId());
+
+		if (lock != null) {
+			Date createDate = lock.getCreateDate();
+
+			if ((System.currentTimeMillis() - createDate.getTime()) <
+					PropsValues.LAYOUT_SET_PROTOTYPE_MERGE_LOCK_MAX_TIME) {
+
+				return;
+			}
+		}
+
 		String owner = _acquireLock(
 			LayoutSet.class.getName(), layoutSet.getLayoutSetId(),
 			PropsValues.LAYOUT_SET_PROTOTYPE_MERGE_LOCK_MAX_TIME);
