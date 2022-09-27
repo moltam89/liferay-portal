@@ -99,7 +99,9 @@ import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.SubscriptionSender;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.portal.kernel.xml.Document;
 import com.liferay.portal.kernel.xml.Element;
+import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portlet.documentlibrary.lar.FileEntryUtil;
 
 import java.io.File;
@@ -1025,8 +1027,38 @@ public class JournalArticleStagedModelDataHandler
 					article.getArticleId(), importedArticle.getArticleId());
 			}
 
-			StagedModelDataHandlerUtil.importReferenceStagedModels(
-				portletDataContext, article, Layout.class);
+			Element importDataRootElement =
+				portletDataContext.getImportDataRootElement();
+
+			try {
+				String xml = portletDataContext.getZipEntryAsString(
+					"/manifest.xml");
+
+				Element rootElement = null;
+
+				try {
+					Document document = SAXReaderUtil.read(xml);
+
+					rootElement = document.getRootElement();
+				}
+				catch (Exception exception) {
+					throw new PortletDataException(
+						"Unable to create portlet data context for the " +
+							"import process because of an invalid LAR manifest",
+						exception);
+				}
+
+				if (rootElement != null) {
+					portletDataContext.setImportDataRootElement(rootElement);
+				}
+
+				StagedModelDataHandlerUtil.importReferenceStagedModels(
+					portletDataContext, article, Layout.class);
+			}
+			finally {
+				portletDataContext.setImportDataRootElement(
+					importDataRootElement);
+			}
 
 			String replacedContent =
 				_journalArticleExportImportContentProcessor.
