@@ -68,6 +68,17 @@ public class ExportImportLocalServiceWrapper
 	}
 
 	@Override
+	public long exportLayoutSetPrototypeInBackground(
+			long userId,
+			com.liferay.exportimport.kernel.model.ExportImportConfiguration
+				exportImportConfiguration)
+		throws com.liferay.portal.kernel.exception.PortalException {
+
+		return _exportImportLocalService.exportLayoutSetPrototypeInBackground(
+			userId, exportImportConfiguration);
+	}
+
+	@Override
 	public java.io.File exportPortletInfoAsFile(
 			com.liferay.exportimport.kernel.model.ExportImportConfiguration
 				exportImportConfiguration)

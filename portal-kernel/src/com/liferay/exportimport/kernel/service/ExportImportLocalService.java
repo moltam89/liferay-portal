@@ -61,6 +61,10 @@ public interface ExportImportLocalService extends BaseLocalService {
 			long userId, long exportImportConfigurationId)
 		throws PortalException;
 
+	public long exportLayoutSetPrototypeInBackground(
+			long userId, ExportImportConfiguration exportImportConfiguration)
+		throws PortalException;
+
 	public File exportPortletInfoAsFile(
 			ExportImportConfiguration exportImportConfiguration)
 		throws PortalException;
