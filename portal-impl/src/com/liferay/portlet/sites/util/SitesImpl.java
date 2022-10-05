@@ -1361,14 +1361,6 @@ public class SitesImpl implements Sites {
 			return;
 		}
 
-		String owner = _acquireLock(
-			LayoutSet.class.getName(), layoutSet.getLayoutSetId(),
-			PropsValues.LAYOUT_SET_PROTOTYPE_MERGE_LOCK_MAX_TIME);
-
-		if (owner == null) {
-			return;
-		}
-
 		EntityCacheUtil.clearLocalCache();
 
 		layoutSet = LayoutSetLocalServiceUtil.fetchLayoutSet(
@@ -1455,9 +1447,6 @@ public class SitesImpl implements Sites {
 		}
 		finally {
 			MergeLayoutPrototypesThreadLocal.setInProgress(false);
-
-			_releaseLock(
-				LayoutSet.class.getName(), layoutSet.getLayoutSetId(), owner);
 		}
 	}
 
@@ -1941,7 +1930,7 @@ public class SitesImpl implements Sites {
 			if (cacheFileName != null) {
 				if (!isSkipExport(
 						layoutSetPrototypeGroupId,
-						layoutSetPrototype.getMvccVersion(), false) ||
+						layoutSetPrototype.getMvccVersion(), false) &&
 					!isSkipExport(
 						layoutSetPrototypeGroupId,
 						layoutSetPrototype.getMvccVersion(), true)) {
@@ -2231,9 +2220,10 @@ public class SitesImpl implements Sites {
 		Map<String, String[]> parameterMap =
 			(Map<String, String[]>)settingsMap.get("parameterMap");
 
-		long previousMvccVersion = MapUtil.getLong(parameterMap, "mvccVersion");
+		long lastMergeVersion = MapUtil.getLong(
+			parameterMap, "lastMergeVersion");
 
-		if (mvccVersion > previousMvccVersion) {
+		if (mvccVersion > lastMergeVersion) {
 			return false;
 		}
 
