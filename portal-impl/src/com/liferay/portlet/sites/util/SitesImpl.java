@@ -1914,6 +1914,8 @@ public class SitesImpl implements Sites {
 		exportLayoutSettingsMap.put(
 			"layoutSetPrototypeId",
 			layoutSetPrototype.getLayoutSetPrototypeId());
+		exportLayoutSettingsMap.put(
+			"mvccVersion", layoutSetPrototype.getMvccVersion());
 
 		ExportImportConfiguration exportImportConfiguration = null;
 
@@ -1937,9 +1939,17 @@ public class SitesImpl implements Sites {
 
 		try {
 			if (cacheFileName != null) {
-				ExportImportLocalServiceUtil.
-					exportLayoutSetPrototypeInBackground(
-						user.getUserId(), exportImportConfiguration);
+				if (!isSkipExport(
+						layoutSetPrototypeGroupId,
+						layoutSetPrototype.getMvccVersion(), false) ||
+					!isSkipExport(
+						layoutSetPrototypeGroupId,
+						layoutSetPrototype.getMvccVersion(), true)) {
+
+					ExportImportLocalServiceUtil.
+						exportLayoutSetPrototypeInBackground(
+							user.getUserId(), exportImportConfiguration);
+				}
 
 				return null;
 			}
@@ -2187,6 +2197,47 @@ public class SitesImpl implements Sites {
 		}
 
 		return false;
+	}
+
+	protected boolean isSkipExport(
+		long groupId, long mvccVersion, boolean completed) {
+
+		BackgroundTask previousBackgroundTask =
+			BackgroundTaskManagerUtil.fetchFirstBackgroundTask(
+				groupId,
+				BackgroundTaskExecutorNames.
+					LAYOUT_SET_PROTOTYPE_EXPORT_BACKGROUND_TASK_EXECUTOR,
+				completed, new BackgroundTaskCreateDateComparator(false));
+
+		if (previousBackgroundTask == null) {
+			return false;
+		}
+
+		Map<String, Serializable> contextMap =
+			previousBackgroundTask.getTaskContextMap();
+
+		ExportImportConfiguration previousExportImportConfiguration =
+			ExportImportConfigurationLocalServiceUtil.
+				fetchExportImportConfiguration(
+					MapUtil.getLong(contextMap, "exportImportConfigurationId"));
+
+		if (previousExportImportConfiguration == null) {
+			return false;
+		}
+
+		Map<String, Serializable> settingsMap =
+			previousExportImportConfiguration.getSettingsMap();
+
+		Map<String, String[]> parameterMap =
+			(Map<String, String[]>)settingsMap.get("parameterMap");
+
+		long previousMvccVersion = MapUtil.getLong(parameterMap, "mvccVersion");
+
+		if (mvccVersion > previousMvccVersion) {
+			return false;
+		}
+
+		return true;
 	}
 
 	protected boolean isSkipImport(
