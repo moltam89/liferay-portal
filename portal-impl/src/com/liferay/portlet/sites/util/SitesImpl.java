@@ -1932,6 +1932,14 @@ public class SitesImpl implements Sites {
 		File file = null;
 
 		try {
+			if (cacheFileName != null) {
+				ExportImportLocalServiceUtil.
+					exportLayoutSetPrototypeInBackground(
+						user.getUserId(), exportImportConfiguration);
+
+				return null;
+			}
+
 			file = ExportImportLocalServiceUtil.exportLayoutsAsFile(
 				exportImportConfiguration);
 		}
