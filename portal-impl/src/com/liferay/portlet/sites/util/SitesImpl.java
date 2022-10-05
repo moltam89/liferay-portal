@@ -1911,6 +1911,10 @@ public class SitesImpl implements Sites {
 						layoutSetPrototypeLayouts),
 					parameterMap);
 
+		exportLayoutSettingsMap.put(
+			"layoutSetPrototypeId",
+			layoutSetPrototype.getLayoutSetPrototypeId());
+
 		ExportImportConfiguration exportImportConfiguration = null;
 
 		try {
