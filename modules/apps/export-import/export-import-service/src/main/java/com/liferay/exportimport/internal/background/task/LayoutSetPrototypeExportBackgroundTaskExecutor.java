@@ -14,22 +14,35 @@
 
 package com.liferay.exportimport.internal.background.task;
 
+import com.liferay.exportimport.kernel.configuration.ExportImportConfigurationSettingsMapFactoryUtil;
+import com.liferay.exportimport.kernel.configuration.constants.ExportImportConfigurationConstants;
 import com.liferay.exportimport.kernel.model.ExportImportConfiguration;
+import com.liferay.exportimport.kernel.service.ExportImportConfigurationLocalServiceUtil;
 import com.liferay.exportimport.kernel.service.ExportImportLocalServiceUtil;
 import com.liferay.petra.string.StringBundler;
+import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTask;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskExecutor;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskResult;
 import com.liferay.portal.kernel.backgroundtask.constants.BackgroundTaskConstants;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.LayoutSet;
 import com.liferay.portal.kernel.model.LayoutSetPrototype;
+import com.liferay.portal.kernel.model.User;
+import com.liferay.portal.kernel.service.LayoutSetLocalServiceUtil;
 import com.liferay.portal.kernel.service.LayoutSetPrototypeLocalServiceUtil;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.UserLocalServiceUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.portal.kernel.util.SystemProperties;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.File;
+import java.io.Serializable;
+
+import java.util.Map;
 
 /**
  * @author Tamas Molnar
@@ -68,8 +81,11 @@ public class LayoutSetPrototypeExportBackgroundTaskExecutor
 		ExportImportConfiguration exportImportConfiguration =
 			getExportImportConfiguration(backgroundTask);
 
+		Map<String, Serializable> settingsMap =
+			exportImportConfiguration.getSettingsMap();
+
 		long layoutSetPrototypeId = MapUtil.getLong(
-			exportImportConfiguration.getSettingsMap(), "layoutSetPrototypeId");
+			settingsMap, "layoutSetPrototypeId");
 
 		LayoutSetPrototype layoutSetPrototype =
 			LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(
@@ -81,38 +97,70 @@ public class LayoutSetPrototypeExportBackgroundTaskExecutor
 
 		File cacheFile = new File(cacheFileName);
 
-		if (cacheFile.exists()) {
+		if (!cacheFile.exists()) {
+			File larFile = ExportImportLocalServiceUtil.exportLayoutsAsFile(
+				exportImportConfiguration);
+
+			try {
+				FileUtil.copyFile(larFile, cacheFile);
+
+				if (_log.isDebugEnabled()) {
+					_log.debug(
+						StringBundler.concat(
+							"Copied ", larFile.getAbsolutePath(), " to ",
+							cacheFile.getAbsolutePath()));
+				}
+			}
+			catch (Exception exception) {
+				_log.error(
+					StringBundler.concat(
+						"Unable to copy file ", larFile.getAbsolutePath(),
+						" to ", cacheFile.getAbsolutePath()),
+					exception);
+			}
+		}
+		else {
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					"Using cached layout set prototype LAR file " +
 						cacheFile.getAbsolutePath());
 			}
-
-			return BackgroundTaskResult.SUCCESS;
 		}
 
-		File larFile = ExportImportLocalServiceUtil.exportLayoutsAsFile(
-			exportImportConfiguration);
+		User user = UserLocalServiceUtil.getDefaultUser(
+			layoutSetPrototype.getCompanyId());
 
-		try {
-			FileUtil.copyFile(larFile, cacheFile);
+		long layoutSetId = MapUtil.getLong(settingsMap, "layoutSetId");
 
-			if (_log.isDebugEnabled()) {
-				_log.debug(
-					StringBundler.concat(
-						"Copied ", larFile.getAbsolutePath(), " to ",
-						cacheFile.getAbsolutePath()));
-			}
-		}
-		catch (Exception exception) {
-			_log.error(
-				StringBundler.concat(
-					"Unable to copy file ", larFile.getAbsolutePath(), " to ",
-					cacheFile.getAbsolutePath()),
-				exception);
-		}
+		LayoutSet layoutSet = LayoutSetLocalServiceUtil.getLayoutSet(
+			layoutSetId);
+
+		Map<String, String[]> parameterMap =
+			(Map<String, String[]>)settingsMap.get("parameterMap");
+
+		Map<String, Serializable> importLayoutSettingsMap =
+			ExportImportConfigurationSettingsMapFactoryUtil.
+				buildImportLayoutSettingsMap(
+					user.getUserId(), layoutSet.getGroupId(),
+					layoutSet.isPrivateLayout(), null, parameterMap,
+					user.getLocale(), user.getTimeZone());
+
+		ExportImportConfiguration importLayoutExportImportConfiguration =
+			ExportImportConfigurationLocalServiceUtil.
+				addExportImportConfiguration(
+					user.getUserId(), layoutSet.getGroupId(), StringPool.BLANK,
+					StringPool.BLANK,
+					ExportImportConfigurationConstants.TYPE_IMPORT_LAYOUT,
+					importLayoutSettingsMap, WorkflowConstants.STATUS_DRAFT,
+					new ServiceContext());
+
+		ExportImportLocalServiceUtil.importLayoutSetPrototypeInBackground(
+			user.getUserId(), importLayoutExportImportConfiguration, cacheFile);
 
 		return BackgroundTaskResult.SUCCESS;
+
+		// TODO: handle exceptions
+
 	}
 
 	private static final String _TEMP_DIR =

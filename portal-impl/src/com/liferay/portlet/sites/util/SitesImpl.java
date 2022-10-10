@@ -1376,8 +1376,6 @@ public class SitesImpl implements Sites {
 					layoutSet.getCompanyId());
 
 		try {
-			MergeLayoutPrototypesThreadLocal.setInProgress(true);
-
 			if (_log.isDebugEnabled()) {
 				_log.debug(
 					StringBundler.concat(
@@ -1410,12 +1408,39 @@ public class SitesImpl implements Sites {
 				return;
 			}
 
-			Map<String, String[]> parameterMap =
-				getLayoutSetPrototypesParameters(importData);
+			User user = UserLocalServiceUtil.getDefaultUser(
+				layoutSetPrototype.getCompanyId());
 
-			importLayoutSetPrototype(
-				layoutSetPrototype, layoutSet.getGroupId(),
-				layoutSet.isPrivateLayout(), parameterMap, importData);
+			List<Layout> layoutSetPrototypeLayouts =
+				LayoutLocalServiceUtil.getLayouts(
+					layoutSetPrototype.getGroupId(), true);
+
+			Map<String, Serializable> exportLayoutSettingsMap =
+				ExportImportConfigurationSettingsMapFactoryUtil.
+					buildExportLayoutSettingsMap(
+						user, layoutSetPrototype.getGroupId(), true,
+						ExportImportHelperUtil.getLayoutIds(
+							layoutSetPrototypeLayouts),
+						getLayoutSetPrototypesParameters(importData));
+
+			exportLayoutSettingsMap.put(
+				"layoutSetId", layoutSet.getLayoutSetId());
+			exportLayoutSettingsMap.put(
+				"layoutSetPrototypeId",
+				layoutSetPrototype.getLayoutSetPrototypeId());
+			exportLayoutSettingsMap.put(
+				"layoutSetPrototypeMvccVersion",
+				layoutSetPrototype.getMvccVersion());
+
+			ExportImportConfiguration exportImportConfiguration =
+				ExportImportConfigurationLocalServiceUtil.
+					addDraftExportImportConfiguration(
+						user.getUserId(),
+						ExportImportConfigurationConstants.TYPE_EXPORT_LAYOUT,
+						exportLayoutSettingsMap);
+
+			ExportImportLocalServiceUtil.exportLayoutSetPrototypeInBackground(
+				user.getUserId(), exportImportConfiguration);
 		}
 		catch (Exception exception) {
 			LayoutSet layoutSetPrototypeLayoutSet =
@@ -1444,9 +1469,6 @@ public class SitesImpl implements Sites {
 			// Invoke updateImpl so that we do not trigger the listeners
 
 			LayoutSetUtil.updateImpl(layoutSetPrototypeLayoutSet);
-		}
-		finally {
-			MergeLayoutPrototypesThreadLocal.setInProgress(false);
 		}
 	}
 
