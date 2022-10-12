@@ -1408,6 +1408,39 @@ public class SitesImpl implements Sites {
 				return;
 			}
 
+			List<BackgroundTask> backgroundTasks =
+				BackgroundTaskManagerUtil.getBackgroundTasks(
+					layoutSetPrototype.getGroupId(),
+					BackgroundTaskExecutorNames.
+						LAYOUT_SET_PROTOTYPE_EXPORT_BACKGROUND_TASK_EXECUTOR);
+
+			for (BackgroundTask backgroundTask : backgroundTasks) {
+				long exportImportConfigurationId = MapUtil.getLong(
+					backgroundTask.getTaskContextMap(),
+					"exportImportConfigurationId");
+
+				ExportImportConfiguration exportImportConfiguration =
+					ExportImportConfigurationLocalServiceUtil.
+						fetchExportImportConfiguration(
+							exportImportConfigurationId);
+
+				Map<String, Serializable> settingsMap =
+					exportImportConfiguration.getSettingsMap();
+
+				long layoutSetId = MapUtil.getLong(settingsMap, "layoutSetId");
+
+				if (layoutSetId == layoutSet.getLayoutSetId()) {
+					long layoutSetPrototypeMvccVersion = MapUtil.getLong(
+						settingsMap, "layoutSetPrototypeMvccVersion");
+
+					if (layoutSetPrototypeMvccVersion >=
+							layoutSetPrototype.getMvccVersion()) {
+
+						return;
+					}
+				}
+			}
+
 			User user = UserLocalServiceUtil.getDefaultUser(
 				layoutSetPrototype.getCompanyId());
 
