@@ -1923,6 +1923,12 @@ public class PortletDataContextImpl implements PortletDataContext {
 			serviceContext.setModifiedDate(auditedModel.getModifiedDate());
 			serviceContext.setUserId(getUserId(auditedModel));
 		}
+		else if (classedModel instanceof StagedModel) {
+			StagedModel stagedModel = (StagedModel)classedModel;
+
+			serviceContext.setCreateDate(stagedModel.getCreateDate());
+			serviceContext.setModifiedDate(stagedModel.getModifiedDate());
+		}
 
 		// Permissions
 
