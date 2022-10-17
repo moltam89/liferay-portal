@@ -15,7 +15,9 @@
 package com.liferay.layout.internal.exportimport.data.handler.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.test.util.lar.BaseStagedModelDataHandlerTestCase;
+import com.liferay.layout.model.LayoutClassedModelUsage;
 import com.liferay.layout.service.LayoutClassedModelUsageLocalService;
 import com.liferay.layout.test.util.LayoutTestUtil;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -36,9 +38,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
@@ -59,6 +63,7 @@ public class LayoutClassedModelUsageStagedModelDataHandlerTest
 		super.setUp();
 
 		_classNameLocalService.addClassName(_CLASS_NAME);
+		_classNameLocalService.addClassName(_CONTAINER_TYPE_CLASS_NAME);
 
 		_classPK = RandomTestUtil.nextLong();
 		_containerKey = String.valueOf(RandomTestUtil.nextLong());
@@ -71,6 +76,46 @@ public class LayoutClassedModelUsageStagedModelDataHandlerTest
 
 		_classNameLocalService.deleteClassName(
 			_classNameLocalService.getClassName(_CLASS_NAME));
+		_classNameLocalService.deleteClassName(
+			_classNameLocalService.getClassName(_CONTAINER_TYPE_CLASS_NAME));
+	}
+
+	@Test
+	public void testCorrectContainerTypeWhenClassNamesDesynced()
+		throws Exception {
+
+		initExport();
+
+		Map<String, List<StagedModel>> dependentStagedModelsMap =
+			addDependentStagedModelsMap(stagingGroup);
+
+		StagedModel stagedModel = addStagedModel(
+			stagingGroup, dependentStagedModelsMap);
+
+		StagedModelDataHandlerUtil.exportStagedModel(
+			portletDataContext, stagedModel);
+
+		initImport();
+
+		StagedModel exportedStagedModel = readExportedStagedModel(stagedModel);
+
+		_classNameLocalService.deleteClassName(
+			_classNameLocalService.getClassName(_CONTAINER_TYPE_CLASS_NAME));
+
+		_classNameLocalService.addClassName(_CONTAINER_TYPE_CLASS_NAME);
+
+		Assert.assertNotNull(exportedStagedModel);
+
+		StagedModelDataHandlerUtil.importStagedModel(
+			portletDataContext, exportedStagedModel);
+
+		LayoutClassedModelUsage importedLayoutClassedModelUsage =
+			(LayoutClassedModelUsage)getStagedModel(
+				stagedModel.getUuid(), liveGroup);
+
+		Assert.assertEquals(
+			_classNameLocalService.getClassNameId(_CONTAINER_TYPE_CLASS_NAME),
+			importedLayoutClassedModelUsage.getContainerType());
 	}
 
 	@Override
