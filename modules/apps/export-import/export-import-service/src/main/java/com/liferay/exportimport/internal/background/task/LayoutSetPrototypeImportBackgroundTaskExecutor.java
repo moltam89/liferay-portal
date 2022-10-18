@@ -56,7 +56,7 @@ public class LayoutSetPrototypeImportBackgroundTaskExecutor
 
 		// Isolation level guarantees this will be serial in a group
 
-		setIsolationLevel(BackgroundTaskConstants.ISOLATION_LEVEL_GROUP);
+		setIsolationLevel(BackgroundTaskConstants.ISOLATION_LEVEL_COMPANY);
 	}
 
 	@Override

@@ -97,6 +97,8 @@ public class LayoutSetPrototypeExportBackgroundTaskExecutor
 			LayoutSetPrototypeLocalServiceUtil.getLayoutSetPrototype(
 				layoutSetPrototypeId);
 
+		// Todo: don't use cache if importData is true
+		
 		String cacheFileName = StringBundler.concat(
 			_TEMP_DIR, layoutSetPrototype.getUuid(), ".v",
 			layoutSetPrototype.getMvccVersion(), ".lar");
