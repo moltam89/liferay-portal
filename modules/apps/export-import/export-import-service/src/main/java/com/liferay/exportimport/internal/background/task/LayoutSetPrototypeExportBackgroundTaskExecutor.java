@@ -78,6 +78,12 @@ public class LayoutSetPrototypeExportBackgroundTaskExecutor
 	public BackgroundTaskResult execute(BackgroundTask backgroundTask)
 		throws Exception {
 
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Execute export background task " +
+					backgroundTask.getBackgroundTaskId());
+		}
+
 		ExportImportConfiguration exportImportConfiguration =
 			getExportImportConfiguration(backgroundTask);
 
@@ -98,6 +104,10 @@ public class LayoutSetPrototypeExportBackgroundTaskExecutor
 		File cacheFile = new File(cacheFileName);
 
 		if (!cacheFile.exists()) {
+			if (_log.isDebugEnabled()) {
+				_log.debug("Export prototype");
+			}
+
 			File larFile = ExportImportLocalServiceUtil.exportLayoutsAsFile(
 				exportImportConfiguration);
 
@@ -137,6 +147,10 @@ public class LayoutSetPrototypeExportBackgroundTaskExecutor
 
 		Map<String, String[]> parameterMap =
 			(Map<String, String[]>)settingsMap.get("parameterMap");
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Create import background task");
+		}
 
 		Map<String, Serializable> importLayoutSettingsMap =
 			ExportImportConfigurationSettingsMapFactoryUtil.

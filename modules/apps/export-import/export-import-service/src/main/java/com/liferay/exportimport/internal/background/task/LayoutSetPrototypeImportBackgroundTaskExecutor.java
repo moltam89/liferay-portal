@@ -78,6 +78,12 @@ public class LayoutSetPrototypeImportBackgroundTaskExecutor
 	public BackgroundTaskResult execute(BackgroundTask backgroundTask)
 		throws Exception {
 
+		if (_log.isDebugEnabled()) {
+			_log.debug(
+				"Execute import background task " +
+					backgroundTask.getBackgroundTaskId());
+		}
+
 		ExportImportConfiguration exportImportConfiguration =
 			getExportImportConfiguration(backgroundTask);
 

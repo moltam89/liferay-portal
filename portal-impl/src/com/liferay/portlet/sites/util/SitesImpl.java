@@ -1431,6 +1431,10 @@ public class SitesImpl implements Sites {
 					exportImportConfiguration.getSettingsMap(), "layoutSetId");
 
 				if (layoutSetId == layoutSet.getLayoutSetId()) {
+					if (_log.isDebugEnabled()) {
+						_log.debug("Template export in progress");
+					}
+					
 					return;
 				}
 			}
@@ -1458,6 +1462,10 @@ public class SitesImpl implements Sites {
 				if (lastCompleteBackgroundTaskCreateDate.after(
 						lastIncompleteBackgroundTask.getCreateDate())) {
 
+					if (_log.isDebugEnabled()) {
+						_log.debug("Template import in progress");
+					}
+					
 					return;
 				}
 			}
@@ -1485,6 +1493,10 @@ public class SitesImpl implements Sites {
 			exportLayoutSettingsMap.put(
 				"layoutSetPrototypeMvccVersion",
 				layoutSetPrototype.getMvccVersion());
+			
+			if (_log.isDebugEnabled()) {
+				_log.debug("Create export background task");
+			}
 
 			ExportImportConfiguration exportImportConfiguration =
 				ExportImportConfigurationLocalServiceUtil.
