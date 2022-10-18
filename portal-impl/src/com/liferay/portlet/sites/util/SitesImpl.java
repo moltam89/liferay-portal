@@ -34,6 +34,7 @@ import com.liferay.portal.kernel.backgroundtask.BackgroundTaskManagerUtil;
 import com.liferay.portal.kernel.backgroundtask.BackgroundTaskThreadLocal;
 import com.liferay.portal.kernel.change.tracking.CTTransactionException;
 import com.liferay.portal.kernel.dao.orm.EntityCacheUtil;
+import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.RequiredLayoutException;
 import com.liferay.portal.kernel.language.LanguageUtil;
@@ -1412,7 +1413,9 @@ public class SitesImpl implements Sites {
 				BackgroundTaskManagerUtil.getBackgroundTasks(
 					layoutSetPrototype.getGroupId(),
 					BackgroundTaskExecutorNames.
-						LAYOUT_SET_PROTOTYPE_EXPORT_BACKGROUND_TASK_EXECUTOR);
+						LAYOUT_SET_PROTOTYPE_EXPORT_BACKGROUND_TASK_EXECUTOR,
+					false, QueryUtil.ALL_POS, QueryUtil.ALL_POS,
+					new BackgroundTaskCreateDateComparator());
 
 			for (BackgroundTask backgroundTask : backgroundTasks) {
 				long exportImportConfigurationId = MapUtil.getLong(
@@ -1424,20 +1427,38 @@ public class SitesImpl implements Sites {
 						fetchExportImportConfiguration(
 							exportImportConfigurationId);
 
-				Map<String, Serializable> settingsMap =
-					exportImportConfiguration.getSettingsMap();
-
-				long layoutSetId = MapUtil.getLong(settingsMap, "layoutSetId");
+				long layoutSetId = MapUtil.getLong(
+					exportImportConfiguration.getSettingsMap(), "layoutSetId");
 
 				if (layoutSetId == layoutSet.getLayoutSetId()) {
-					long layoutSetPrototypeMvccVersion = MapUtil.getLong(
-						settingsMap, "layoutSetPrototypeMvccVersion");
+					return;
+				}
+			}
 
-					if (layoutSetPrototypeMvccVersion >=
-							layoutSetPrototype.getMvccVersion()) {
+			BackgroundTask lastIncompleteBackgroundTask =
+				BackgroundTaskManagerUtil.fetchFirstBackgroundTask(
+					group.getGroupId(),
+					BackgroundTaskExecutorNames.
+						LAYOUT_SET_PROTOTYPE_IMPORT_BACKGROUND_TASK_EXECUTOR,
+					false, new BackgroundTaskCreateDateComparator(false));
 
-						return;
-					}
+			BackgroundTask lastCompleteBackgroundTask =
+				BackgroundTaskManagerUtil.fetchFirstBackgroundTask(
+					group.getGroupId(),
+					BackgroundTaskExecutorNames.
+						LAYOUT_SET_PROTOTYPE_IMPORT_BACKGROUND_TASK_EXECUTOR,
+					true, new BackgroundTaskCreateDateComparator(false));
+
+			if ((lastIncompleteBackgroundTask != null) &&
+				(lastCompleteBackgroundTask != null)) {
+
+				Date lastCompleteBackgroundTaskCreateDate =
+					lastCompleteBackgroundTask.getCreateDate();
+
+				if (lastCompleteBackgroundTaskCreateDate.after(
+						lastIncompleteBackgroundTask.getCreateDate())) {
+
+					return;
 				}
 			}
 
