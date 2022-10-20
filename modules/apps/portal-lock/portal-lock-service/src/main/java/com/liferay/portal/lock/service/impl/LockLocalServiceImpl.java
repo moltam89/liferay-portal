@@ -185,6 +185,10 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 			long userId, String className, String key, String owner,
 			boolean inheritable, long expirationTime, boolean renew)
 		throws PortalException {
+		
+		if (_log.isDebugEnabled()) {
+			_log.debug("Lock " + key);
+		}
 
 		Lock lock = lockPersistence.fetchByC_K(className, key);
 
@@ -253,6 +257,10 @@ public class LockLocalServiceImpl extends LockLocalServiceBaseImpl {
 	public Lock lock(
 		String className, String key, String expectedOwner,
 		String updatedOwner) {
+
+		if (_log.isDebugEnabled()) {
+			_log.debug("Lock BGT " + key);
+		}
 
 		while (true) {
 			try {

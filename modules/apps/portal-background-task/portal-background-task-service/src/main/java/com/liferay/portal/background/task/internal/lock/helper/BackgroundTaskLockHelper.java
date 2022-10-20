@@ -41,6 +41,9 @@ public class BackgroundTaskLockHelper {
 		String owner =
 			backgroundTask.getName() + StringPool.POUND +
 				backgroundTask.getBackgroundTaskId();
+		
+		System.out.println("Lock " + backgroundTask.getBackgroundTaskId() + " " +
+			owner);
 
 		return _lockManager.lock(
 			BackgroundTaskExecutor.class.getName(), _getLockKey(backgroundTask),
