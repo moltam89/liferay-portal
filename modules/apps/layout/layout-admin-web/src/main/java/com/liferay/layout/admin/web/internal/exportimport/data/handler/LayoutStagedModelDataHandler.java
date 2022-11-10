@@ -676,6 +676,23 @@ public class LayoutStagedModelDataHandler
 				GetterUtil.getLong(
 					layoutElement.attributeValue("draft-layout-id")));
 
+			if (draftLayout == null) {
+				try {
+					portletDataContext.removePrimaryKey(
+						draftLayoutElement.attributeValue("path"));
+
+					StagedModelDataHandlerUtil.importStagedModel(
+						portletDataContext, draftLayoutElement);
+				}
+				finally {
+					portletDataContext.setPlid(originalPlid);
+				}
+				
+				draftLayout = layouts.get(
+					GetterUtil.getLong(
+						layoutElement.attributeValue("draft-layout-id")));
+			}
+
 			draftLayout = _layoutLocalService.getLayout(draftLayout.getPlid());
 
 			draftLayout.setClassNameId(_portal.getClassNameId(Layout.class));
