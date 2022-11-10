@@ -694,7 +694,7 @@ public class LayoutStagedModelDataHandler
 			}
 
 			Layout refetchedDraftLayout =
-				_layoutLocalService.fetchLayout(draftLayout.getPlid())
+				_layoutLocalService.fetchLayout(draftLayout.getPlid());
 
 			if (refetchedDraftLayout != null) {
 				draftLayout = refetchedDraftLayout;
