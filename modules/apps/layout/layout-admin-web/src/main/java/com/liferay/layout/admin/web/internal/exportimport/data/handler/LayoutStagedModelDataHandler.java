@@ -693,7 +693,12 @@ public class LayoutStagedModelDataHandler
 						layoutElement.attributeValue("draft-layout-id")));
 			}
 
-			draftLayout = _layoutLocalService.getLayout(draftLayout.getPlid());
+			Layout refetchedDraftLayout =
+				_layoutLocalService.fetchLayout(draftLayout.getPlid())
+
+			if (refetchedDraftLayout != null) {
+				draftLayout = refetchedDraftLayout;
+			}
 
 			draftLayout.setClassNameId(_portal.getClassNameId(Layout.class));
 			draftLayout.setClassPK(importedLayout.getPlid());
