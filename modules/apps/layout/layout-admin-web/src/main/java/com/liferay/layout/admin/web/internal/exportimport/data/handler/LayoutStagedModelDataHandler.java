@@ -793,20 +793,30 @@ public class LayoutStagedModelDataHandler
 				importedParentLayout =
 					_layoutLocalService.fetchLayoutByFriendlyURL(
 						groupId, privateLayout, parentLayoutFriendlyURL);
-			}
-			
-			if (importedParentLayout == null) {
-				long originalPlid = portletDataContext.getPlid();
+				
+				if (importedParentLayout == null) {
+					long originalPlid = portletDataContext.getPlid();
 
-				try {
-					portletDataContext.removePrimaryKey(
-						parentLayoutElement.attributeValue("path"));
+					try {
+						portletDataContext.removePrimaryKey(
+							parentLayoutElement.attributeValue("path"));
 
-					StagedModelDataHandlerUtil.importStagedModel(
-						portletDataContext, parentLayoutElement);
-				}
-				finally {
-					portletDataContext.setPlid(originalPlid);
+						StagedModelDataHandlerUtil.importStagedModel(
+							portletDataContext, parentLayoutElement);
+					}
+					finally {
+						portletDataContext.setPlid(originalPlid);
+					}
+					
+					importedParentLayout =
+						_layoutLocalService.fetchLayoutByUuidAndGroupId(
+							parentLayoutUuid, groupId, privateLayout);
+
+					if (importedParentLayout == null) {
+						importedParentLayout =
+							_layoutLocalService.fetchLayoutByFriendlyURL(
+								groupId, privateLayout, parentLayoutFriendlyURL);
+					}
 				}
 			}
 
