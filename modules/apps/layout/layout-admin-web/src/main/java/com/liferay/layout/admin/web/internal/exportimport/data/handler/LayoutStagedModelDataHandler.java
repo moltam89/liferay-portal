@@ -777,6 +777,21 @@ public class LayoutStagedModelDataHandler
 					_layoutLocalService.fetchLayoutByFriendlyURL(
 						groupId, privateLayout, parentLayoutFriendlyURL);
 			}
+			
+			if (importedParentLayout == null) {
+				long originalPlid = portletDataContext.getPlid();
+
+				try {
+					portletDataContext.removePrimaryKey(
+						parentLayoutElement.attributeValue("path"));
+
+					StagedModelDataHandlerUtil.importStagedModel(
+						portletDataContext, parentLayoutElement);
+				}
+				finally {
+					portletDataContext.setPlid(originalPlid);
+				}
+			}
 
 			parentPlid = importedParentLayout.getPlid();
 			parentLayoutId = importedParentLayout.getLayoutId();
