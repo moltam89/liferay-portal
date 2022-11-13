@@ -676,28 +676,14 @@ public class LayoutStagedModelDataHandler
 				GetterUtil.getLong(
 					layoutElement.attributeValue("draft-layout-id")));
 
-			if (draftLayout == null) {
-				try {
-					portletDataContext.removePrimaryKey(
-						draftLayoutElement.attributeValue("path"));
-
-					StagedModelDataHandlerUtil.importStagedModel(
-						portletDataContext, draftLayoutElement);
-				}
-				finally {
-					portletDataContext.setPlid(originalPlid);
-				}
-				
-				draftLayout = layouts.get(
-					GetterUtil.getLong(
-						layoutElement.attributeValue("draft-layout-id")));
-			}
-
-			Layout refetchedDraftLayout =
-				_layoutLocalService.fetchLayout(draftLayout.getPlid());
+			Layout refetchedDraftLayout = _layoutLocalService.fetchLayout(
+				draftLayout.getPlid());
 
 			if (refetchedDraftLayout != null) {
 				draftLayout = refetchedDraftLayout;
+			}
+			else {
+				System.out.println("Let me just debug this part");
 			}
 
 			draftLayout.setClassNameId(_portal.getClassNameId(Layout.class));
@@ -798,29 +784,13 @@ public class LayoutStagedModelDataHandler
 				importedParentLayout =
 					_layoutLocalService.fetchLayoutByFriendlyURL(
 						groupId, privateLayout, parentLayoutFriendlyURL);
-				
+
 				if (importedParentLayout == null) {
-					long originalPlid = portletDataContext.getPlid();
-
-					try {
-						portletDataContext.removePrimaryKey(
-							parentLayoutElement.attributeValue("path"));
-
-						StagedModelDataHandlerUtil.importStagedModel(
-							portletDataContext, parentLayoutElement);
-					}
-					finally {
-						portletDataContext.setPlid(originalPlid);
-					}
-					
-					importedParentLayout =
-						_layoutLocalService.fetchLayoutByUuidAndGroupId(
-							parentLayoutUuid, groupId, privateLayout);
+					importedParentLayout = layouts.get(parentLayoutId);
 
 					if (importedParentLayout == null) {
-						importedParentLayout =
-							_layoutLocalService.fetchLayoutByFriendlyURL(
-								groupId, privateLayout, parentLayoutFriendlyURL);
+						System.out.println(
+							"I just want to put a breakpoint here");
 					}
 				}
 			}
