@@ -789,8 +789,38 @@ public class LayoutStagedModelDataHandler
 					importedParentLayout = layouts.get(parentLayoutId);
 
 					if (importedParentLayout == null) {
-						System.out.println(
-							"I just want to put a breakpoint here");
+						if (action.equals(Constants.SKIP)) {
+							long originalPlid = portletDataContext.getPlid();
+
+							try {
+								StagedModelDataHandlerUtil.importStagedModel(
+									portletDataContext, parentLayoutElement);
+							}
+							finally {
+								portletDataContext.setPlid(originalPlid);
+							}
+
+							importedParentLayout =
+								_layoutLocalService.fetchLayoutByUuidAndGroupId(
+									parentLayoutUuid, groupId, privateLayout);
+
+							if (importedParentLayout == null) {
+								importedParentLayout =
+									_layoutLocalService.
+										fetchLayoutByFriendlyURL(
+											groupId, privateLayout,
+											parentLayoutFriendlyURL);
+							}
+
+							if (importedParentLayout == null) {
+								importedParentLayout = layouts.get(
+									parentLayoutId);
+							}
+
+							if (importedLayout == null) {
+								System.out.println("I run out of ideas");
+							}
+						}
 					}
 				}
 			}
