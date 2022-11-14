@@ -534,7 +534,13 @@ public class ContentUtil {
 			return null;
 		}
 
-		String className = PortalUtil.getClassName(classNameId);
+		String className = null;
+		try {
+			className = PortalUtil.getClassName(classNameId);
+		}
+		catch(Exception exception) {
+			return null;
+		}
 
 		LayoutDisplayPageProvider<?> layoutDisplayPageProvider =
 			LayoutDisplayPageProviderTrackerUtil.getLayoutDisplayPageProvider(
