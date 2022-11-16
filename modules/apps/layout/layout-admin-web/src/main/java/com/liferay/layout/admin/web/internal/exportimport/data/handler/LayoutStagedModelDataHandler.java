@@ -561,6 +561,17 @@ public class LayoutStagedModelDataHandler
 			// The default behavior of import mode is
 			// PortletDataHandlerKeys.LAYOUTS_IMPORT_MODE_MERGE_BY_LAYOUT_UUID
 
+			
+			existingLayout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
+				uuid, groupId, false);
+			
+			if (existingLayout != null) {
+				privateLayout = false;
+			}
+			else {
+				privateLayout = privateLayout; // debug
+			}
+
 			existingLayout = _layoutLocalService.fetchLayoutByUuidAndGroupId(
 				uuid, groupId, privateLayout);
 
