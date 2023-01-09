@@ -360,9 +360,13 @@ public class StagedModelDataHandlerUtil {
 			Serializable classPK = GetterUtil.getString(
 				referenceElement.attributeValue("class-pk"));
 
-			importReferenceStagedModel(
-				portletDataContext, referrerStagedModel, stagedModelClass,
-				classPK);
+			//importReferenceStagedModel(
+			//	portletDataContext, referrerStagedModel, stagedModelClass,
+			//	classPK);
+			
+			doImportReferenceStagedModel(
+				portletDataContext, referenceElement,
+				stagedModelClass.getName());
 		}
 	}
 
