@@ -373,16 +373,6 @@ public class StagingLocalServiceImpl extends StagingLocalServiceBaseImpl {
 			ExportImportConfigurationParameterMapFactoryUtil.
 				buildFullPublishParameterMap();
 
-		if (liveGroup.hasPrivateLayouts()) {
-			StagingUtil.publishLayouts(
-				userId, liveGroup.getGroupId(), stagingGroup.getGroupId(), true,
-				parameterMap);
-
-			parameterMap =
-				ExportImportConfigurationParameterMapFactoryUtil.
-					buildParameterMap();
-		}
-
 		if (liveGroup.hasPublicLayouts() || !liveGroup.hasPrivateLayouts()) {
 			StagingUtil.publishLayouts(
 				userId, liveGroup.getGroupId(), stagingGroup.getGroupId(),
