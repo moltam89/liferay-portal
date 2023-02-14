@@ -470,7 +470,9 @@ public class LayoutStagedModelDataHandler
 		if ((portletDataContext.isPrivateLayout() &&
 			 !layout.isTypeAssetDisplay()) ||
 			GetterUtil.getBoolean(
-				layoutElement.attributeValue("layout-content-page-template"))) {
+				layoutElement.attributeValue("layout-content-page-template")) ||
+			GetterUtil.getBoolean(
+				layoutElement.attributeValue("layout-master-page-template"))) {
 
 			privateLayout = true;
 		}
@@ -2668,12 +2670,22 @@ public class LayoutStagedModelDataHandler
 						fetchLayoutPageTemplateEntryByPlid(layout.getClassPK());
 			}
 
-			if ((layoutPageTemplateEntry != null) &&
-				(layoutPageTemplateEntry.getType() ==
-					LayoutPageTemplateEntryTypeConstants.TYPE_BASIC)) {
+			if (layoutPageTemplateEntry != null) {
+				if (layoutPageTemplateEntry.getType() ==
+						LayoutPageTemplateEntryTypeConstants.TYPE_BASIC) {
 
-				layoutElement.addAttribute(
-					"layout-content-page-template", Boolean.TRUE.toString());
+					layoutElement.addAttribute(
+						"layout-content-page-template",
+						Boolean.TRUE.toString());
+				}
+
+				if (layoutPageTemplateEntry.getType() ==
+						LayoutPageTemplateEntryTypeConstants.
+							TYPE_MASTER_LAYOUT) {
+
+					layoutElement.addAttribute(
+						"layout-master-page-template", Boolean.TRUE.toString());
+				}
 			}
 		}
 
