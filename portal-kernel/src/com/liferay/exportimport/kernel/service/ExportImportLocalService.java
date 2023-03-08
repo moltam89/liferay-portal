@@ -149,6 +149,10 @@ public interface ExportImportLocalService extends BaseLocalService {
 			InputStream inputStream)
 		throws PortalException;
 
+	public long mergeLayoutSetPrototypeInBackground(
+			long userId, ExportImportConfiguration exportImportConfiguration)
+		throws PortalException;
+
 	public MissingReferences validateImportLayoutsFile(
 			ExportImportConfiguration exportImportConfiguration, File file)
 		throws PortalException;
