@@ -14,6 +14,7 @@
 
 package com.liferay.layout.set.prototype.web.internal.model.listener;
 
+import com.liferay.exportimport.kernel.staging.MergeLayoutPrototypesThreadLocal;
 import com.liferay.layout.set.prototype.configuration.LayoutSetPrototypeConfiguration;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -74,6 +75,8 @@ public class LayoutSetPrototypeModelListener
 					layoutSet.getGroupId(), layoutSet.isPrivateLayout(),
 					LayoutConstants.DEFAULT_PARENT_LAYOUT_ID, true,
 					QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+
+				MergeLayoutPrototypesThreadLocal.setSkipMerge(false);
 			}
 		}
 	}
