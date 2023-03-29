@@ -94,17 +94,10 @@ public class LayoutPageTemplateStructureStagedModelDataHandler
 			GetterUtil.getLong(element.attributeValue("classPK")));
 
 		LayoutPageTemplateStructure existingLayoutPageTemplateStructure =
-			_stagedModelRepository.fetchStagedModelByUuidAndGroupId(
-				layoutPageTemplateStructure.getUuid(),
-				portletDataContext.getScopeGroupId());
-
-		if (existingLayoutPageTemplateStructure == null) {
-			existingLayoutPageTemplateStructure =
-				_layoutPageTemplateStructureLocalService.
-					fetchLayoutPageTemplateStructure(
-						portletDataContext.getScopeGroupId(),
-						importedLayoutPageTemplateStructure.getClassPK());
-		}
+			_layoutPageTemplateStructureLocalService.
+				fetchLayoutPageTemplateStructure(
+					portletDataContext.getScopeGroupId(),
+					importedLayoutPageTemplateStructure.getClassPK());
 
 		if ((existingLayoutPageTemplateStructure == null) ||
 			!portletDataContext.isDataStrategyMirror()) {
