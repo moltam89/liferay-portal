@@ -34,7 +34,6 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -72,9 +71,28 @@ public class StagingGetScopeGroupIdTest extends BaseLocalStagingTestCase {
 		_mockHttpServletRequest.setAttribute(WebKeys.LAYOUT, stagingLayout);
 	}
 
-	@Ignore
 	@Test
-	public void testGetScopeGroupId() throws Exception {
+	public void testGetScopeGroupIdBlogs1() throws Exception {
+		_testGetScopeGroupId(false, false, BlogsPortletKeys.BLOGS);
+	}
+
+	@Test
+	public void testGetScopeGroupIdBlogs2() throws Exception {
+		_testGetScopeGroupId(false, true, BlogsPortletKeys.BLOGS);
+	}
+
+	@Test
+	public void testGetScopeGroupIdBlogs3() throws Exception {
+		_testGetScopeGroupId(true, false, BlogsPortletKeys.BLOGS);
+	}
+
+	@Test
+	public void testGetScopeGroupIdBlogs4() throws Exception {
+		_testGetScopeGroupId(true, true, BlogsPortletKeys.BLOGS);
+	}
+
+	@Test
+	public void testGetScopeGroupIdJournal() throws Exception {
 		_testGetScopeGroupId(
 			false, false, JournalContentPortletKeys.JOURNAL_CONTENT);
 		_testGetScopeGroupId(
@@ -83,16 +101,13 @@ public class StagingGetScopeGroupIdTest extends BaseLocalStagingTestCase {
 			true, false, JournalContentPortletKeys.JOURNAL_CONTENT);
 		_testGetScopeGroupId(
 			true, true, JournalContentPortletKeys.JOURNAL_CONTENT);
-
-		_testGetScopeGroupId(false, false, BlogsPortletKeys.BLOGS);
-		_testGetScopeGroupId(false, true, BlogsPortletKeys.BLOGS);
-		_testGetScopeGroupId(true, false, BlogsPortletKeys.BLOGS);
-		_testGetScopeGroupId(true, true, BlogsPortletKeys.BLOGS);
 	}
 
 	@Override
 	protected String[] getNotStagedPortletIds() {
-		return new String[] {BlogsPortletKeys.BLOGS_ADMIN};
+		return new String[] {
+			BlogsPortletKeys.BLOGS_ADMIN, BlogsPortletKeys.BLOGS
+		};
 	}
 
 	private Group _getExpectedGroup(
